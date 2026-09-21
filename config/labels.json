@@ -1,0 +1,37 @@
+[
+  {
+    "name": "factory:triage",
+    "color": "D9E2D3",
+    "description": "Needs bounded scope and capability routing"
+  },
+  {
+    "name": "factory:spec",
+    "color": "E8D6AB",
+    "description": "Needs product/technical specification"
+  },
+  {
+    "name": "factory:ready",
+    "color": "436B48",
+    "description": "Maintainer requests work on the accepted scope"
+  },
+  {
+    "name": "factory:review",
+    "color": "B5CEE2",
+    "description": "Result and evidence await review"
+  },
+  {
+    "name": "factory:blocked",
+    "color": "A65E47",
+    "description": "Needs a concrete decision or recovery"
+  },
+  {
+    "name": "track:software",
+    "color": "D5DFE8",
+    "description": "Software delivery track"
+  },
+  {
+    "name": "track:defence",
+    "color": "E0CACA",
+    "description": "Private or appropriately scoped security track"
+  }
+]

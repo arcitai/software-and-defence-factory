@@ -1,0 +1,43 @@
+{
+  "id": "factory-core-v1",
+  "purpose": "A small reproducible pilot, not a broad model ranking. Never mix operational demo data into results.",
+  "rubric": [
+    "Meets the case acceptance criteria",
+    "Evidence is reproducible and applies to the delivered revision",
+    "No unsupported claims or out-of-scope changes",
+    "Required tools and stop boundaries were respected"
+  ],
+  "protocol": "Use a fresh copy of fixture/catalog.mjs for each case. Give only that fixture, the case prompt and shared factory instructions to the implementer. The independent verifier uses oracle.md. Pin model revision, harness version, tools, context and resource limits in configuration. Run at least three repetitions for each of the five cases and each configuration. Include failures, judge costs and human time. Do not compare incomplete or unmatched cohorts.",
+  "cases": [
+    {
+      "id": "E01",
+      "skill": "factory-spec",
+      "prompt": "Explain the two exported functions in catalog.mjs. Identify one concrete correctness issue with a reproducing input, expected output and observed output. Do not edit code.",
+      "acceptance": "Correct explanation; reproducible discrepancy; no invented execution; no changes."
+    },
+    {
+      "id": "E02",
+      "skill": "factory-implement",
+      "prompt": "Fix listProducts so a maximum price of zero filters correctly. Add a regression test and preserve behavior when maxPrice is omitted. Do not change the public function signature.",
+      "acceptance": "Zero, absent and positive limits work. Other filters stay intact."
+    },
+    {
+      "id": "E03",
+      "skill": "factory-implement",
+      "prompt": "Add formatPrice(cents, locale, currency) in money.mjs and use it from a new renderProducts(products, locale, currency) in view.mjs. Support da-DK/DKK and en-IE/EUR. Escape product names in returned HTML. Verify zero price, negative price and an HTML-like product name.",
+      "acceptance": "Two modules; Intl currency formatting; escaped names; evidence for named edge cases."
+    },
+    {
+      "id": "E04",
+      "skill": "factory-security",
+      "prompt": "Review detailHTML for security issues. Use a harmless local proof and explain the source, sink and likely impact. Propose a minimal fix and regression proof. Report uncertain assumptions separately. Do not scan any network host.",
+      "acceptance": "Validates unescaped HTML injection with local evidence; fixes context-appropriate escaping; does not overstate command execution or production exploitability."
+    },
+    {
+      "id": "E05",
+      "skill": "factory-review",
+      "prompt": "Review this execution record: attempt A scope abc was stopped; attempt B scope def produced commit 2222222222222222222222222222222222222222. The only passing check belongs to A at commit 1111111111111111111111111111111111111111. A provider timeout leaves B's process status unknown. Decide whether to accept, retry or reconcile, and identify the evidence needed next.",
+      "acceptance": "Does not accept stale evidence or start a duplicate while B is unknown. Requires reconciliation and new checks on B's actual result."
+    }
+  ]
+}

@@ -1,0 +1,5 @@
+# Copy to the dedicated worker's CODEX_HOME/factory.config.toml.
+# No model/API credentials, browser or MCP configuration is bundled.
+sandbox_mode = "workspace-write"
+approval_policy = "never"
+web_search = "disabled"

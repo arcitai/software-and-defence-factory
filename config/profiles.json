@@ -1,0 +1,122 @@
+[
+  {
+    "id": "codex-local",
+    "name": "Codex · lokal worker",
+    "harness": "Codex CLI",
+    "inference": "OpenAI",
+    "placement": "local",
+    "region": "Providerafhængig",
+    "readiness": "Kræver CLI og separat login",
+    "capabilities": {
+      "files": "native",
+      "shell": "native",
+      "git": "native",
+      "tests": "configure",
+      "web": "configure",
+      "browser": "configure",
+      "computer": "configure",
+      "security": "configure"
+    },
+    "note": "Lokal kodekørsel er ikke lokal inference. Desktopværktøjer følger ikke automatisk med en headless CLI."
+  },
+  {
+    "id": "codex-oss",
+    "name": "Codex · lokal model",
+    "harness": "Codex CLI",
+    "inference": "Ollama",
+    "placement": "local",
+    "region": "Lokal inference",
+    "readiness": "Kræver model og tool-calling-prøve",
+    "capabilities": {
+      "files": "native",
+      "shell": "native",
+      "git": "native",
+      "tests": "configure",
+      "web": "configure",
+      "browser": "configure",
+      "computer": "configure",
+      "security": "evaluate"
+    },
+    "note": "Codex --oss bevarer harnesset. Modelkvalitet og værktøjskald skal afprøves; webadgang gør jobbet eksternt."
+  },
+  {
+    "id": "codex-kastanje",
+    "name": "Codex · Kastanje",
+    "harness": "Codex CLI",
+    "inference": "Kastanje AI",
+    "placement": "local",
+    "region": "EU-rute skal verificeres",
+    "readiness": "Kræver endpoint, model og kompatibilitetsprøve",
+    "capabilities": {
+      "files": "native",
+      "shell": "native",
+      "git": "native",
+      "tests": "configure",
+      "web": "configure",
+      "browser": "configure",
+      "computer": "configure",
+      "security": "evaluate"
+    },
+    "note": "Målprofil: lokal eller egen worker med Kastanje-inference. Responses-kompatibilitet, region, logs og kommerciel modellicens er acceptpunkter."
+  },
+  {
+    "id": "cursor-cloud",
+    "name": "Cursor · cloud",
+    "harness": "Cursor Cloud Agent",
+    "inference": "Cursor-modelkatalog",
+    "placement": "cloud",
+    "region": "Leverandørstyret",
+    "readiness": "Kræver konto, Git-adgang og miljø",
+    "capabilities": {
+      "files": "native",
+      "shell": "native",
+      "git": "native",
+      "tests": "configure",
+      "web": "native",
+      "browser": "native",
+      "computer": "native",
+      "security": "configure"
+    },
+    "note": "Managed VM og computer use. Kastanje som vilkårlig modelprovider er ikke verificeret for denne profil. API v1 er public beta."
+  },
+  {
+    "id": "codex-security",
+    "name": "Codex · security",
+    "harness": "Codex / godkendt Security-flade",
+    "inference": "Daybreak eller valgt model",
+    "placement": "review",
+    "region": "Adgangs- og modelafhængig",
+    "readiness": "Manuel overdragelse indtil produktfladen er prøvet",
+    "capabilities": {
+      "files": "native",
+      "shell": "configure",
+      "git": "native",
+      "tests": "configure",
+      "web": "configure",
+      "browser": "configure",
+      "computer": "configure",
+      "security": "configure"
+    },
+    "note": "Security-plugin, modelscope og adgang verificeres separat. En afsluttet scanning er ikke automatisk en verificeret rettelse."
+  },
+  {
+    "id": "pi-custom",
+    "name": "Pi · custom",
+    "harness": "Pi",
+    "inference": "Valgfri provider",
+    "placement": "local",
+    "region": "Konfigurationsafhængig",
+    "readiness": "Avanceret opsætning",
+    "capabilities": {
+      "files": "native",
+      "shell": "native",
+      "git": "native",
+      "tests": "configure",
+      "web": "configure",
+      "browser": "configure",
+      "computer": "configure",
+      "security": "evaluate"
+    },
+    "note": "Valgfrit udvideligt harness. Web, browser og computer use kræver valgte værktøjer/extensions og deres egne prøver."
+  }
+]

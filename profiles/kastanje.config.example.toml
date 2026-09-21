@@ -1,0 +1,13 @@
+# NOT a connected integration. Replace both values after compatibility testing.
+# Copy to CODEX_HOME/kastanje.config.toml on the dedicated worker.
+model = "REPLACE_WITH_VERIFIED_MODEL_ID"
+model_provider = "kastanje"
+sandbox_mode = "workspace-write"
+approval_policy = "never"
+web_search = "disabled"
+
+[model_providers.kastanje]
+name = "Kastanje AI (verified route required)"
+base_url = "https://REPLACE_WITH_VERIFIED_ENDPOINT.invalid/v1"
+env_key = "KASTANJE_API_KEY"
+wire_api = "responses"

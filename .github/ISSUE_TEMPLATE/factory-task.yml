@@ -1,0 +1,35 @@
+name: Factory task
+description: Describe a business outcome and observable acceptance criteria.
+title: "[Factory] "
+body:
+  - type: textarea
+    id: need
+    attributes:
+      label: Who needs what to improve?
+      description: Describe the problem and concrete desired behavior.
+    validations:
+      required: true
+  - type: textarea
+    id: acceptance
+    attributes:
+      label: Acceptance and evidence
+      description: What will independently demonstrate that the result works?
+    validations:
+      required: true
+  - type: textarea
+    id: scope
+    attributes:
+      label: Scope, constraints and recovery
+      description: Affected repository, relevant files, allowed changes and rollback.
+  - type: dropdown
+    id: track
+    attributes:
+      label: Work track
+      options:
+        - Software
+        - Defence (use a private channel for sensitive findings)
+  - type: textarea
+    id: capabilities
+    attributes:
+      label: Required capabilities
+      description: For example browser, computer use, tests, web research or security review. Never paste credentials.
