@@ -44,6 +44,8 @@ Pi er et avanceret tilvalg, når den konkrete værktøjskæde begrunder det. Sec
 
 ## Læs videre
 
+- [Seks videoer: kildegennemgang og dækningskontrol](docs/video-audit.md)
+- [Næste runtime: samlet pipeline og prioriterede opgaver](docs/next-runtime.md) · [Reviewpakke med før/efter](templates/review-packet.md)
 - [Opsætning og en hel opgave fra start til accept](docs/setup.md)
 - [Research: Warp/Oz, alternativer og anbefalet system](docs/research.md)
 - [Målinger, benchmarks og salgspilot](docs/value.md)

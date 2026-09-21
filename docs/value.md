@@ -60,6 +60,25 @@ Resultatet vises under **Værdi & benchmarks → Fast evalueringssuite** efter o
 
 Resultater med forskellig case-/gentagelsesdækning må ikke rangeres. Dashboardet viser dækning, antal forsøg, accept og omkostning; det udpeger ingen vinder. En senere analyse skal vise per-case variation og hvorfor afvisninger opstod. Forbedring i en syntetisk kodecase er ikke automatisk business ROI.
 
+## Supplerende målinger fra videogennemgangen
+
+En ændring af skills eller prompts er også en ny konfiguration. Gem factory-commit, workflowversion, hashes for faktisk anvendte prompts/skills, provider/model, harness, relevante lokale indstillinger, tools og miljø i det private artifact. I v0.1 henvises til dette fra `evidence`, og `configuration`/`environment` navngives entydigt; der er endnu ingen automatisk provenance-collector. Gem ikke hemmeligheder i konfigurationssporet.
+
+Tilføj disse målinger til run-artifactet, når runtime understøtter dem. **De er ikke nye automatiske dashboardfelter i v0.1.**
+
+| Måling | Anvendelse |
+| --- | --- |
+| Fase og aktør: kode, agent eller menneske | Find om tiden bruges på implementering, review, værktøjer eller manuel afklaring |
+| Start/slut, køtid og ekstern ventetid | Skeln mellem travl worker og venten på checks. Summen af parallelle agenttider er ikke gennemløbstiden |
+| Input/output/cachetokens og kilde | Forklar forbruget; undgå at tælle cachetokens dobbelt i providerens samlede inputtal |
+| Værktøjskald, polling og reparationsårsag | Find gentagne mekaniske handlinger, der kan flyttes til kode |
+| Afvisninger og fejl efter accept | Vis om en billigere konfiguration blot flytter arbejde og fejl til kunden |
+| Konfigurationens version | Knyt ændret resultat til de faktisk anvendte prompts, skills, tools og modelversioner |
+
+Best-of-N skal rapportere N, alle kandidaters udfald, samlet pris og udvælgelsesmetode. En afbrudt/langsom variant må ikke slettes fra sammenligningen. Gentagen drift før/efter et modelskifte har ofte forskellige opgaver; det er en observation, ikke et kontrolleret årsagsbevis. Brug de faste cases til sammenligning og produktpiloten til forretningsværdi.
+
+En evalændring starter med en hypotese, fx: “Et script til at afvente checks reducerer tokens uden flere oversete fejl.” Fastlås inputs, ændr én væsentlig faktor, bevar fejlede runs, lad en separat verifier vurdere, og indfør kun forbedringen via en almindelig versioneret ændring. Den konkrete [reviewpakke](../templates/review-packet.md) samler beviserne.
+
 ## Et enkelt kundetilbud
 
 1. **Afgrænset afklaring:** Find én arbejdsgang, dens omkostning i dag og et accepteret resultat. En kort rådgivningssession er stadig mulig.

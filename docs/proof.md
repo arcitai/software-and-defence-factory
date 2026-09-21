@@ -52,3 +52,13 @@ This was the implementing agent's scoped review and verification, not an indepen
 Actual Codex/OpenAI execution under the worker profile; Codex/Ollama on the Z13 hardware; Kastanje Responses/tool-calling/region/usage; Cursor create/poll/stop and billing; security plugin/Daybreak availability on the intended execution surface; outer sandbox containment; authenticated remote ingress; unattended recovery and financial spend caps.
 
 These are visible setup and product-roadmap boundaries. The starter does not claim automatic dispatch, production multi-tenancy, full GitHub reconciliation or an authenticated evidence provenance system. See architecture.md, SECURITY.md and profiles/ before operating on customer material.
+
+## Six-video research follow-up — 21 September 2026
+
+All six user-supplied YouTube videos were opened, their descriptions expanded, and their English auto-generated transcripts exported and read. Relevant technical description links were followed, including the redirects to Matt Pocock's and Michael Shimeles' skill repositories. The source audit records timestamps, inspected revisions, unavailable/member-only material and links classified as promotional or social.
+
+Read-only source inspection covered Machinist's runtime/security/roadmap, SSSF's real check implementation and adapter stub, Inkwell's environment lifecycle, Sandcastle, the linked skill collections and Owain Lewis' PR-review demo. No third-party workflow code was executed. Only the publicly accessible part of the Pragmatic Engineer article was read. Full transcripts and third-party clones remain outside the deliverable archive.
+
+Changes are limited to research, the proposed next runtime, a manual review-packet template and three existing skills. No runtime or dashboard behavior changed. The existing 16 behavioral/integration tests passed again. New financial controls, provenance collection, before/after collection and production observation are documented requirements, not implemented capabilities. No live model, sandbox-service, inference-billing or production trial was performed.
+
+The three changed skills passed `quick_validate.py`; all local Markdown file targets resolved and `git diff --check` passed. The six local transcript exports were checked against their video IDs and recorded with SHA-256 hashes in the private research scratch manifest.

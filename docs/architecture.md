@@ -49,3 +49,5 @@ En fjern worker kan få en eksporteret jobpakke og aflevere beviser til operatø
 - Ingen aktiv kundescanning, automatisk udgivelse, telefonadgang eller offentlig webservice. Appen er loopback-only, uden multi-user login.
 
 Udvid først det, pilotens målinger begrunder. Lad adaptere eje provider-specific API/state, og behold domænet og metrics uafhængige.
+
+Efter gennemgangen af seks konkrete factory-videoer er [næste runtime](next-runtime.md) specificeret separat. Den dækker genbrug af en eksisterende motor, miljølivscyklus, krævede checks, risikobestemt review, budgetter og observation efter release. Dette dokument beskriver fortsat kun v0.1; de nye kontrakter er ikke automatisk implementeret ved at være skrevet ned.

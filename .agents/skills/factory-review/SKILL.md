@@ -9,4 +9,6 @@ Read the accepted scope, diff and actual check artifacts. Use a distinct review 
 
 Confirm the delivered commit, exercise the acceptance criteria and relevant regression paths, and assess correctness, maintainability and user-visible behavior. Tie every check to that full commit SHA. Changed scope or new code requires refreshed evidence. Never carry a previous attempt's check onto a new attempt.
 
+Compare before/after evidence where the claim needs it, using the same relevant workload and environment. Check that the required controls actually ran; an empty suite, placeholder command, or generic provider score cannot establish acceptance. Route specialist review by consequences such as authorization, data migration, dependencies or agent-policy changes, not merely diff size. Integration or rebase requires checking the resulting revision again. Keep review evidence private unless its destination is authorized.
+
 Return accept recommendation, request changes or inconclusive with concrete evidence. Include limitations and measured review minutes. Review does not merge a PR or accept a task on the owner's behalf. If execution is still running or unknown, reconcile before further writers or acceptance. Use factory-security when a scoped security assessment is part of the accepted task.

@@ -2,6 +2,8 @@
 
 Research opdateret **21. september 2026**. Dette dokument supplerer den tidligere brede research og ændrer standardvalget fra Pi først til **Codex lokalt / Cursor i cloud**. Pi bliver et avanceret tilvalg. Resultatet er en kørbar starter, ikke et færdigt produktionssystem eller dokumentation for modelbesparelser.
 
+**Suppleret med brugerens seks videoer:** [transskriptionsbaseret kildegennemgang](video-audit.md) og [næste runtime](next-runtime.md). Den vigtigste nye beslutning er at afprøve Machinist som mulig runtime, før en permanent egen dispatcher bygges. Codex er fortsat første harness; de to valg er uafhængige. Før/efter-bevis, miljølivscyklus og feedback fra drift er nu eksplicit med i planen.
+
 ## Den anbefalede form
 
 Ét produkt: **Arcitai Software & Defence Factory**. Én metode og arbejdsflade, to arbejdsspor, flere udskiftelige harness-/modelprofiler. Start med en operatør og et pilotrepo. GitHub er den første forge-adapter; kernen ejer ikke GitHub-specifikke agentantagelser. Kastanje bliver både en pilotcase og en valgfri inference-rute.
@@ -72,6 +74,6 @@ Den kommercielle kæde og beviskravene er konkretiseret i [value.md](value.md). 
 1. To matchede konfigurationer på de fem evalcases, mindst tre gentagelser pr. case; dokumenteret modeladgang før betalt kørsel.
 2. Tre små Kastanje-produktopgaver med faktisk commit/review/forbrug og en sammenlignelig baseline.
 3. Prøv én rigtig cloudoverdragelse og stop/recovery, eller én isoleret lokal modelrute på Z13. Lad pilotbehovet vælge rækkefølge.
-4. Implementér kun derefter en permanent dispatcher, provider-reconciliation og automatiske PR-/check-skrivninger.
+4. Vælg genbrug eller viderebygning af runtime ud fra [den afgrænsede motorprøve](next-runtime.md#før-vi-vælger-en-permanent-motor), før en permanent dispatcher, provider-reconciliation og automatiske PR-/check-skrivninger implementeres.
 
 Denne rækkefølge bygger et reelt tilbud uden at foregive, at en flot dashboard-demo allerede dokumenterer en billigere eller sikrere softwarefabrik.
