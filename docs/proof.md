@@ -62,3 +62,13 @@ Read-only source inspection covered Machinist's runtime/security/roadmap, SSSF's
 Changes are limited to research, the proposed next runtime, a manual review-packet template and three existing skills. No runtime or dashboard behavior changed. The existing 16 behavioral/integration tests passed again. New financial controls, provenance collection, before/after collection and production observation are documented requirements, not implemented capabilities. No live model, sandbox-service, inference-billing or production trial was performed.
 
 The three changed skills passed `quick_validate.py`; all local Markdown file targets resolved and `git diff --check` passed. The six local transcript exports were checked against their video IDs and recorded with SHA-256 hashes in the private research scratch manifest.
+
+## Pi research and synthetic protocol probe — 22 September 2026
+
+Read the supplied X post and its source replies, HarnessTax's expanded experiment setup, and the published chart JSON at the recorded revision. Inspected Pi core/security/models/RPC/containerization and concrete browser, desktop, search, MCP and sandbox candidates. Pinned source provenance is in [pi-sources.json](pi-sources.json). This is a source review, not a security audit of those dependencies.
+
+Executed [probe-pi.mjs](../scripts/probe-pi.mjs) against the host's already installed **Pi 0.85.1**, using a temporary isolated configuration, synthetic fixture and loopback-only fake Chat Completions endpoint. No provider secrets were inherited, no external inference request was made, no extension was installed, and temporary state was removed. Seven checks passed: custom provider selection; RPC prompt plus a real built-in read-tool/result roundtrip; LF JSON framing with U+2028; synthetic token/configured-price accounting; clear_queue plus abort cancelling a stalled HTTP request; accepted prompt followed by a surfaced provider error; exclusion of a project-local extension fixture.
+
+The probe uses controlled responses and artificial usage/prices. It is **not** a model benchmark, a cost-saving measurement, a sandbox boundary test, a process-tree cancellation proof, or a test of Kastanje, browser/desktop extensions or scanner accuracy. It is not wired into dashboard job execution. New Pi profiles are documented blueprints; the operational capabilities register and UI remain unchanged.
+
+`npm run check` passed all 16 existing behavioral/integration tests and JavaScript syntax checks after the optional probe was added. All nine deliverable JSON files parsed, and local Markdown file links resolved. No UI behavior was changed in this follow-up.

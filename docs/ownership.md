@@ -2,6 +2,12 @@
 
 This independent repository owns its code, instructions, skills, design, tests, evaluation fixture and operation docs. Arcitai/Gustav owns product decisions and acceptance. Customer repositories remain owned by their maintainers. Provider credentials and usage terms remain account-specific.
 
+## Product boundary
+
+AIOS is a separate product: **Business first. Productivity built in.** Software & Defence Factory is a separate product: **Business first. Security and quality built in.** The factory must work without AIOS installation, runtime or mandatory methods. It owns its software/security skills and Spec/Implement/Review flow; these are not removed merely to reuse an AIOS skill.
+
+Job isolation, automated review/repair loops, security workflows and automatic PR evidence belong to the factory's implementation. Installing a skill does not provide those runtime capabilities. General coding checks and proportionate visual comparisons can exist in both products without creating a dependency. This boundary incorporates the owner-authorized AIOS-task handoff received on 22 September 2026; AIOS code and releases are maintained separately.
+
 The seed was generated with onlinesourdough/Agentic-project-template's canonical create helper from commit `dfcdca1d64e8c61e4d79c0cd4c23a6595d424440`. Its template validation passed before generation. The seed's MIT LICENSE is preserved. AGENTS/README and ownership/proof/recovery records were adapted to this actual starter. Authoring used installed AIOS methods; they are not dependencies of the resulting product.
 
 Warp/Oz were inspected read-only as references, not copied:

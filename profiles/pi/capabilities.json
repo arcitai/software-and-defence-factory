@@ -1,0 +1,31 @@
+{
+  "kind": "design-proposal-not-runtime-configuration",
+  "observedAt": "2026-09-22",
+  "harness": "pi",
+  "protocolTestedVersion": "0.85.1",
+  "requiredOutsideHarness": ["isolation", "job-supervision", "scope-and-revision-gates", "credential-policy", "private-evidence", "budget-and-usage-provenance"],
+  "profiles": [
+    {
+      "id": "software",
+      "piExtensions": [],
+      "tools": ["read", "write", "edit", "bash"],
+      "workerPrograms": ["git", "ripgrep", "project-toolchain", "agent-browser"],
+      "conditionalCapabilities": ["external-web-search", "image-input-for-visual-review"],
+      "acceptance": ["model-tool-roundtrip", "project-checks", "browser-when-ui-changes", "separate-review-at-exact-head"]
+    },
+    {
+      "id": "defence",
+      "piExtensions": [],
+      "workerPrograms": ["gitleaks", "osv-scanner", "scope-specific-sast"],
+      "conditionalCapabilities": ["scoped-test-app-dast", "codex-security-handoff"],
+      "acceptance": ["finding-reproduction", "scanner-errors-not-clean-results", "fix-regression-test", "sensitive-evidence-private"]
+    },
+    {
+      "id": "desktop-pilot",
+      "piExtensionCandidates": ["@injaneity/pi-computer-use@0.5.1"],
+      "requirements": ["separate-interactive-desktop", "os-helper", "platform-permissions", "image-model-when-pixels-required"],
+      "acceptance": ["observe-act-verify", "stale-reference-rejection", "no-cross-job-session-reuse", "verified-stop"]
+    }
+  ],
+  "notProven": ["live-model-quality", "kastanje-route", "browser-integration", "desktop-integration", "sandbox-containment", "unattended-operation", "price-savings"]
+}

@@ -1,4 +1,6 @@
-# Codex som første lokale harness
+# Den eksisterende lokale Codex-adapter
+
+Pi er efter [researchen 22. september](../docs/pi-research.md) første kandidat til næste factory-integration. Denne profil beskriver den Codex-adapter, der allerede findes i v0.1, og kan fortsat bruges som sammenligning eller selvstændigt valg.
 
 Codex CLI er open source; det gør ikke OpenAI-modeller, inference eller abonnementer open source/gratis. CLI kan køre lokalt med et eksternt modelkald, eller med `--oss --local-provider ollama --model <afprøvet-model>`.
 

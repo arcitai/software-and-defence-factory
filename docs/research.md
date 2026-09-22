@@ -1,8 +1,8 @@
 # Fra Warp-inspiration til en åben Arcitai Factory
 
-Research opdateret **21. september 2026**. Dette dokument supplerer den tidligere brede research og ændrer standardvalget fra Pi først til **Codex lokalt / Cursor i cloud**. Pi bliver et avanceret tilvalg. Resultatet er en kørbar starter, ikke et færdigt produktionssystem eller dokumentation for modelbesparelser.
+Research opdateret **22. september 2026**. Warp-gennemgangen nedenfor suppleres nu af [den dybe Pi-research](pi-research.md). **Pi er første kandidat til den åbne factory**, mens Codex er den workeradapter, der allerede findes i v0.1, og Cursor er et managed alternativ. Denne anbefaling erstatter den tidligere prioritering af Codex lokalt / Cursor i cloud. Starteren er ikke et færdigt produktionssystem eller dokumentation for modelbesparelser.
 
-**Suppleret med brugerens seks videoer:** [transskriptionsbaseret kildegennemgang](video-audit.md) og [næste runtime](next-runtime.md). Den vigtigste nye beslutning er at afprøve Machinist som mulig runtime, før en permanent egen dispatcher bygges. Codex er fortsat første harness; de to valg er uafhængige. Før/efter-bevis, miljølivscyklus og feedback fra drift er nu eksplicit med i planen.
+**Suppleret med brugerens seks videoer:** [transskriptionsbaseret kildegennemgang](video-audit.md) og [næste runtime](next-runtime.md). Machinist skal stadig afprøves som mulig controller, før en permanent egen dispatcher bygges. Pi som harness og Machinist som controller er uafhængige valg. Før/efter-bevis, miljølivscyklus og feedback fra drift er eksplicit med i planen.
 
 ## Den anbefalede form
 

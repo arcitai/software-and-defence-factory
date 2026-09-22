@@ -1,6 +1,6 @@
 # Fra starter til en factory, der kan arbejde uden opsyn
 
-Beslutningsforslag efter [videogennemgangen](video-audit.md), 21. september 2026. Dette er **næste versions kontrakt og prioritering**, ikke funktioner, som v0.1 allerede har. [Arkitekturen](architecture.md) beskriver den kørende kode.
+Beslutningsforslag efter [videogennemgangen](video-audit.md), suppleret med [Pi-research](pi-research.md) 22. september 2026. Dette er **næste versions kontrakt og prioritering**, ikke funktioner, som v0.1 allerede har. [Arkitekturen](architecture.md) beskriver den kørende kode.
 
 Den mindste fornuftige løsning er **én controller, én worker og ét pilotrepo**. GitHub er indgangen til arbejdet og hjem for kode/PR. Runtime ejer kørsler, låse og stop. Dashboardet viser denne tilstand. Skills beskriver faglig metode; de skal ikke være eneste håndhævelse af budgetter, checks eller adgang.
 
@@ -27,7 +27,7 @@ Implementering kan bruge Codex, Cursor eller en anden egnet harness. Security ka
 
 ## Før vi vælger en permanent motor
 
-Afprøv **Machinist først som runtime-kandidat**, med Sandcastle som alternativ byggesten, hvis hovedbehovet er agent-/sandboxadaptere. Dette ændrer ikke anbefalingen om Codex som første harness. Runtime og harness løser forskellige opgaver. Begræns afprøvningen til ét syntetisk repo, ingen providerbetaling og ingen produktionsadgang i første fase.
+Afprøv **Machinist først som controller-kandidat**, med Sandcastle som alternativ byggesten, hvis hovedbehovet er agent-/sandboxadaptere. **Pi er nu første harness-kandidat**; controller og harness løser forskellige opgaver. Pi’s syntetiske RPC-prøve er gennemført, men erstatter ikke controller-/recovery-prøven nedenfor. Begræns denne til ét syntetisk repo, ingen providerbetaling og ingen produktionsadgang i første fase.
 
 | Afprøvning | Bestået når |
 | --- | --- |
@@ -35,7 +35,7 @@ Afprøv **Machinist først som runtime-kandidat**, med Sandcastle som alternativ
 | Dublet og afbrudt worker | Samme opgave kan ikke få to writers; en mistet lease giver ikke skjult dobbeltudførelse |
 | Fejl, stop og genstart | Timeout og cancellation stopper procestræet; et restart nulstiller ikke reparationsbudgettet |
 | Reviewgrænse | Exit 0 bliver ikke automatisk accept; reviewer vurderer præcis den leverede revision |
-| Portabilitet | Samme workflow kan bruge en testadapter og derefter Codex uden at ændre kundens scope/accept |
+| Portabilitet | Samme workflow kan bruge en testadapter og derefter Pi eller Codex uden at ændre kundens scope/accept |
 | Vedligehold | Adapteren erstatter mere kode, end den tilfører; ingen anden scheduler ejer samme aktive levering |
 
 Kilden til kandidatens muligheder og begrænsninger står i [Machinist-afsnittet](video-audit.md#machinist-undersøg-før-vi-genopfinder-runtime). Vi har kun læst koden; denne afprøvning er **ikke udført**. Hvis kandidaten vælges, bliver dens runtime-status autoritativ. Arcitais UI kan vise den via en adapter; den eksisterende lokale forsøgsjournal må ikke konkurrere om jobclaim. Gem en eksport og definér migreringen, før en kø flyttes.

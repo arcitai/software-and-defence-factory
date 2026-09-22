@@ -1,6 +1,6 @@
 # Arcitai Factory
 
-**Business first. Security built in.**
+**Business first. Security and quality built in.**
 
 En åben, self-hostable starter til en software- og security-factory. GitHub ejer issues, kode og PR’er. Factoryen samler opgaver, jobforsøg, review og dokumenteret værdi. Harness og inference vælges hver for sig.
 
@@ -36,14 +36,15 @@ npm run doctor
 
 ## Vælg første setup
 
-1. **Lokal pilot: Codex CLI.** Behold kendt harness; brug OpenAI-inference eller en afprøvet Ollama-model på fx ROG Flow Z13. Lokal worker er ikke automatisk lokal inference. [Lokal profil](profiles/codex-local.md).
-2. **Cloudpilot: Cursor Cloud Agent.** Managed computer/browser og repo-miljø. Brug en godkendt label eller API-overdragelse. [Cursor-opskrift](profiles/cursor-cloud.md).
-3. **Målprofil: Codex + Kastanje AI.** Egen worker, valgte åbne modeller og en dokumenteret EU-inference-rute. Endpoint, tool calling, kvalitet, dataveje og forbrug skal verificeres først. [Kastanje/Ollama](profiles/open-models.md).
+1. **Åben factory: Pi er første kandidat.** Efter den nye research anbefales Pi + isoleret worker + én browser-CLI, med Kastanje eller lokal inference som mulige ruter. En syntetisk RPC-prøve er bestået; Pi er endnu ikke en eksekverende dashboard-worker. [Research](docs/pi-research.md) · [konkret Pi-blueprint](profiles/pi/README.md).
+2. **Adapter som findes i v0.1: Codex CLI.** Brug den eksisterende worker-overdragelse, når den konkrete Codex/model/miljøprofil er kvalificeret. Lokal worker er ikke automatisk lokal inference. [Lokal profil](profiles/codex-local.md) · [Kastanje/Ollama via Codex](profiles/open-models.md).
+3. **Managed cloud: Cursor Cloud Agent.** Relevant, når managed computer/browser og repo-miljø begrunder mindre kontrol over stacken. [Cursor-opskrift](profiles/cursor-cloud.md).
 
-Pi er et avanceret tilvalg, når den konkrete værktøjskæde begrunder det. Security bruger samme kerne og et særskilt specialistspor; Codex Security/Daybreak kan tilsluttes på den produktflade, hvor adgang faktisk findes. Ingen Warp-abonnement kræves.
+Security bruger samme kerne og et særskilt specialistspor; Codex Security/Daybreak kan tilsluttes på den produktflade, hvor adgang faktisk findes. Browser og især desktopstyring kræver deres egne prøver. Ingen Warp-abonnement kræves, og ingen prisbesparelse er målt på en komplet pilot endnu.
 
 ## Læs videre
 
+- [Pi: dyb research, minimumscapabilities og vurdering af HarnessTax](docs/pi-research.md) · [Pi-profiler](profiles/pi/README.md)
 - [Seks videoer: kildegennemgang og dækningskontrol](docs/video-audit.md)
 - [Næste runtime: samlet pipeline og prioriterede opgaver](docs/next-runtime.md) · [Reviewpakke med før/efter](templates/review-packet.md)
 - [Opsætning og en hel opgave fra start til accept](docs/setup.md)
