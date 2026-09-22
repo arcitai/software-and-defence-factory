@@ -72,3 +72,9 @@ Executed [probe-pi.mjs](../scripts/probe-pi.mjs) against the host's already inst
 The probe uses controlled responses and artificial usage/prices. It is **not** a model benchmark, a cost-saving measurement, a sandbox boundary test, a process-tree cancellation proof, or a test of Kastanje, browser/desktop extensions or scanner accuracy. It is not wired into dashboard job execution. New Pi profiles are documented blueprints; the operational capabilities register and UI remain unchanged.
 
 `npm run check` passed all 16 existing behavioral/integration tests and JavaScript syntax checks after the optional probe was added. All nine deliverable JSON files parsed, and local Markdown file links resolved. No UI behavior was changed in this follow-up.
+
+## Codex component reuse — 22 September 2026
+
+Verified the official Codex platform, browser and Security SDK documentation, the public `openai/codex-security` repository, its Apache-2.0 license and plugin 0.1.95 manifest, and the security-scan skill's host/script dependencies. Compared these with installed plugin manifests and read the installed Codex 0.155.1 CLI help. The public Security source is distinct from the older installed plugin 0.1.24, which declares a proprietary license. The resulting correction and proposed SDK integration are in [codex-reuse.md](codex-reuse.md).
+
+Documentation only; no package installation, source redistribution, scan, model call or runtime change. `git diff --check` passed. Existing runtime tests were not repeated for this documentation update. A real SDK job, provider access, worker isolation and result import remain unverified.

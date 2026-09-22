@@ -40,11 +40,12 @@ npm run doctor
 2. **Adapter som findes i v0.1: Codex CLI.** Brug den eksisterende worker-overdragelse, når den konkrete Codex/model/miljøprofil er kvalificeret. Lokal worker er ikke automatisk lokal inference. [Lokal profil](profiles/codex-local.md) · [Kastanje/Ollama via Codex](profiles/open-models.md).
 3. **Managed cloud: Cursor Cloud Agent.** Relevant, når managed computer/browser og repo-miljø begrunder mindre kontrol over stacken. [Cursor-opskrift](profiles/cursor-cloud.md).
 
-Security bruger samme kerne og et særskilt specialistspor; Codex Security/Daybreak kan tilsluttes på den produktflade, hvor adgang faktisk findes. Browser og især desktopstyring kræver deres egne prøver. Ingen Warp-abonnement kræves, og ingen prisbesparelse er målt på en komplet pilot endnu.
+Security bruger samme kerne og et særskilt specialistspor. Den offentlige Codex Security CLI/SDK er den anbefalede genbrugsvej; modeladgang og den faktiske integration skal kvalificeres separat. Browser og især desktopstyring kræver deres egne prøver. Ingen Warp-abonnement kræves, og ingen prisbesparelse er målt på en komplet pilot endnu.
 
 ## Læs videre
 
 - [Pi: dyb research, minimumscapabilities og vurdering af HarnessTax](docs/pi-research.md) · [Pi-profiler](profiles/pi/README.md)
+- [Genbrug Codex Security og pak et lean Pi-setup](docs/codex-reuse.md)
 - [Seks videoer: kildegennemgang og dækningskontrol](docs/video-audit.md)
 - [Næste runtime: samlet pipeline og prioriterede opgaver](docs/next-runtime.md) · [Reviewpakke med før/efter](templates/review-packet.md)
 - [Opsætning og en hel opgave fra start til accept](docs/setup.md)

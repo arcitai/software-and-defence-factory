@@ -11,6 +11,7 @@
 | Metode | De seks eksisterende factory-skills, kun relevante faser indlæst | Eksisterende projektfiler |
 | Søgefunktion | En lille CLI mod Brave Search, kun når nødvendig | Blueprint; konto og wrapper ikke konfigureret |
 | Sikkerhed | Gitleaks + OSV-Scanner; sprogtilpasset SAST efter scope | Tools/rules skal versionslåses i worker-image |
+| Faglig security-agent | Officiel Codex Security CLI/SDK som separat worker | Offentlig kode/licens og integrationsflade verificeret; runtimeintegration ikke afprøvet. [Genbrugsbeslutning](../../docs/codex-reuse.md) |
 | Desktop | `@injaneity/pi-computer-use` 0.5.1 | Valgfri separat pilot; ikke installeret |
 | Controller | Én ejer af jobclaim, budget og reviewstatus | Eksisterende journal; ubemandet pipeline er næste version |
 | Model | Eksakt, verificeret model-ID på Kastanje eller lokal API-server | Skabelon; ingen faktisk endpoint-/modeladgang antaget |

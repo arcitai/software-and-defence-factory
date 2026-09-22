@@ -125,13 +125,15 @@ Defence er en profil i samme system med egen adgang og evidens, ikke endnu en pl
 | Kendte dependency-sårbarheder | [OSV-Scanner](https://github.com/google/osv-scanner) | Scan relevant lockfile/SBOM; brug kontrolleret database/opslagsrute |
 | Sprogspecifik kildeanalyse | [Semgrep CE](https://docs.semgrep.dev/licensing) eller projektets egnede scanner | Målrettede regler, fast version og kendt rule-license; ingen tilfældig gigantisk regelpakke |
 | Webapp under kørsel | [ZAP baseline](https://www.zaproxy.org/docs/docker/baseline-scan/) som tilvalg | Spider/passiv analyse mod afgrænset testinstans; ikke et bevis for fuld pentest |
-| Validering og remediation | Pi-review eller konkret Codex Security-overdragelse | Fund → reproduktion → konsekvens → patch → regressionstest → kontrol på samme head |
+| Validering og remediation | Pi-review eller separat worker med officiel Codex Security CLI/SDK | Fund → reproduktion → konsekvens → patch → regressionstest → kontrol på samme head |
 
 Semgrep CE-motoren og Semgrep’s vedligeholdte regler har **forskellige licenser**. De officielle regler er ikke uden videre materiale, vi kan videredistribuere i en konkurrerende security-tjeneste. Brug egne eller særskilt godkendte regler i produktpakken; afklar den konkrete anvendelse. [Licensopdelingen](https://docs.semgrep.dev/licensing).
 
 Et “scan bestået” betyder kun, at de valgte kontroller ikke fandt deres typer af fejl. Authentication, autorisation, dataflows og forretningslogik kræver relevante tests og vurdering. Ingen fund må få høj alvor alene på en agents ord; bevar reproduktion og usikkerhed.
 
-Daybreak-adgang i Codex er ikke det samme som tilgængelig API-inference i Pi. Det samme gælder Codex-plugins og produktets øvrige værktøjer. Vi beholder specialistgrænsen og kopierer ikke pluginfiler ind i vores MIT-repo. En åben model må gerne konkurrere på samme afgrænsede security-cases, men får ikke en kvalitetsgaranti gennem modelnavnet.
+**Opdatering:** Den offentlige Codex Security CLI/SDK og plugin er Apache-2.0-licenseret og kan genbruges. Brug den officielle scanner som separat worker; en direkte Pi-port af skills kræver også tilpasning af deres scripts og host-integration. Den offentlige version må ikke forveksles med ældre, lokalt installerede pluginversioners licens. [Genbrug, kilder og lean opsætning](codex-reuse.md).
+
+Daybreak-adgang i Codex er ikke det samme som tilgængelig modeladgang via SDK eller Pi. Security SDK dokumenterer flere inferenceproviders; den konkrete Kastanje-/lokale route er endnu ikke efterprøvet. En åben model må gerne konkurrere på samme afgrænsede security-cases, men får ikke en kvalitetsgaranti gennem modelnavnet.
 
 ## Lokal, egen cloud og Kastanje
 
