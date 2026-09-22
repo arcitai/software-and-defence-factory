@@ -1,6 +1,6 @@
 # Foreslået Pi-worker
 
-**Status: blueprint og efterprøvet protokol, ikke en tilsluttet production worker.** Se [research og begrundelser](../../docs/pi-research.md). Skabelonerne her bliver ikke automatisk læst af Pi eller dashboardet. De skal kopieres til en særskilt worker-konfiguration efter valg af miljø og model. Ingen af dem ændrer brugerens `~/.pi/agent`.
+**Status: Pi er nu forbundet med CLI-jobrunneren og afprøvet gennem et helt syntetisk job.** Se [aktuel worker-opsætning](../../docs/worker-integrations.md). Model, browser og miljø skal stadig kvalificeres. Se [research og begrundelser](../../docs/pi-research.md). Skabelonerne her bliver ikke automatisk læst af Pi eller dashboardet. De skal kopieres til en særskilt worker-konfiguration efter valg af miljø og model. Ingen af dem ændrer brugerens `~/.pi/agent`.
 
 ## Pakken vi vil afprøve
 
@@ -11,7 +11,7 @@
 | Metode | De seks eksisterende factory-skills, kun relevante faser indlæst | Eksisterende projektfiler |
 | Søgefunktion | En lille CLI mod Brave Search, kun når nødvendig | Blueprint; konto og wrapper ikke konfigureret |
 | Sikkerhed | Gitleaks + OSV-Scanner; sprogtilpasset SAST efter scope | Tools/rules skal versionslåses i worker-image |
-| Faglig security-agent | Officiel Codex Security CLI/SDK som separat worker | Offentlig kode/licens og integrationsflade verificeret; runtimeintegration ikke afprøvet. [Genbrugsbeslutning](../../docs/codex-reuse.md) |
+| Faglig security-agent | Officiel Codex Security CLI/SDK som separat worker | Offentlig kode/licens og integrationsflade verificeret; syntetisk SDK-rapportprøve bestået. [Aktuel opsætning](../../docs/worker-integrations.md). [Genbrugsbeslutning](../../docs/codex-reuse.md) |
 | Desktop | `@injaneity/pi-computer-use` 0.5.1 | Valgfri separat pilot; ikke installeret |
 | Controller | Én ejer af jobclaim, budget og reviewstatus | Eksisterende journal; ubemandet pipeline er næste version |
 | Model | Eksakt, verificeret model-ID på Kastanje eller lokal API-server | Skabelon; ingen faktisk endpoint-/modeladgang antaget |

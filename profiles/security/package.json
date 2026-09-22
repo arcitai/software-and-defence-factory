@@ -1,0 +1,6 @@
+{
+  "name": "arcitai-security-worker",
+  "private": true,
+  "type": "module",
+  "dependencies": { "@openai/codex-security": "0.1.29" }
+}

@@ -1,100 +1,12 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import {
-  mkdtempSync,
-  mkdirSync,
-  writeFileSync,
-  readFileSync,
-  rmSync,
-} from "node:fs";
+import { writeFileSync, readFileSync } from "node:fs";
 import { execFileSync, spawn } from "node:child_process";
-import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { fileURLToPath } from "node:url";
 import { Store } from "../src/store.mjs";
-import {
-  newTask,
-  approveScope,
-  prepare,
-  complete,
-  hashScope,
-} from "../src/domain.mjs";
-const root = fileURLToPath(new URL("../", import.meta.url));
-function fixture() {
-  const dir = mkdtempSync(join(tmpdir(), "factory-worker-")),
-    workspace = join(dir, "checkout"),
-    bin = join(dir, "bin"),
-    home = join(dir, "codex");
-  for (const p of [workspace, bin, home]) mkdirSync(p);
-  const git = (...args) =>
-    execFileSync("git", ["-C", workspace, ...args], {
-      encoding: "utf8",
-      stdio: ["ignore", "pipe", "pipe"],
-    }).trim();
-  git("init", "-q");
-  git("config", "user.name", "Factory Test");
-  git("config", "user.email", "factory-test@example.invalid");
-  git("remote", "add", "origin", "https://github.com/example/pilot");
-  writeFileSync(join(workspace, "input.txt"), "fixture\n");
-  git("add", ".");
-  git("commit", "-qm", "fixture");
-  const t = newTask({
-    title: "Fixture only",
-    body: "Test stub execution",
-    acceptance: "Test fixture evidence exists",
-    repo: "example/pilot",
-  });
-  approveScope(t);
-  prepare(t);
-  const db = join(dir, "state.sqlite");
-  const s = new Store(db);
-  s.insert(t);
-  s.close();
-  const preflight = join(dir, "preflight.json");
-  writeFileSync(
-    preflight,
-    JSON.stringify({
-      profile: t.profile,
-      scopeHash: hashScope(t),
-      baseCommit: git("rev-parse", "HEAD"),
-      verifiedAt: new Date().toISOString(),
-      capabilities: { files: true, shell: true, git: true, tests: true },
-    }),
-  );
-  const env = {
-    ...process.env,
-    PATH: bin + ":" + process.env.PATH,
-    FACTORY_DB: db,
-    FACTORY_WORKER_ISOLATED: "1",
-    FACTORY_CODEX_HOME: home,
-  };
-  return {
-    dir,
-    workspace,
-    bin,
-    db,
-    task: t,
-    preflight,
-    env,
-    args: [
-      join(root, "scripts/run-job.mjs"),
-      "--task",
-      t.id,
-      "--workspace",
-      workspace,
-      "--preflight",
-      preflight,
-      "--execute",
-    ],
-    cleanup() {
-      rmSync(dir, { recursive: true, force: true });
-      rmSync(join(root, ".factory/jobs", t.attempts[0].id), {
-        recursive: true,
-        force: true,
-      });
-    },
-  };
-}
+import { complete } from "../src/domain.mjs";
+import { fixture, root } from "./helpers/worker-fixture.mjs";
+
 test("worker completes a real subprocess handoff without model calls; unknown costs stay missing", () => {
   const f = fixture();
   try {

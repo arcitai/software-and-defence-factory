@@ -22,7 +22,7 @@ flowchart LR
 | Metode | AGENTS.md og `.agents/skills` | Tekst giver hverken browser, sandbox eller adgang |
 | Routing og tilstand | `src/domain.mjs`, `src/store.mjs` | Servervalideret scope og optimistic revision |
 | GitHub-spejl | `src/github.mjs` | Read-only REST; åbne issues/PR’er, højst 100 af hver; webhooks for udvalgte issue-events |
-| Harness | `src/jobs.mjs`, `scripts/run-job.mjs`, profiler | Codex-adapter implementeret; cloud-job eksporteres til separat afvikling |
+| Harness | `src/jobs.mjs`, `scripts/run-job.mjs`, profiler | Codex CLI-, Pi RPC- og Security SDK-adaptere; cloud-job eksporteres til separat afvikling |
 | Inference | Profilens provider | Kan skiftes uden ny workflow-metode; kvalitet/kompatibilitet følger ikke automatisk med |
 | Beviser og værdi | Evidensimport + eval-import | Operatørbetroet input; formatkontrol er ikke kryptografisk attestation |
 | UI | `public/` | Ingen tokens, shells eller provider-kald fra browseren |

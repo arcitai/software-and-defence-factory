@@ -267,7 +267,7 @@ export function complete(task, evidence) {
     security: evidence.security,
     costs: evidence.costs,
     costComplete: evidence.costComplete === true,
-    activeMs: evidence.activeMs ?? null,
+    activeMs: evidence.activeMs ?? a.activeMs ?? null,
     reviewMinutes: evidence.reviewMinutes ?? null,
     status: "completed",
     endedAt: new Date().toISOString(),

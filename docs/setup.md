@@ -28,6 +28,8 @@ GitHub kan ikke kontakte en loopbackadresse direkte. Vælg i pilot enten manuel 
 
 Issue-form og labeldefinitioner ligger i `.github/ISSUE_TEMPLATE/factory-task.yml` og `config/labels.json`. De er filer klar til at blive valgt i målrepoet; denne aflevering ændrer ikke GitHub-indstillinger.
 
+Pi og Codex Security bruger nu den samme jobrunner. Se [deres konkrete opsætning og integrationsprøver](worker-integrations.md). Nedenstående Codex-profil og evidenskontrakt gælder fortsat.
+
 ## Fra scope til lokal Codex-worker
 
 1. Opret/importér en opgave. Skriv konkrete acceptkriterier og vælg profil. Klik **Godkend scope → Forbered job → Hent jobpakke**. Opdag opgave-id i download eller `/api/export`.

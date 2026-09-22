@@ -1,0 +1,7 @@
+{
+  "provider": "openai",
+  "model": "REPLACE_WITH_VERIFIED_MODEL_ID",
+  "home": "/private/factory-security-home",
+  "auth": "api-key",
+  "credentialEnv": ["OPENAI_API_KEY"]
+}

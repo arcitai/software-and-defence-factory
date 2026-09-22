@@ -1,0 +1,9 @@
+{
+  "provider": "kastanje",
+  "model": "REPLACE_WITH_VERIFIED_MODEL_ID",
+  "home": "/private/factory-worker-home",
+  "agentDir": "/private/factory-pi",
+  "policyFile": "/private/factory-implement-policy.md",
+  "thinking": "off",
+  "credentialEnv": ["KASTANJE_API_KEY"]
+}

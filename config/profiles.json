@@ -82,11 +82,11 @@
   {
     "id": "codex-security",
     "name": "Codex · security",
-    "harness": "Codex / godkendt Security-flade",
-    "inference": "Daybreak eller valgt model",
+    "harness": "Codex Security SDK",
+    "inference": "Eksplicit valgt security-model",
     "placement": "review",
     "region": "Adgangs- og modelafhængig",
-    "readiness": "Manuel overdragelse indtil produktfladen er prøvet",
+    "readiness": "SDK-adapter klar · syntetisk rapportprøve bestået",
     "capabilities": {
       "files": "native",
       "shell": "configure",
@@ -97,7 +97,7 @@
       "computer": "configure",
       "security": "configure"
     },
-    "note": "Security-plugin, modelscope og adgang verificeres separat. En afsluttet scanning er ikke automatisk en verificeret rettelse."
+    "note": "Officiel SDK som valgfri Standard-scanner af hele repoet. Reel modeladgang og miljø kræver preflight. Fund og tomme fundlister kræver selvstændig vurdering."
   },
   {
     "id": "pi-custom",
@@ -106,7 +106,7 @@
     "inference": "Valgfri provider",
     "placement": "local",
     "region": "Konfigurationsafhængig",
-    "readiness": "Avanceret opsætning",
+    "readiness": "Jobadapter afprøvet · model og miljø kræver preflight",
     "capabilities": {
       "files": "native",
       "shell": "native",
@@ -117,6 +117,6 @@
       "computer": "configure",
       "security": "evaluate"
     },
-    "note": "Valgfrit udvideligt harness. Web, browser og computer use kræver valgte værktøjer/extensions og deres egne prøver."
+    "note": "Pi RPC er forbundet med den fælles jobrunner og afprøvet med syntetisk inference. Browser og desktop kræver særskilte værktøjer og prøver."
   }
 ]

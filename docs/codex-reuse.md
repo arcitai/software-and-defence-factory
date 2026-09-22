@@ -1,5 +1,7 @@
 # Genbrug Codex i en Pi-factory
 
+**Implementeringsopdatering:** Pi RPC og den officielle Security SDK er nu integreret i CLI-jobrunneren og afprøvet med syntetiske inputs. [Aktuel status, opsætning og begrænsninger](worker-integrations.md). Afsnittene nedenfor dokumenterer researchgrundlaget før denne implementering.
+
 Undersøgt 22. september 2026. **Anbefaling: genbrug færdige komponenter gennem deres CLI/SDK og pak én understøttet opsætning.** Pi forbliver kandidat til softwareagenten; security kan bruge en separat, færdig Codex Security-worker. Dette er en opdateret integrationsbeslutning, ikke en udført installation.
 
 ## Hvad kan genbruges?

@@ -2,6 +2,8 @@
 
 Beslutningsforslag efter [videogennemgangen](video-audit.md), suppleret med [Pi-research](pi-research.md) 22. september 2026. Dette er **næste versions kontrakt og prioritering**, ikke funktioner, som v0.1 allerede har. [Arkitekturen](architecture.md) beskriver den kørende kode.
 
+**Senere implementering samme dag:** Pi RPC og Security SDK er nu tilsluttet den eksisterende CLI-runner og syntetisk afprøvet. [Aktuel worker-status](worker-integrations.md). Det implementerer ikke i sig selv den ubemandede pipeline nedenfor.
+
 Den mindste fornuftige løsning er **én controller, én worker og ét pilotrepo**. GitHub er indgangen til arbejdet og hjem for kode/PR. Runtime ejer kørsler, låse og stop. Dashboardet viser denne tilstand. Skills beskriver faglig metode; de skal ikke være eneste håndhævelse af budgetter, checks eller adgang.
 
 ## Den samlede arbejdsgang

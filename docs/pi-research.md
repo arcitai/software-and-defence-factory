@@ -1,5 +1,7 @@
 # Pi som motor i Arcitai Software & Defence Factory
 
+**Implementeringsopdatering:** Pi RPC og den officielle Security SDK er nu integreret i CLI-jobrunneren og afprøvet med syntetiske inputs. [Aktuel status, opsætning og begrænsninger](worker-integrations.md). Afsnittene nedenfor dokumenterer researchgrundlaget før denne implementering.
+
 Undersøgt **22. september 2026** for Gustav. Beslutningsforslag, kildekritik og konkret capability-valg. Dette dokument erstatter den tidligere strategiske anbefaling om Pi som et avanceret tilvalg. Det ændrer ikke, hvilke workers starteren allerede kan afvikle.
 
 ## Anbefaling

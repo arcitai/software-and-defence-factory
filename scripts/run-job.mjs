@@ -1,10 +1,11 @@
-import { readFileSync, mkdirSync, writeFileSync, existsSync } from "node:fs";
+import { readFileSync, mkdirSync, writeFileSync, existsSync, realpathSync } from "node:fs";
 import { resolve, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { spawn, execFileSync } from "node:child_process";
 import { Store } from "../src/store.mjs";
 import { requireThat, event, hashScope } from "../src/domain.mjs";
 import { jobBundle } from "../src/jobs.mjs";
+import { loadWorkerConfig, workerEnvironment, privatePath, outside } from "../src/worker-config.mjs";
 
 const root = fileURLToPath(new URL("../", import.meta.url));
 const args = process.argv.slice(2);
@@ -41,7 +42,7 @@ try {
       "Demo-opgaver kan ikke sendes til en rigtig agent.",
     );
     requireThat(
-      bundle.command,
+      bundle.command || bundle.adapter,
       "Denne profil bruger en manuel/cloud-overdragelse. Se profiles/.",
     );
     requireThat(
@@ -52,14 +53,13 @@ try {
       has("--workspace") && option("--workspace"),
       "Angiv et dedikeret checkout med --workspace.",
     );
-    const workspace = resolve(option("--workspace"));
+    const workspace = realpathSync(resolve(option("--workspace")));
+    const controllerRoot = realpathSync(root);
     requireThat(
-      workspace !== root &&
-        !root.startsWith(workspace + "/") &&
-        !workspace.startsWith(root),
+      outside(workspace, controllerRoot) && outside(controllerRoot, workspace),
       "Worker-checkout må ikke være controllerens repository eller overmappe.",
     );
-    requireThat(
+    if (!bundle.adapter) requireThat(
       process.env.FACTORY_CODEX_HOME &&
         existsSync(process.env.FACTORY_CODEX_HOME),
       "FACTORY_CODEX_HOME skal pege på workerens særskilte Codex-konfiguration.",
@@ -85,7 +85,7 @@ try {
       "Angiv --preflight /privat/preflight.json uden for checkout.",
     );
     const preflight = JSON.parse(
-      readFileSync(resolve(option("--preflight")), "utf8"),
+      readFileSync(privatePath(resolve(option("--preflight")), workspace), "utf8"),
     );
     requireThat(
       preflight.profile === task.profile &&
@@ -93,7 +93,8 @@ try {
       "Preflight skal gælde den valgte profil og det aktuelle scope.",
     );
     requireThat(
-      task.requirements.every((c) => preflight.capabilities?.[c] === true),
+      task.requirements.every((c) => preflight.capabilities?.[c] === true) &&
+        (bundle.adapter !== "security" || preflight.capabilities?.security === true),
       "En påkrævet capability er ikke afprøvet.",
     );
     requireThat(
@@ -102,7 +103,11 @@ try {
         Date.now() - Date.parse(preflight.verifiedAt) < 86400000,
       "Preflight skal være mindre end et døgn gammel.",
     );
-    if (bundle.command.modelRequired)
+    const configured = bundle.adapter ? loadWorkerConfig(process.env.FACTORY_WORKER_CONFIG, workspace, bundle.adapter) : null;
+    if (configured) requireThat(preflight.workerConfigHash === configured.hash,
+      "Preflight skal binde den gennemprøvede worker-konfiguration med workerConfigHash.");
+    const adapterEnv = configured ? workerEnvironment(configured.config) : null;
+    if (bundle.command?.modelRequired)
       requireThat(
         process.env.FACTORY_MODEL,
         "Vælg den afprøvede lokale model med FACTORY_MODEL.",
@@ -140,19 +145,21 @@ try {
         workspace,
       });
       fresh.stage = "running";
-      event(fresh, "start", "Codex startet på separat worker.");
+      a.adapter = bundle.adapter ?? "codex";
+      a.workerConfigHash = configured?.hash ?? null;
+      event(fresh, "start", `${bundle.adapter === "pi" ? "Pi" : bundle.adapter === "security" ? "Codex Security" : "Codex"} startet på separat worker.`);
       store.save(fresh);
     });
     claimed = { taskId: task.id, attemptId: bundle.attemptId };
     git("switch", "-c", branch);
-    const commandArgs = [...bundle.command.args];
-    if (process.env.FACTORY_MODEL)
+    const commandArgs = bundle.adapter ? [join(root, "scripts/adapter-worker.mjs")] : [...bundle.command.args];
+    if (!bundle.adapter && process.env.FACTORY_MODEL)
       commandArgs.splice(-1, 0, "--model", process.env.FACTORY_MODEL);
     // Credential scopes are supplied by the dedicated worker, never by the issue or web UI.
-    const child = spawn(bundle.command.executable, commandArgs, {
+    const child = spawn(bundle.adapter ? process.execPath : bundle.command.executable, commandArgs, {
       cwd: workspace,
       detached: process.platform !== "win32",
-      env: {
+      env: adapterEnv ?? {
         PATH: process.env.PATH,
         HOME: process.env.HOME,
         TMPDIR: process.env.TMPDIR,
@@ -191,7 +198,7 @@ try {
     child.stdout.on("data", log);
     child.stderr.on("data", log);
     child.stdin.on("error", () => {});
-    child.stdin.end(bundle.prompt);
+    child.stdin.end(bundle.adapter ? JSON.stringify({ ...bundle, config: configured.config, jobDir, base }) : bundle.prompt);
     const started = Date.now(),
       timeout = setTimeout(stop, 45 * 60000);
     const poll = setInterval(() => {
@@ -239,6 +246,27 @@ try {
     );
     const dirty = git("status", "--porcelain");
     writeFileSync(join(jobDir, "working-tree.txt"), dirty, { mode: 0o600 });
+    let result = null;
+    if (bundle.adapter && exitCode === 0 && !stopping) {
+      try {
+        const bytes = readFileSync(join(jobDir, "worker-result.json"));
+        requireThat(bytes.length <= 1024 * 1024, "Worker result exceeds size limit.");
+        result = JSON.parse(bytes);
+        requireThat(result.version === 1 && result.status === "completed" &&
+          result.attemptId === bundle.attemptId && result.scopeHash === bundle.scopeHash &&
+          result.base === base && result.adapter === bundle.adapter && result.synthetic !== true &&
+          result.model === configured.config.model && result.provider === configured.config.provider,
+          "Worker result does not match this attempt.");
+        if (bundle.adapter === "security") {
+          requireThat(head === base && !dirty, "Security scan changed the checkout; result needs investigation.");
+          requireThat(Number.isInteger(result.findingsCount) && result.findingsCount >= 0, "Invalid finding count.");
+        }
+      } catch {
+        result = null;
+        exitCode = 1;
+        errorMessage = "Workerresultatet kunne ikke valideres. Se private artifacts.";
+      }
+    }
     store.transaction(() => {
       const fresh = store.get(task.id),
         a = fresh.attempts.find((a) => a.id === bundle.attemptId);
@@ -254,6 +282,10 @@ try {
         exitCode,
         error: errorMessage,
         uncommitted: !!dirty,
+        // Agent/SDK telemetry is retained privately. It never becomes independent review or an invoice.
+        workerResult: result ? "worker-result.json" : null,
+        findingsCount: result?.findingsCount ?? null,
+        ...(result?.adapter === "security" ? { security: result.findingsCount > 0 ? "finding" : "inconclusive" } : {}),
       });
       fresh.stage = exitCode === 0 && !stopping ? "review" : "blocked";
       fresh.stopRequested = false;
