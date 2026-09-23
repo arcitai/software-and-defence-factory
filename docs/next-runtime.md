@@ -1,10 +1,12 @@
 # Fra starter til en factory, der kan arbejde uden opsyn
 
-Beslutningsforslag efter [videogennemgangen](video-audit.md), suppleret med [Pi-research](pi-research.md) 22. september 2026. Dette er **næste versions kontrakt og prioritering**, ikke funktioner, som v0.1 allerede har. [Arkitekturen](architecture.md) beskriver den kørende kode.
+Beslutningsforslag efter [videogennemgangen](video-audit.md), [Pi-research](pi-research.md) og [BuilderIO-gennemgangen 23. september 2026](builderio-review.md). Dette er **næste versions kontrakt og prioritering**, ikke funktioner, som v0.1 allerede har. [Arkitekturen](architecture.md) beskriver den kørende kode.
 
-**Senere implementering samme dag:** Pi RPC og Security SDK er nu tilsluttet den eksisterende CLI-runner og syntetisk afprøvet. [Aktuel worker-status](worker-integrations.md). Det implementerer ikke i sig selv den ubemandede pipeline nedenfor.
+**Implementeret 22. september:** Pi RPC og Security SDK er nu tilsluttet den eksisterende CLI-runner og syntetisk afprøvet. [Aktuel worker-status](worker-integrations.md). Det implementerer ikke i sig selv den ubemandede pipeline nedenfor.
 
 Den mindste fornuftige løsning er **én controller, én worker og ét pilotrepo**. GitHub er indgangen til arbejdet og hjem for kode/PR. Runtime ejer kørsler, låse og stop. Dashboardet viser denne tilstand. Skills beskriver faglig metode; de skal ikke være eneste håndhævelse af budgetter, checks eller adgang.
+
+**Forenkling 23. september:** behold den nuværende runner til en manuel pilot. Den synlige arbejdsgang er **find og afgræns → ret og bevis → review og aflever**. Et samlet overblik viser beslutninger, beviser og forbrug. Automatisér ét gentaget trin ad gangen efter faktisk brug; et nyt framework, endnu en controller og mange planlagte agentjobs er ikke forudsætninger.
 
 ## Den samlede arbejdsgang
 
@@ -27,9 +29,9 @@ flowchart TD
 
 Implementering kan bruge Codex, Cursor eller en anden egnet harness. Security kan tilføje en specialist til samme pipeline. Små rettelser behøver ikke en separat planner-agent. Tests og venten på kendte eksterne tilstande udføres af kode. En agent tilkaldes, når noget kræver vurdering eller reparation.
 
-## Før vi vælger en permanent motor
+## Hvis piloten viser behov for en anden motor
 
-Afprøv **Machinist først som controller-kandidat**, med Sandcastle som alternativ byggesten, hvis hovedbehovet er agent-/sandboxadaptere. **Pi er nu første harness-kandidat**; controller og harness løser forskellige opgaver. Pi’s syntetiske RPC-prøve er gennemført, men erstatter ikke controller-/recovery-prøven nedenfor. Begræns denne til ét syntetisk repo, ingen providerbetaling og ingen produktionsadgang i første fase.
+**Machinist er en mulig senere controller-kandidat**, med Sandcastle som alternativ byggesten, hvis hovedbehovet er agent-/sandboxadaptere. Det tidligere forslag om at afprøve Machinist før piloten er nedprioriteret: dokumentér først en konkret begrænsning i nuværende runner og forventet mindre vedligehold. **Pi er første harness-kandidat**; controller og harness løser forskellige opgaver. Pi’s syntetiske RPC-prøve er gennemført, men erstatter ikke controller-/recovery-prøven nedenfor. Ved et muligt skifte begrænses prøven til ét syntetisk repo, ingen providerbetaling og ingen produktionsadgang i første fase.
 
 | Afprøvning | Bestået når |
 | --- | --- |
@@ -78,6 +80,8 @@ Review, PR-merge, deployment og produktionsobservation har hver sin status. En i
 
 Start efter en reel pilotrelease med read-only observation af få aftalte signaler: fejlrate, svartid og kundens valgte forretningsmål. Registrér baseline, release-SHA, observationsvindue og kontaktperson. Et signal bliver en deduplikeret opgave med reproduktion og konsekvens. Rå kundelogs og sårbarheder bliver i det godkendte private scope.
 
+Saml nødvendige menneskelige beslutninger i [én lille oversigt](../templates/human-review.md), inklusive ældre uafsluttet arbejde og manglende datadækning. Efter pilotleverancer laves et manuelt tilbageblik: kom samme fejl igen efter en verificeret release, eller manglede der bevis for første fix? Automatisér kun dette, hvis gentagelsen er nyttig. Kendt status og venten indsamles af kode; modeller bruges til vurdering og diagnose.
+
 Fejl i selve factoryen klassificeres: uklart scope, utilgængeligt værktøj, miljøfejl, implementeringsfejl, reviewfejl, kapacitets-/budgetstop eller regressionsfejl efter release. En foreslået prompt-/skillændring får en almindelig ændring i Git og en sammenlignelig evaluering, før den bruges til fremtidige jobs. Produktionsagenter må ikke ændre deres egne sikkerheds- eller acceptgrænser.
 
 ## Prioriterede næste opgaver
@@ -86,12 +90,13 @@ Disse er lokale opgaveudkast; de er ikke oprettet på GitHub.
 
 | Prioritet / opgave | Leverance og konkret accept |
 | --- | --- |
-| **P0 — Vælg én runtime gennem en afgrænset prøve** | Kør scenarierne ovenfor med en testadapter. Beslut genbrug eller fortsat lille egen motor; skriv begrundelse og kodeomfang |
-| **P0 — Et reproducerbart, afgrænset miljø** | Én workerprofil med rigtige checks, testdata og capabilities. Bevis at controllerdata/administrationsnøgler ikke kan nås, og at stop virker |
-| **P0 — Luk kvalitetssløjfen** | Implementering → konfigurerede checks → separat review → højst to reparationer → reviewpakke eller præcis blocker. Stale head, manglende check og ændret policy afvises |
+| **P0 — Én manuel pilot gennem eksisterende runner** | Dry-run-triage af få aftalte issues; én reproducerbar fejl gennem de tre trin. Bevar præcis revision, beviser, alle forsøg og faktisk mennesketid. Ingen ny scheduler kræves |
+| **P0 før reel workerafvikling — Et reproducerbart, afgrænset miljø** | Én workerprofil med rigtige checks, testdata og de nødvendige capabilities. Bevis at controllerdata/administrationsnøgler ikke kan nås, og at stop virker |
+| **P0 før automatisk aflevering — Luk kvalitetssløjfen** | Implementering → konfigurerede checks → separat review → højst to reparationer → reviewpakke eller præcis blocker. Stale head, manglende check og ændret policy afvises. Manuel review bruges indtil da |
 | **P0 før betalt ubemandet brug — Forbrug og recovery** | Providerens stop efterprøves; jobs kan genstartes uden dublet, tabte artifacts eller nulstillet budget. Ukendt forbrug forbliver ukendt |
 | **P1 — GitHub-pipeline og synligt forbrug** | Pagination/reconciliation, issue/PR-identitet, konkret aktørkontrol, versionsspor og automatisk usage, hvor API giver det. Én ejer af eventrouting |
-| **P1 — Tre rigtige Kastanje-opgaver** | En bug, en mindre forbedring og en afgrænset security-rettelse. Samme dokumentationskrav og målt samlet mennesketid før/efter |
+| **P1 — Tre rigtige Kastanje-opgaver** | En bug, en mindre forbedring og en afgrænset security-rettelse. Samme dokumentationskrav og målt samlet mennesketid før/efter; derefter manuelt tilbageblik og valg af ét trin at automatisere |
 | **P2 — Drift og begrænset parallelitet** | Først read-only releasefeedback. Derefter separate workspaces og integrationskø, hvis ventetid og økonomi begrunder flere writers |
+| **Kun ved dokumenteret behov — Ny controller** | Afprøv scenarierne ovenfor, sammenlign vedligehold og migrér til én autoritativ runtime. Ingen parallel kø som ekstra lag |
 
 Kastanje som inference-produkt og Z13 som hardwarepilot kan testes uafhængigt. Bachelorens eksisterende afgrænsning ændres ikke her. Kundetilbuddet bør være én fungerende arbejdsgang med dokumenteret kvalitet og ejerskab, ikke et løfte om fuld autonomi eller et bestemt modelabonnement.

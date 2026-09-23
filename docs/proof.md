@@ -94,3 +94,13 @@ The optional SDK was installed only under `profiles/security/node_modules` with 
 Browser inspection of a disposable local demo confirmed the revised Setup and Agents pages, including the distinct synthetic integration/model-preflight labels, at desktop and narrow layouts. The browser's temporary viewport was reset and the tab closed. Local Markdown targets resolved and `git diff --check` passed.
 
 This was the implementing agent's scoped review, not an independent specialist review. Live inference, model quality, provider billing, customer scanning, OS sandbox containment, browser/desktop capability integration and unattended GitHub-to-PR execution remain pilot work. [Current setup and boundaries](worker-integrations.md).
+
+## BuilderIO simplification — 23 September 2026
+
+Read the complete 17:34 English auto-generated transcript for Steve (Builder.io)'s `pNmfMi-yjZk`, including all 596 timestamped segments. The browser export initially reported no transcript; after the actual video and transcript panel loaded, export succeeded. The private scratch manifest records the source ID, description links, language and transcript SHA-256 `1f41d3ae2ba002ffc07108825b5cca96ba51974e56b0dd89a4a66fb96179744f`. The full transcript is excluded from this repository and its archive.
+
+Read the Factory guide, configuration convention, all nine Factory skills, general agent-watchdog, catalog and plugin/MCP configuration at BuilderIO/skills revision `9e4f7beb3def2d785a6fa347fd946fd1a063f522`. Followed the second description link to BuilderIO/agent-native at `67cf8bbeca31c3c43b795cf5b9b89b60c011421f`, inspecting the shared-action documentation, package metadata, Factory template and selected dispatch/automation source. No upstream installer, app or workflow was run; this was not a dependency or security audit.
+
+The [research](builderio-review.md) distinguishes instructions from host capabilities and from the larger Factory app. Updated next-runtime priorities to use the existing runner for a manual pilot before considering another controller. Added a manual human-decision template and recurrence field in the review packet. Existing skill instructions, runtime code, schemas and UI behavior were not changed; the skill index now explains the three-step presentation.
+
+All 101 local Markdown file targets resolved and `git diff --check` passed. Runtime tests were not repeated for this documentation-only change; the latest runtime validation remains the 24-test run above. No new UI behavior is claimed, and no model execution, installation, scheduler, external message, PR or deployment was performed. Review was by the authoring agent, not an independent reviewer.

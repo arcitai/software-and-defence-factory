@@ -46,7 +46,10 @@ Alle kendte findings skal have en disposition med grundlag. Review må ikke bliv
 - Lokal accept, PR, merge og deploy angives separat:
 - Genkontrol efter rebase/integration:
 - Hvis release indgår: releaseidentitet, baseline, observationsvindue og ansvarlig:
+- Ved tilbagevendende fejl: oprindelig opgave, tidligere fix, faktisk releaseversion og ny reproduktion:
 - Hvis driftssignal opstår: privat evidens, deduplikeringsnøgle og scoped opgave:
 - Stop/oprydning: processtatus, bevarede commits/artifacts og credential-status:
 
 Den udfyldte pakke supplerer v0.1-evidensimporten. Den aktuelle importer læser **ikke** denne Markdown automatisk og håndhæver ikke alle felterne ovenfor.
+
+Det, der kræver en menneskelig beslutning, kan samles i [én kort oversigt](human-review.md) med link til denne pakke.

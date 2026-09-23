@@ -18,4 +18,6 @@ Warp/Oz were inspected read-only as references, not copied:
 
 Primary sources and product claims are linked in research.md and profiles/. The prior Arcitai issue/task context informed the pilot and offer shape. Private conversation transcripts, customer content, tokens and owner-home files were not bundled into this repository. The demo and evaluation fixture are synthetic and original.
 
+The [BuilderIO review](builderio-review.md), 23 September 2026, inspected `BuilderIO/skills` at `9e4f7beb3def2d785a6fa347fd946fd1a063f522` and selected `BuilderIO/agent-native` files at `67cf8bbeca31c3c43b795cf5b9b89b60c011421f`. Its linked YouTube transcript was read in full. The original analysis and manual decision template adapt workflow ideas; no upstream code, skills, plugin configuration or full transcript was copied into this product. No BuilderIO service is a runtime dependency.
+
 No remote repository, PR, issue comment, deployment, account automation or paid model job was created by this delivery. A local initial Git snapshot and source archive make the result portable; publication remains a separate chosen destination.

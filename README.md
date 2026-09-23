@@ -46,6 +46,7 @@ Security SDK har et åbent dependencyfund i ZIP-håndteringen. Adapteren bruger 
 
 ## Læs videre
 
+- [BuilderIO: tre trin, få capabilities og en manuel pilot først](docs/builderio-review.md) · [Kræver din beslutning](templates/human-review.md)
 - [Pi: dyb research, minimumscapabilities og vurdering af HarnessTax](docs/pi-research.md) · [Pi-profiler](profiles/pi/README.md)
 - [Pi- og Security-jobadaptere: opsætning og prøver](docs/worker-integrations.md)
 - [Genbrug Codex Security og pak et lean Pi-setup](docs/codex-reuse.md)

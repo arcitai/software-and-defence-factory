@@ -9,4 +9,6 @@ These six original, portable skills are project-local Markdown. They require no 
 - [factory-security](factory-security/SKILL.md): Perform the bounded security review requested by a factory task and separate candidate findings, validation and verified remediation.
 - [factory-evaluate](factory-evaluate/SKILL.md): Run or assess a controlled comparison of factory configurations using fixed cases, evidence and complete cost accounting.
 
+The human workflow has three steps: find and scope (`triage` + `spec`), implement and prove (`implement`, with `security` when needed), and review and hand back (`review`). `evaluate` is for controlled comparisons, not a mandatory extra agent on every job. Six instructions do not require six concurrent agents. See the [BuilderIO review](../../docs/builderio-review.md) from the repository root (`docs/builderio-review.md`).
+
 Skills describe work; they do not install browsers, model endpoints, sandboxes or permissions. See [capabilities](../../config/profiles.json) through the repository root (`config/profiles.json`).

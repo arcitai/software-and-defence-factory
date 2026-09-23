@@ -2,6 +2,8 @@
 
 Gennemgået **21. september 2026**. Alle seks engelske, automatisk genererede YouTube-transskriptioner er hentet og læst. Beskrivelserne er åbnet, forkortede tekniske links er fulgt, og udvalgt kildekode er undersøgt. Undertekster kan fejlskrive navne og modeller; modelpriser og rangeringer i videoerne bruges derfor ikke som aktuelle benchmarks. Dette er en arkitektur- og kildegennemgang, ikke en fuld sikkerhedsaudit af de eksterne projekter.
 
+**Senere opdatering 23. september:** [BuilderIO-videoen og den konkrete kode](builderio-review.md) er nu også gennemgået. Aktuel prioritet er en manuel pilot på eksisterende runner; Machinist er en senere mulighed ved dokumenteret behov. Beskrivelserne og dækningsstatus nedenfor er historikken fra denne første gennemgang. Pi- og Security-adaptere er siden tilføjet; se [aktuel worker-status](worker-integrations.md).
+
 **Anbefaling: behold én lille, åben factory med to spor.** Lad Arcitai eje kundens metode, acceptkriterier, beviser og målinger. Efter [Pi-researchen 22. september](pi-research.md) er Pi første harness-kandidat; Codex er stadig den implementerede adapter. Afprøv Machinist som mulig controller, før vi bygger en permanent kø og scheduler selv. Sandcastle er en alternativ byggesten til isoleret agentafvikling. De to skal ikke begge styre samme job. Kildegennemgangen nedenfor beskriver fortsat de seks videoer og deres konkrete kode.
 
 Vores v0.1 er fortsat en **kørbar starter med manuel overdragelse**, ikke en færdig ubemandet factory. Videoerne ændrer især prioriteringen af den næste version: reproducerbare miljøer, før/efter-bevis, versioneret kørselskonfiguration, økonomiske stop og feedback fra drift. Den konkrete rækkefølge står i [næste runtime](next-runtime.md).
