@@ -34,6 +34,12 @@
     .flow li { position:relative; background:#e9eee7; padding:10px 12px; border-radius:6px; font-size:14px; }
     .flow li:not(:last-child)::after { content:'→'; position:absolute; right:-17px; top:11px; color:var(--muted); }
     .flow b { display:block; font-size:15px; }
+    table { width:100%; border-collapse:collapse; font-size:15px; background:white; }
+    caption { text-align:left; color:var(--muted); font-size:14px; padding-bottom:10px; }
+    th,td { padding:10px 12px; text-align:left; vertical-align:top; border-bottom:1px solid var(--line); overflow-wrap:anywhere; }
+    thead { background:#e9eee7; }
+    tbody th { width:23%; font-weight:650; }
+    .note { margin-top:12px; font-size:14px; color:var(--muted); }
     .scope { display:grid; grid-template-columns:1.1fr 1fr; gap:28px; }
     .scope ul { margin:0; padding-left:20px; }
     .scope li { margin-bottom:8px; padding-left:3px; }
@@ -51,6 +57,9 @@
       .flow { grid-template-columns:1fr; gap:15px; }
       .flow li:not(:last-child)::after { content:'↓'; left:15px; right:auto; top:auto; bottom:-18px; }
       .intro { font-size:17px; }
+      table { font-size:14px; }
+      th,td { padding:9px 7px; }
+      tbody th { width:30%; }
       .finish { margin-top:6px; }
       .recommendation { padding:16px; }
     }
@@ -67,64 +76,63 @@
 <body>
 <main>
   <header>
-    <div class="meta"><span class="brand">ARCITAI / FACTORY</span><span>Til Gustav · 2 minutters review · 24. september 2026</span></div>
-    <h1>Én fungerende del ad gangen.</h1>
-    <p class="intro">Vertical slices er grundreglen: byg én lille funktion gennem de nødvendige lag, afprøv den og udvid derfra. Hele opgaven skal stadig færdiggøres.</p>
+    <div class="meta"><span class="brand">ARCITAI / FACTORY</span><span>Til Gustav · 3–4 minutters review · 24. september 2026</span></div>
+    <h1>Factoryen arbejder i skyen.</h1>
+    <p class="intro">Du behøver ingen kraftig lokal computer. Udviklingen følger stadig vertical slices: én lille funktion fra ende til ende, afprøvning og derefter næste del.</p>
   </header>
 
   <aside class="recommendation" aria-label="Anbefalet beslutning">
-    <strong>Mit forslag: gå videre med etape 1 nedenfor.</strong>
-    Ét system til software og security. Pi som første worker, Codex Security som valgfri specialist. Model og hosting skal fortsat kunne skiftes.
+    <strong>Hurtig pilot: Codex Cloud. Åben produktprofil: Pi i en cloud-sandbox.</strong>
+    Start manuelt med dit eksisterende abonnement, hvis cloudadgangen er tilgængelig. Byg derefter én Pi/Daytona-forbindelse til vores dashboard. Samme metode, krav og målinger; model og hosting kan skiftes.
   </aside>
 
-  <section aria-labelledby="status-title">
-    <h2 id="status-title">Hvor er vi nu?</h2>
-    <div class="status">
-      <article class="card"><span class="tag built">BYGGET</span><h3>Det lokale fundament</h3><p>Dashboard, opgaver, GitHub-læsning, jobjournal, stop, evidensimport og lokal accept.</p></article>
-      <article class="card"><span class="tag tested">SYNTETISK AFPRØVET</span><h3>Agentforbindelserne</h3><p>Pi- og Security-adaptere virker med kontrollerede testdata. En rigtig model- og kundepilot mangler.</p></article>
-      <article class="card"><span class="tag next">BESKREVET · MANUELT</span><h3>Værdien og kvaliteten</h3><p>Fem målepunkter og én scorer er klar som metode. Automatisk scoring og de nye dashboardfelter mangler.</p></article>
-    </div>
+  <section aria-labelledby="stack-title">
+    <h2 id="stack-title">Hvad bruger vi til hvad?</h2>
+    <table>
+      <caption>Forslag til vores åbne cloudprofil · integrationen skal bygges</caption>
+      <thead><tr><th scope="col">Del</th><th scope="col">Valg og opgave</th></tr></thead>
+      <tbody>
+        <tr><th scope="row">Opgaver og kode</th><td><strong>GitHub.</strong> Issues, branches og PR’er er arbejdsgrundlaget.</td></tr>
+        <tr><th scope="row">Styring og UI</th><td><strong>Vores Node/SQLite-app på en lille EU-server.</strong> Holder kø, status og beviser. Privat adgang via SSH i første version.</td></tr>
+        <tr><th scope="row">Agentens computer</th><td><strong>Daytona-sandbox ved behov.</strong> Eget checkout, terminal, tests og browser. Arbejder videre, når din laptop lukkes.</td></tr>
+        <tr><th scope="row">Agent og model</th><td><strong>Pi + valgt model-API.</strong> Repoets skills følger med. Kastanje/EU er en mulig modelrute, som skal kvalificeres.</td></tr>
+        <tr><th scope="row">Browser / desktop</th><td><strong>Browser-CLI først.</strong> Computer-use tilføjes ved behov; Pi får ikke værktøjerne automatisk fra sandboxen.</td></tr>
+        <tr><th scope="row">Kvalitet og security</th><td><strong>Faste checks + separat review.</strong> Codex Security som valgfri specialist. Beviser skal passe til kodeversionen.</td></tr>
+        <tr><th scope="row">Triggere og CI</th><td><strong>GitHub API fra controlleren.</strong> GitHub Actions er valgfrit til korte PR-checks. Agenten og ventetiden ligger udenfor.</td></tr>
+        <tr><th scope="row">Dokumenteret værdi</th><td><strong>Journal + målekort.</strong> Kvalitet, samlet pris, al mennesketid, gennemløbstid og fejl efter accept.</td></tr>
+      </tbody>
+    </table>
+    <p class="note"><strong>Det er kun styringen, der skal være tændt hele tiden.</strong> Agentcomputeren starter ved opgaver. Ingen egen GPU er nødvendig, når modellen leveres via en API.</p>
   </section>
 
-  <section aria-labelledby="method-title">
-    <h2 id="method-title">Det nye fra Dex og playbooken</h2>
-    <ol class="flow" aria-label="Fire perspektiver på større ændringer">
-      <li><b>1. Behov</b>Hvem hjælper vi, og hvad skal virke?</li>
-      <li><b>2. Arkitektur</b>Hvor passer ændringen ind?</li>
-      <li><b>3. Kodevalg</b>Hvilke kontrakter og tests er vigtige?</li>
-      <li><b>4. Vertical slices</b>Ét lille forløb, der virker fra ende til ende.</li>
-    </ol>
-    <p class="small" style="margin-top:12px">Kort plan først. Hver slice får afprøvning, beviser og et gemt næste skridt. Agenten fortsætter inden for aftalt scope; du involveres ved væsentlige, uafklarede beslutninger.</p>
+  <section aria-labelledby="choice-title">
+    <h2 id="choice-title">Tre vigtige afklaringer</h2>
+    <div class="status">
+      <article class="card"><h3>Codex Cloud er genvejen</h3><p>En manuel pilot kræver ingen egen server. Cloud og lokal Codex deler dog abonnementsgrænser. Eget dashboard via Agents API er en særskilt, API-afregnet integration.</p></article>
+      <article class="card"><h3>Cloudroom er inspiration</h3><p>God model for jobs, der overlever en afkoblet klient. Men selvhosting tilføjer Linux-drift, Rust og PostgreSQL. Vi overtager principperne og beholder vores lille kerne.</p></article>
+      <article class="card"><h3>Compute er kun én udgift</h3><p>Daytona-eksempel: 2 vCPU + 4 GiB i 20 timer ≈ $3,31. Model, disk, controller og øvrig drift kommer oveni. Ingen samlet prisbesparelse er målt.</p></article>
+    </div>
+    <p class="note">Cursor er et alternativ, hvis færdig browser/desktop sparer opsætning. Vi bygger én cloudadapter først. <a href="cloud-setup.md">Se alternativer, prisgrundlag og Cloudroom-gennemgang</a>.</p>
+  </section>
+
+  <section aria-labelledby="status-title">
+    <h2 id="status-title">Hvad findes allerede?</h2>
+    <p><strong>Bygget:</strong> lokalt dashboard, opgaver, GitHub-læsning, journal, stop og evidensimport. <strong>Syntetisk afprøvet:</strong> Pi og Security. <strong>Mangler:</strong> fjernworker, automatisk jobforløb og rigtige pilotmålinger. Cloudprofilen er endnu en plan.</p>
   </section>
 
   <section aria-labelledby="build-title">
-    <h2 id="build-title">Etape 1 · Det bygger jeg som det næste</h2>
-    <div class="scope">
-      <ul>
-        <li><strong>Én brugbar Pi-profil:</strong> afgrænset arbejdsmiljø, modelprøve og browserværktøj til UI-opgaver.</li>
-        <li><strong>Et samlet opgaveforløb:</strong> forbind runner, krævede checks og reviewpakke; vis fejl og stop tydeligt.</li>
-        <li><strong>Et lille resultatoverblik:</strong> kvalitet, pris, mennesketid, gennemløbstid og fejl efter accept. Scorer registreres først manuelt.</li>
-      </ul>
-      <div class="finish">
-        <h3>Etapen er færdig, når …</h3>
-        <p>Én afgrænset opgave kan følges fra krav til review af både adfærd og kodevalg, med præcis kodeversion, beviser og målinger. Ukendte tal står som ukendte.</p>
-        <p class="small">Prøven skal også vise, at fejlede checks og forældede beviser stopper accept. En syntetisk prøve dokumenterer integration; en rigtig modelkørsel dokumenteres særskilt.</p>
-      </div>
-    </div>
-  </section>
-
-  <section aria-labelledby="later-title">
-    <h2 id="later-title">Derefter, i denne rækkefølge</h2>
+    <h2 id="build-title">Næste byggetrin · tre vertical slices</h2>
     <div class="roadmap">
-      <p><b>2 / Kastanje som produktpilot</b>Tre små opgaver; én videreudvikler tidligere leveret kode. Mål mennesketid, omarbejde og regressioner til bacheloren.</p>
-      <p><b>3 / Automatisér gentagelserne</b>Forbind issues og PR’er tættere. Tilføj automatisk scoring, når vurderingerne er kalibreret.</p>
-      <p><b>4 / Kvalificér driften</b>Kastanje/EU-inference eller lokal Z13-model efter pilotbehov. Afprøv recovery og forbrugsgrænser.</p>
+      <p><b>1 / Én opgave gennem skyen</b>Forberedt opgave → Pi-sandbox → synlig reviewpakke. Med fast revision, adgangsgrænser, timeout og stop fra første slice.</p>
+      <p><b>2 / Afbryd og kom tilbage</b>Genfind jobbet efter mistet forbindelse eller genstart. Ingen dobbelt worker, tabte beviser eller nulstillet budget.</p>
+      <p><b>3 / Tilslut GitHub-flowet</b>En godkendt issue følger samme vej til PR og review. Derefter tre Kastanje-opgaver, inklusive videreudvikling af tidligere kode.</p>
     </div>
+    <p class="note">Behov → arkitektur → kodevalg → små fungerende dele. Afprøv hver del, gem beviser og fortsæt inden for aftalt scope. Ukendt status eller pris skal være synlig.</p>
   </section>
 
   <footer>
-    <p><strong>Til dit review:</strong> retning, afgrænsning og rækkefølge. De praktiske detaljer kan jeg håndtere. Dette er en opdateret plan; etape 1 er endnu ikke færdigbygget.</p>
-    <p>Grundlag: <a href="dex-review.md">Dex, video og gist</a>, <a href="proof.md">afprøvninger</a>, <a href="next-runtime.md">byggeplan</a> og <a href="value.md">målemetode</a>. En rigtig pilot kræver et egnet worker-miljø og en konkret modelrute. Siden virker offline uden JavaScript.</p>
+    <p><strong>Til dit review:</strong> cloudretning, komponentvalg og byggeorden. Kontoopsætning, deployment og betalte forsøg er ikke udført.</p>
+    <p><a href="cloud-setup.md">Cloudguide og primære kilder</a> · <a href="next-runtime.md">Byggeplan</a> · <a href="value.md">Målemetode</a> · <a href="dex-review.md">Dex og playbook</a> · <a href="proof.md">Afprøvninger</a>. Siden virker offline uden JavaScript.</p>
   </footer>
 </main>
 </body>

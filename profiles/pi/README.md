@@ -2,6 +2,8 @@
 
 **Status: Pi er nu forbundet med CLI-jobrunneren og afprøvet gennem et helt syntetisk job.** Se [aktuel worker-opsætning](../../docs/worker-integrations.md). Model, browser og miljø skal stadig kvalificeres. Se [research og begrundelser](../../docs/pi-research.md). Skabelonerne her bliver ikke automatisk læst af Pi eller dashboardet. De skal kopieres til en særskilt worker-konfiguration efter valg af miljø og model. Ingen af dem ændrer brugerens `~/.pi/agent`.
 
+**Cloud uden egen stor maskine:** den foreslåede første fjernprofil er Pi i en Daytona-sandbox med ekstern model-API og den eksisterende controller på en lille server. Worker-image, browserforbindelse og fjernadapter mangler. Se [komponenter, omkostninger og byggeorden](../../docs/cloud-setup.md). Den lokale RPC-prøve beviser ikke dette cloudsetup.
+
 ## Pakken vi vil afprøve
 
 | Del | Første valg | Status |

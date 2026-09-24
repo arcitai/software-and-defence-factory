@@ -10,6 +10,8 @@ Den mindste fornuftige løsning er **én controller, én worker og ét pilotrepo
 
 **Måling 24. september:** følg [den lille måleprotokol](value.md#start-her-fem-målepunkter-og-en-scorer): kvalitet, samlet pris, al mennesketid, gennemløbstid og fejl efter accept. Én valgfri scorer supplerer reviewet med en evidensvurdering. Brug baseline → undersøg fejl → afprøv én ændring → review → mål igen. Det bygger videre på [Warp Scorers](warp-measurement.md) uden en ny runtime eller obligatorisk evaluatormodel.
 
+**Cloudretning 24. september:** udgangspunktet er nu en bruger uden stort lokalt setup. [Komponentoversigten](cloud-setup.md) anbefaler Codex Cloud til en hurtig, manuel metodepilot og **Pi/Daytona som første nye fjernadapter** til vores eksisterende kerne på en lille server. Ingen Actions er nødvendig som runtime. Cloudroom er gennemgået, men Rust/PostgreSQL indføres ikke uden et dokumenteret behov. Dette præciserer den tidligere lokale pilotretning; den lokale runner bevares som udviklings- og testvej.
+
 ## Den samlede arbejdsgang
 
 **Design før større ændringer:** udfyld fire korte punkter i [reviewpakken](../templates/review-packet.md): behov/succesmål, berørte systemgrænser, vigtigste kodekontrakter og første afprøvelige del. Undersøg eksisterende kode og markér væsentlige, usikre valg. Omfanget følger konsekvens og usikkerhed. Tydelige små rettelser kan bruge det eksisterende scope direkte. Saml relevante beslutninger; fire perspektiver medfører ikke fire obligatoriske godkendelser eller nye agenter.
@@ -54,17 +56,28 @@ Implementering kan bruge Codex, Cursor eller en anden egnet harness. Security ka
 
 Kilden til kandidatens muligheder og begrænsninger står i [Machinist-afsnittet](video-audit.md#machinist-undersøg-før-vi-genopfinder-runtime). Vi har kun læst koden; denne afprøvning er **ikke udført**. Hvis kandidaten vælges, bliver dens runtime-status autoritativ. Arcitais UI kan vise den via en adapter; den eksisterende lokale forsøgsjournal må ikke konkurrere om jobclaim. Gem en eksport og definér migreringen, før en kø flyttes.
 
-## Tre deploymentprofiler
+## Deploymentprofiler og førstevalg
 
-| Profil | Controller og worker | Inference | Første brug |
+| Profil | Controller og worker | Inference | Første brug / grænse |
 | --- | --- | --- | --- |
-| Lokal | Loopback-UI på egen maskine; dedikeret VM/arbejdsmiljø til worker | Lokal Ollama eller valgt ekstern rute | Z13 med syntetiske cases. Mål RAM, GPU, kontekst og stabilitet først |
-| Egen cloud | Privat UI på en lille egen VM via SSH-tunnel; isoleret worker | Kastanje/EU eller anden valgt provider | Kastanje-pilot med én opgave ad gangen |
-| Managed cloud | Eksisterende UI og eksplicit overdragelse til Cursor Cloud Agent | Providerens dokumenterede muligheder | Når managed browser/computer reducerer opsætningsarbejdet |
+| Hurtig managed pilot | Codex Cloud styrer sin egen opgave; manuel forbindelse til vores review/metode | Tjenestens tilgængelige modeller | Hurtig start uden egen server. Konto/adgang skal prøves; ikke vores automatiske issue-pipeline |
+| **Åben cloudprofil — første nye adapter** | Eksisterende Node/SQLite-controller på lille VM; Pi i Daytona-sandbox pr. job | Valgt ekstern API; Kastanje/EU efter kvalifikation | Pi-image, fjernprotokol, artifact-import og recovery skal bygges. UI via privat SSH-portforward |
+| Andre managed alternativer | Cursor Cloud Agent eller Agents API med hosted sandbox | Den valgte tjenestes muligheder | Cursor ved færdig computer-use; Agents API ved eget dashboard med OpenAI-harness. Særskilt adgang/afregning; bygges ikke parallelt med Pi-ruten |
+| Lokal | Loopback-UI; dedikeret VM/arbejdsmiljø til worker | Lokal Ollama eller valgt ekstern rute | Z13-pilot senere. Mål RAM, GPU, kontekst og stabilitet først |
+
+De konkrete primærkilder og prisgrænser står i [cloudguiden](cloud-setup.md). Ingen profil er endnu afprøvet som en komplet cloudleverance. Cloud betyder ikke én samlet tjeneste: controller, arbejdsmiljø og model har hver sin livscyklus og afregning.
 
 Ingen profil kræver GitHub Actions. Repository-checks kan køre i workerens testmiljø. Hvis projektet allerede bruger ekstern CI, læses dens resultater også. En ny issue starter ikke automatisk en dyr agent: den gennemgår deduplikering, aktør-/repo-kontrol, scope og capability/budget-check, før den kan claimes.
 
 Egen cloud kræver ikke en GPU, når inference er ekstern. Lokal runtime betyder ikke lokal inference. En lokal model gør heller ikke browseropslag, GitHub, logs og backups lokale. EU-løftet kræver kontrol af hele den valgte datavej; se [value.md](value.md).
+
+### Fjernprofilen bygges i gennemgående dele
+
+1. **Forberedt job → rigtig fjernstatus → reviewpakke:** den mindste Pi/Daytona-adapter, nødvendigt image, kendt base/revision, afgrænset adgang, én writer, timeout, stop og bevarede artifacts. Prøv med syntetisk provider først. En rigtig modelkørsel er særskilt evidens.
+2. **Afbryd og genoptag samme job:** gem provider-id, genfind faktisk tilstand, håndter crash og dobbelte events uden en ekstra writer. Efterprøv budgetgrænser og oprydning før betalt ubemandet drift; mistet kontakt er ukendt, ikke stoppet.
+3. **Godkendt issue → eksisterende jobvej → PR/review:** periodisk API-læsning med reconciliation først; signed webhook kan følge senere. Ingen ny scheduler og ingen automatisk merge.
+
+Hver slice bruger de nødvendige lag og afprøves før næste. Den nuværende controller og worker deler filsystem/journal; en ekstern sandbox kan ikke kobles på med en URL alene. SQLite forbliver lokalt hos controlleren. Fjernadapteren skal transportere job og artifacts samt afstemme processtatus. Det lokale Codex-arbejde og cloudjobbet får separate branches/workspaces.
 
 ## Arbejdsmiljøets kontrakt
 
@@ -102,7 +115,7 @@ Disse er lokale opgaveudkast; de er ikke oprettet på GitHub.
 
 | Prioritet / opgave | Leverance og konkret accept |
 | --- | --- |
-| **P0 — Én manuel pilot gennem eksisterende runner** | Kort behov/design/kontrolplan; én reproducerbar fejl gennem hele forløbet i små afprøvelige dele. Fastlæg baseline og udfyld [målekort](../templates/measurement-card.md) med præcis revision, beviser, alle forsøg og samlet mennesketid. Review omfatter både adfærd og kodevalg |
+| **P0 — Én manuel metodepilot og første fjernslice** | Hurtig metodepilot kan ske i Codex Cloud med manuel reviewpakke. Produktarbejdet bygger én Pi/Daytona-jobvej gennem eksisterende kerne som ovenfor. Fastlæg baseline og udfyld [målekort](../templates/measurement-card.md) med præcis revision, beviser, alle forsøg og samlet mennesketid. Skeln mellem manuelle overdragelser, syntetiske prøver og reel cloudintegration |
 | **P0 før reel workerafvikling — Et reproducerbart, afgrænset miljø** | Én workerprofil med rigtige checks, testdata og de nødvendige capabilities. Bevis at controllerdata/administrationsnøgler ikke kan nås, og at stop virker |
 | **P0 før automatisk aflevering — Luk kvalitetssløjfen** | Implementering → konfigurerede checks → separat review → højst to reparationer → reviewpakke eller præcis blocker. Stale head, manglende check og ændret policy afvises. Manuel review bruges indtil da |
 | **P0 før betalt ubemandet brug — Forbrug og recovery** | Providerens stop efterprøves; jobs kan genstartes uden dublet, tabte artifacts eller nulstillet budget. Ukendt forbrug forbliver ukendt |

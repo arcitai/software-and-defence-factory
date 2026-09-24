@@ -6,6 +6,8 @@ Research samlet **24. september 2026**. Warp-gennemgangen nedenfor suppleres af 
 
 **Dex og playbooken, 24. september:** [Artikel, billeder, fuld videotransskription og den supplerende gist](dex-review.md) er gennemgået. Planen samler behov, arkitektur og kodevalg før større ændringer, bygger små gennemgående leverancer og afprøver et senere krav på samme kode. Den eksisterende reviewpakke bærer metoden; der tilføjes ingen obligatorisk række af godkendelser eller ny runtime.
 
+**Cloudsetup, 24. september:** [Komponenttabel og Cloudroom-gennemgang](cloud-setup.md) tager udgangspunkt i en bruger uden stort lokalt setup. Codex Cloud er den hurtigste manuelle pilotmulighed; Pi/Daytona med eksisterende kerne på en lille server er den åbne målprofil. Agents API og Cursor er alternativer. Cloudroom bidrager med principper, ikke en ny obligatorisk runtime. Ingen komplet cloudprofil er tilsluttet eller økonomisk benchmarket.
+
 ## Den anbefalede form
 
 Ét produkt: **Arcitai Software & Defence Factory**. Én metode og arbejdsflade, to arbejdsspor, flere udskiftelige harness-/modelprofiler. Start med en operatør og et pilotrepo. GitHub er den første forge-adapter; kernen ejer ikke GitHub-specifikke agentantagelser. Kastanje bliver både en pilotcase og en valgfri inference-rute.

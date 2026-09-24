@@ -38,9 +38,9 @@ npm run doctor
 
 ## Vælg første setup
 
-1. **Åben factory: Pi er første kandidat.** Efter den nye research anbefales Pi + isoleret worker + én browser-CLI, med Kastanje eller lokal inference som mulige ruter. Pi er nu tilsluttet CLI-jobrunneren og har bestået et helt syntetisk job. Model og miljø kræver konkret preflight. [Worker-opsætning](docs/worker-integrations.md). [Research](docs/pi-research.md) · [konkret Pi-blueprint](profiles/pi/README.md).
-2. **Adapter som findes i v0.1: Codex CLI.** Brug den eksisterende worker-overdragelse, når den konkrete Codex/model/miljøprofil er kvalificeret. Lokal worker er ikke automatisk lokal inference. [Lokal profil](profiles/codex-local.md) · [Kastanje/Ollama via Codex](profiles/open-models.md).
-3. **Managed cloud: Cursor Cloud Agent.** Relevant, når managed computer/browser og repo-miljø begrunder mindre kontrol over stacken. [Cursor-opskrift](profiles/cursor-cloud.md).
+1. **Hurtigste cloudpilot: Codex Cloud**, hvis dit eksisterende abonnement giver adgang. Start én afgrænset opgave manuelt; arbejd videre lokalt imens. Cloud og lokal brug deler forbrugsgrænser. Vores dashboard er endnu ikke koblet til tjenesten.
+2. **Vores åbne cloudprofil: Pi i Daytona-sandbox + lille server til den eksisterende kerne.** Ingen kraftig lokal hardware eller egen GPU kræves med ekstern model-API. Fjernadapter, worker-image og recovery skal bygges; første nye integration er Pi/Daytona. [Komponenttabel, alternativer, priser og Cloudroom-vurdering](docs/cloud-setup.md).
+3. **Eget arbejdsmiljø:** de eksisterende CLI-adaptere kan bruges efter konkret kvalifikation. [Pi-blueprint](profiles/pi/README.md) · [Codex lokalt](profiles/codex-local.md) · [Kastanje/Ollama](profiles/open-models.md). Cursor er et managed alternativ, især ved behov for færdig browser/desktop. [Cursor-opskrift](profiles/cursor-cloud.md).
 
 Security bruger samme kerne og et særskilt specialistspor. Den officielle Codex Security SDK er nu et valgfrit worker-modul med en bestået syntetisk rapportprøve. Reel modeladgang og scanning skal kvalificeres separat. Browser og især desktopstyring kræver deres egne prøver. Ingen Warp-abonnement kræves, og ingen prisbesparelse er målt på en komplet pilot endnu.
 
@@ -48,6 +48,7 @@ Security SDK har et åbent dependencyfund i ZIP-håndteringen. Adapteren bruger 
 
 ## Læs videre
 
+- [Cloudsetup: hvad bruger vi til hvad, Cloudroom og forbrugsmodellen](docs/cloud-setup.md)
 - [Dex og playbooken: design før kode, små leverancer og en prøve med senere krav](docs/dex-review.md)
 - [BuilderIO: tre trin, få capabilities og en manuel pilot først](docs/builderio-review.md) · [Kræver din beslutning](templates/human-review.md)
 - [Pi: dyb research, minimumscapabilities og vurdering af HarnessTax](docs/pi-research.md) · [Pi-profiler](profiles/pi/README.md)

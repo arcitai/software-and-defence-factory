@@ -1,5 +1,7 @@
 # Opsætning og en fuld opgave
 
+Vil du starte uden stor lokal maskine, så læs først [cloudoversigten med komponentvalg](cloud-setup.md). Den skelner mellem en manuel Codex Cloud-pilot og vores endnu ikke tilsluttede Pi/sandbox-profil. Opskriften nedenfor beskriver den eksisterende lokale kerne.
+
 ## Start lokalt eller på egen VM
 
 `npm start` giver en komplet lokal demo uden nøgler. En VM kan køre samme proces under en service manager; brug persistent lokal disk og SSH-portforward:
