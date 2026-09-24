@@ -95,7 +95,7 @@ Brug den nuværende runner. Gennemgå først nogle få syntetiske eller godkendt
 
 Efter tre reelle leverancer undersøger vi: Hvilke fejl undslap review? Hvilke kom tilbage på en verificeret release? Hvad krævede mennesketid? Hvilket manuelt trin gentog sig? Et lavere antal rapporter beviser ikke effekt, hvis trafikken, datadækningen eller måleperioden har ændret sig. Hold driftsobservation adskilt fra [kontrollerede evals](value.md).
 
-Automatisér derefter ét gentaget trin. Undersøg Machinist eller en anden controller, hvis konkrete recovery-/driftsproblemer gør det billigere end den nuværende løsning. Det er ikke længere en forudsætning for piloten. Software og defence forbliver profiler i samme factory; kundeværdien skal dokumenteres pr. accepteret resultat.
+Automatisér derefter ét gentaget trin. Undersøg Machinist eller en anden controller, hvis konkrete recovery-/driftsproblemer gør det billigere end den nuværende løsning. Det er ikke længere en forudsætning for piloten. Software og security er arbejdsspor i Software and Security Factory; kundeværdien skal dokumenteres pr. accepteret resultat.
 
 ## Kilde- og leverancestatus
 

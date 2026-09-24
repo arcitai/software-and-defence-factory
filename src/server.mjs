@@ -347,6 +347,6 @@ if (
   process.on("SIGTERM", shutdown);
   const port = Number(process.env.PORT ?? 4317);
   server.listen(port, "127.0.0.1", () =>
-    console.log(`Arcitai Factory: http://127.0.0.1:${port} (local only)`),
+    console.log(`Arcitai Software and Security Factory: http://127.0.0.1:${port} (local only)`),
   );
 }

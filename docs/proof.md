@@ -158,3 +158,13 @@ Revisited the pinned Ras Mic and BuilderIO sources and current primary Agent Ski
 Inspected the 438-word review at measured CSS widths 1562 and 375 with no horizontal overflow. Keyboard focus reached the first detail link with a solid focus outline. A narrow full-page capture again showed a stitching overlap; the DOM had one profiles section and one roadmap. The page has no scripts or remote assets. Reset temporary viewport settings and closed only the agent-created tab. Checked 46 documentation files: 166 local links and 12 heading anchors resolved; `git diff --check` passed. Review was by the authoring agent.
 
 The optional runtime code and active GitHub integration were not changed. No app adoption, runner registration, account configuration, scheduled automation, paid scan, remote publication or deployment was performed. A real selected-app pilot remains the next qualification step.
+
+## Product naming and Defense boundary — 24 September 2026
+
+Applied the owner-selected **Arcitai Software and Security Factory** name to the README, instructions, research/design headings, review page, dashboard, CLI display and exported kit. The issue form, label blueprint and optional Pi profile now use `security` for this product's work track. Stable repository/package/storage identifiers and third-party source titles are preserved. No existing external labels or installed app copies were migrated.
+
+Documented the separate proposed Defense Factory responsibility for ongoing operational monitoring, logs, incidents and dependency/advisory observation, including software built elsewhere. Scoped findings can come here for verified repairs and return to operations for confirmation after release. Security work here still includes post-release changes; this naming update adds no runtime integration or monitoring service.
+
+`npm run check` passed. Because a concurrent Defense task was adding untracked tests in the shared checkout, also ran the four tracked test suites explicitly: **27 tests passed**. The unrelated work was excluded from this change. Parsed the issue YAML and checked the label/profile identifiers; searched all tracked files for superseded product names and track IDs. Checked 47 documentation files: 174 local targets and 19 heading anchors resolved. `git diff --check` passed.
+
+Inspected the updated review and dashboard in the browser at measured CSS widths 1562 and 375. Full product names wrap visibly with no page or brand/footer horizontal overflow. The dashboard used a separate temporary SQLite database with synthetic demo data; no live GitHub integration or model was started. Reset the viewport, closed only the test tabs and stopped both temporary servers. Review was by the authoring agent.

@@ -1,6 +1,6 @@
 # Sæt en eksisterende app i factoryen
 
-Denne pakke lægger en fælles arbejdsmetode ind i **dit app-repo**. Appens sprog, arkitektur, CI og hosting bevares. Du vælger agent/harness, model og arbejdsmiljø. GitHub issues, checks og PR’er kan være hele kontrolpanelet; Arcitais runner og dashboard er valgfrie.
+**Arcitai Software and Security Factory**. Denne pakke lægger en fælles arbejdsmetode ind i **dit app-repo**. Appens sprog, arkitektur, CI og hosting bevares. Du vælger agent/harness, model og arbejdsmiljø. GitHub issues, checks og PR’er kan være hele kontrolpanelet; Arcitais runner og dashboard er valgfrie.
 
 ## Det får du
 

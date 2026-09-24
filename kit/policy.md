@@ -1,6 +1,6 @@
 # Fælles factory-regler
 
-Disse regler beskriver metoden. Den konkrete installation håndhæver adgang, concurrency, budget, checks og release. Projektets eksisterende instruktioner og brugerens autoritet gælder fortsat; en issue, label eller skill tildeler ikke nye rettigheder.
+Disse regler beskriver metoden i **Arcitai Software and Security Factory**. Den konkrete installation håndhæver adgang, concurrency, budget, checks og release. Projektets eksisterende instruktioner og brugerens autoritet gælder fortsat; en issue, label eller skill tildeler ikke nye rettigheder.
 
 ## Fra opgave til levering
 
@@ -17,7 +17,7 @@ Kun én writer må eje samme arbejdsområde/opgave. Brug separat branch/workspac
 | PR eller ændring til review | Kør reproducerbare checks på kendt revision: relevante tests, build/type/lint og hurtige security-checks | Eksakte kommandoer, sprogversioner og CI-tjeneste; genbrug eksisterende checks |
 | Agentstart | Kontroller autoriseret aktør, accepteret scope og kapacitet; start ét job og gem identitet | Manuel start, managed automation eller egen runner. Actions kan være en kort dispatch, hvis nødvendig |
 | Release | Godkend integreret revision og de nødvendige checks; hold deploycredentials uden for almindelige PR-jobs | Eksisterende hostingintegration eller separat CD-workflow, miljøregler og rollback |
-| Efter release | Observer aftalte fejl-/forretningssignaler og lav afgrænsede opgaver | Datakilder, periode og ansvarlig; ingen automatisk produktionsændring uden politik |
+| Efter release | Verificér leverancen med aftalte releasechecks og mål dens effekt. Modtag afgrænsede fejl-/security-opgaver fra drift eller Defense Factory | Datakilder, periode og ansvarlig; løbende overvågning og incidents ejes af drift/Defense; ingen automatisk produktionsændring uden politik |
 
 TDD bruges under udviklingen, hvor en relevant prøve først viser den ønskede adfærd eller fejlen; CI genkører testene på ændringen. Det erstatter ikke afprøvning af en fungerende vertical slice.
 
@@ -36,6 +36,10 @@ Ved Actions: mindst mulige permissions, gennemgåede action-versioner fastlåst 
 | Release eller aftalt periodisk gennemgang | Gentag relevante kontroller på den integrerede revision. Bred scanning og frekvens vælges efter eksponering, ændringer og budget |
 
 Codex Security kan levere specialistarbejdet, hvor det er tilgængeligt. Andre agenter/scannere skal opfylde samme evidenskrav. Modelnavn, 5/5-score eller vellykket scan er ikke garanti for sikkerhed. Aktiv afprøvning af eksterne/produktionsmål kræver et udtrykkeligt, afgrænset mandat.
+
+## Samarbejde med Defense Factory
+
+**Defense Factory** er en separat løsning til løbende overvågning, logs, incidents og dependency-/advisory-opfølgning på systemer i drift, også software bygget uden denne pakke. Den er ikke en forudsætning for adoption. Et fund overdrages som en afgrænset opgave med system/revision, konsekvens, bevis og acceptkriterier. Denne factory verificerer rettelsen og afleverer PR/beviser; release følger appens politik, og drift/Defense kontrollerer effekten. Følsomme detaljer bliver i den private fundkanal. Security-arbejde her omfatter også rettelser efter release.
 
 ## Dokumenteret værdi
 

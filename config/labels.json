@@ -30,7 +30,7 @@
     "description": "Software delivery track"
   },
   {
-    "name": "track:defence",
+    "name": "track:security",
     "color": "E0CACA",
     "description": "Private or appropriately scoped security track"
   }

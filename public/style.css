@@ -90,6 +90,7 @@ a {
   letter-spacing: -1px;
 }
 .mark {
+  flex-shrink: 0;
   width: 35px;
   height: 36px;
   background: var(--ink);
@@ -111,8 +112,10 @@ a {
 }
 .brand-sub {
   display: block;
-  font-size: 8px;
-  letter-spacing: 1.2px;
+  max-width: 130px;
+  font-size: 9px;
+  line-height: 1.4;
+  letter-spacing: 0.2px;
   color: var(--muted);
   font-weight: 600;
   margin-top: 3px;
@@ -1085,7 +1088,8 @@ select {
     font-size: 21px;
   }
   .brand-sub {
-    font-size: 7px;
+    font-size: 9px;
+    max-width: none;
   }
   .workspace,
   .rail-bottom {

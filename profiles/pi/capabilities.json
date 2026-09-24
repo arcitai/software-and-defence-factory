@@ -14,7 +14,7 @@
       "acceptance": ["model-tool-roundtrip", "project-checks", "browser-when-ui-changes", "separate-review-at-exact-head"]
     },
     {
-      "id": "defence",
+      "id": "security",
       "piExtensions": [],
       "workerPrograms": ["gitleaks", "osv-scanner", "scope-specific-sast"],
       "conditionalCapabilities": ["scoped-test-app-dast", "codex-security-handoff"],

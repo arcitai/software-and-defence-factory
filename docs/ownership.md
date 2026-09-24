@@ -4,7 +4,11 @@ This independent repository owns its code, instructions, skills, design, tests, 
 
 ## Product boundary
 
-AIOS is a separate product: **Business first. Productivity built in.** Software & Defence Factory is a separate product: **Business first. Security and quality built in.** The factory must work without AIOS installation, runtime or mandatory methods. It owns its software/security skills and Spec/Implement/Review flow; these are not removed merely to reuse an AIOS skill.
+AIOS is a separate product: **Business first. Productivity built in.** Software and Security Factory is a separate product: **Business first. Security and quality built in.** The factory must work without AIOS installation, runtime or mandatory methods. It owns its software/security skills and Spec/Implement/Review flow; these are not removed merely to reuse an AIOS skill.
+
+The owner selected **Software and Security Factory** on 24 September 2026. **Defense Factory** is a separate proposed solution for ongoing monitoring, logs, incidents and dependency/advisory observation, including software built elsewhere. Findings can become scoped repair tasks here; post-release fixes remain part of this product. This naming decision does not implement the proposed operational service. See [the product boundary](adoption.md#produktnavn-og-grænsen-til-defense-factory).
+
+The repository slug `software-factory`, npm identifier `arcitai-factory`, local paths, API identifiers and `.factory` storage names remain stable technical identifiers. They do not name a separate product. New issue/profile templates use `security` for the work track; existing external labels or installed copies are not silently migrated. Third-party source titles such as OpenAI Defense Factory retain their original names.
 
 Job isolation, automated review/repair loops, security workflows and automatic PR evidence belong to the factory's implementation. Installing a skill does not provide those runtime capabilities. General coding checks and proportionate visual comparisons can exist in both products without creating a dependency. This boundary incorporates the owner-authorized AIOS-task handoff received on 22 September 2026; AIOS code and releases are maintained separately.
 

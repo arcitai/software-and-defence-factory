@@ -1,8 +1,10 @@
-# Arcitai Software & Defence Factory
+# Arcitai Software and Security Factory
 
 **Business first. Security and quality built in.**
 
 En åben factory-pakke til **eksisterende app-repositories**: fælles skills, vertical slices, CI-/security-principper, review og dokumenteret værdi. Agent/harness, model, arbejdsmiljø og deployment vælges pr. installation. GitHub kan være hele kontrolpanelet. Vores lokale runner og dashboard er et valgfrit supplement.
+
+**Produktgrænse:** Denne factory bygger og retter software med security og kvalitet indbygget. Den separate **Defense Factory** overvåger systemer i drift og kan aflevere konkrete fund hertil — også fra software bygget andre steder. [Ansvar og overdragelse](docs/adoption.md#produktnavn-og-grænsen-til-defense-factory).
 
 **Start her:** [Kort visuelt review](docs/review.html) · [Hvad er fast, og hvad vælger installationen?](docs/adoption.md)
 

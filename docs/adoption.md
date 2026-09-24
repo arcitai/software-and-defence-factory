@@ -1,6 +1,19 @@
 # Én metodepakke, flere måder at køre den på
 
-**Gældende retning, 24. september 2026:** Arcitai Software Factory skal først være et repository med det, der kan genbruges på tværs af apps og agenter. Det enkelte app-repo får en lille, versioneret pakke. Appens kode bliver, hvor den er. Et bestemt abonnement, Pi/Daytona, en egen server eller vores dashboard er ikke produktkrav.
+**Gældende retning, 24. september 2026:** Arcitai Software and Security Factory skal først være et repository med det, der kan genbruges på tværs af apps og agenter. Det enkelte app-repo får en lille, versioneret pakke. Appens kode bliver, hvor den er. Et bestemt abonnement, Pi/Daytona, en egen server eller vores dashboard er ikke produktkrav.
+
+## Produktnavn og grænsen til Defense Factory
+
+Det fulde navn er **Arcitai Software and Security Factory**. “Factoryen” og “factory-pakken” er korte henvisninger til samme produkt. Security er indbygget i udviklingen og et særskilt arbejdsspor, når en opgave kræver specialistarbejde.
+
+| Produkt | Ansvar |
+| --- | --- |
+| **Software and Security Factory** — dette repo | Afklare, designe, bygge og rette software i vertical slices; teste, reviewe og verificere security før levering og ved senere ændringer |
+| **Defense Factory** — separat løsning | Løbende overvågning, logs, incidents, dependencies/advisories og opfølgning på systemer i drift; også software, der er bygget uden vores factory |
+
+**Samarbejde:** Defense registrerer et fund → afleverer en afgrænset issue med berørt system/revision, konsekvens, bevis og acceptkriterier → denne factory leverer en verificeret rettelse/PR → release følger appens politik → Defense efterprøver effekten i drift. Følsomme beviser bliver i den aftalte private kanal. Et fund giver ikke i sig selv ret til produktionsændringer.
+
+Dette er en ansvarsdeling, ikke en tidsgrænse for security: denne factory kan også rette fejl og sårbarheder efter release. Appens releasechecks, smoke tests og kvalitetsmålinger bliver her; en løbende overvågningstjeneste hører til Defense. Ingen af produkterne kræver installation af det andet. Overdragelsen kan begynde som en almindelig issue; der er ingen ny automatisk integration implementeret med navneændringen.
 
 ## Hvad kan vi definere?
 

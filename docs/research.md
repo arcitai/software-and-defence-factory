@@ -1,4 +1,4 @@
-# Fra Warp-inspiration til en åben Arcitai Factory
+# Fra Warp-inspiration til en åben Arcitai Software and Security Factory
 
 Research samlet **24. september 2026**. Warp-gennemgangen nedenfor suppleres af [Pi-research](pi-research.md), [BuilderIO-metoden](builderio-review.md) og [Warp Scorers og måling](warp-measurement.md). **Den portable metodepakke er kernen; ingen provider er forhåndsvalgt.** Pi, Codex og valgfri Codex Security findes som adaptere i den valgfrie lokale runtime; managed løsninger er alternative installationer. De nye adapteres [afprøvning er syntetisk](worker-integrations.md). Starteren er ikke et færdigt produktionssystem eller dokumentation for modelbesparelser.
 
@@ -10,9 +10,11 @@ Research samlet **24. september 2026**. Warp-gennemgangen nedenfor suppleres af 
 
 **Gældende produktretning, 24. september:** [En portabel metodepakke til eksisterende apps](adoption.md) er kernen. GitHub kan være hele arbejdsfladen. De tidligere konkrete Pi/Daytona- og controllerforslag er valgfrie driftsprofiler, ikke universelle krav. Skills, checks, security-udløsere og beviser defineres fælles; installationen vælger leverandører og integration.
 
+**Navn og ansvar, 24. september:** Denne factory hedder **Software and Security Factory**. Den separate **Defense Factory** skal håndtere løbende observation og incidents i drift, også for eksternt bygget software. Fund kan overdrages hertil til verificerede rettelser. [Gældende produktgrænse](adoption.md#produktnavn-og-grænsen-til-defense-factory).
+
 ## Den anbefalede form
 
-Ét produkt: **Arcitai Software & Defence Factory**. Én metode, to arbejdsspor og udskiftelige harness-/modelprofiler; GitHub eller et valgfrit dashboard er arbejdsfladen. Start med en operatør og et pilotrepo. GitHub er den første forge-adapter; kernen ejer ikke GitHub-specifikke agentantagelser. Kastanje bliver både en pilotcase og en valgfri inference-rute.
+Ét produkt: **Arcitai Software and Security Factory**. Én metode med software- og security-spor og udskiftelige harness-/modelprofiler; GitHub eller et valgfrit dashboard er arbejdsfladen. Start med en operatør og et pilotrepo. GitHub er den første forge-adapter; kernen ejer ikke GitHub-specifikke agentantagelser. Kastanje bliver både en pilotcase og en valgfri inference-rute.
 
 | Lag | Mindste nyttige indhold |
 | --- | --- |

@@ -27,7 +27,7 @@ body:
       label: Work track
       options:
         - Software
-        - Defence (use a private channel for sensitive findings)
+        - Security (use a private channel for sensitive findings)
   - type: textarea
     id: capabilities
     attributes:

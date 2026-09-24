@@ -1,8 +1,10 @@
-# Arcitai Factory
+# Arcitai Software and Security Factory
 
 This repository owns a portable adoption kit for existing app repositories and an optional local, single-operator factory starter. Read README.md and only the relevant docs. It runs independently of AIOS, Codex Desktop or any particular model vendor. `CLAUDE.md` imports this file; maintain instructions here.
 
 ## Product contract
+
+- The product name is **Arcitai Software and Security Factory**. Use **security**, not defence/defense, for this product's work track. **Defense Factory** is a separate operational monitoring/incident solution, including existing third-party-built software. It may hand off scoped findings here for verified repairs; this factory also handles changes after release. See docs/adoption.md for the boundary.
 
 - Keep the adoption kit independent of any harness, model, hosting provider or runtime service. GitHub may be the entire control surface. An installation makes concrete choices; the core defines method and evidence.
 - Preserve an adopting app's instructions, architecture, CI and deployment. Export into a new staging directory; never silently install or overwrite app files.

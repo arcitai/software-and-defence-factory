@@ -105,7 +105,7 @@ Review, PR-merge, deployment og produktionsobservation har hver sin status. En i
 
 ## Feedback uden en selvændrende produktionsmaskine
 
-Start efter en reel pilotrelease med read-only observation af få aftalte signaler: fejlrate, svartid og kundens valgte forretningsmål. Registrér baseline, release-SHA, observationsvindue og kontaktperson. Et signal bliver en deduplikeret opgave med reproduktion og konsekvens. Rå kundelogs og sårbarheder bliver i det godkendte private scope.
+Løbende overvågning af produktion hører til drift eller den separate **Defense Factory**; den bygges ikke ind som krav i denne runtime. Denne factory modtager feedback og leverer verificerede rettelser. Efter en reel pilotrelease aftales read-only målinger af få signaler med den ansvarlige: fejlrate, svartid og kundens valgte forretningsmål. Registrér baseline, release-SHA, observationsvindue og kontaktperson. Et signal bliver en deduplikeret opgave med reproduktion og konsekvens. Rå kundelogs og sårbarheder bliver i det godkendte private scope.
 
 Saml nødvendige menneskelige beslutninger i [én lille oversigt](../templates/human-review.md), inklusive ældre uafsluttet arbejde og manglende datadækning. Efter pilotleverancer laves et manuelt tilbageblik: kom samme fejl igen efter en verificeret release, eller manglede der bevis for første fix? Automatisér kun dette, hvis gentagelsen er nyttig. Kendt status og venten indsamles af kode; modeller bruges til vurdering og diagnose.
 

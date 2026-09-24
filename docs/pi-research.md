@@ -1,12 +1,14 @@
-# Pi som motor i Arcitai Software & Defence Factory
+# Pi som motor i Arcitai Software and Security Factory
 
 **Implementeringsopdatering:** Pi RPC og den officielle Security SDK er nu integreret i CLI-jobrunneren og afprøvet med syntetiske inputs. [Aktuel status, opsætning og begrænsninger](worker-integrations.md). Afsnittene nedenfor dokumenterer researchgrundlaget før denne implementering.
 
 Undersøgt **22. september 2026** for Gustav. Beslutningsforslag, kildekritik og konkret capability-valg. Dette dokument erstatter den tidligere strategiske anbefaling om Pi som et avanceret tilvalg. Det ændrer ikke, hvilke workers starteren allerede kan afvikle.
 
+**Gældende produktretning, 24. september 2026:** Produktet hedder Software and Security Factory. Pi er en valgfri profil; den nedenstående researchanbefaling er ikke et fælles installationskrav. [Aktuel retning og grænse til Defense Factory](adoption.md).
+
 ## Anbefaling
 
-**Vælg Pi som første kandidat til factoryens åbne agentmotor. Behold én fælles factory med software- og defence-profiler.** Pi passer til ønsket om egen hosting, udskiftelig inference og lille grundopsætning. Codex Security/Daybreak kan fortsat være en specialist, når den konkrete adgang findes. Cursor er et relevant managed alternativ, når mindre driftsarbejde vejer tungere end kontrol over worker og inference.
+**Vælg Pi som første kandidat til factoryens åbne agentmotor. Behold én fælles factory med software- og security-profiler.** Pi passer til ønsket om egen hosting, udskiftelig inference og lille grundopsætning. Codex Security/Daybreak kan fortsat være en specialist, når den konkrete adgang findes. Cursor er et relevant managed alternativ, når mindre driftsarbejde vejer tungere end kontrol over worker og inference.
 
 Valget handler først om produktets åbenhed og ejerskab. Et allerede betalt Codex-abonnement kan stadig gøre Codex økonomisk attraktivt til Gustav’s egen pilot; en lavere beregnet API-pris i et studie afgør ikke den sammenligning.
 
@@ -68,7 +70,7 @@ Dette er foreslåede profiler, ikke capabilities som allerede er koblet til dash
 | Computer use | Native apps eller UI, der ikke kan betjenes via API/DOM | `@injaneity/pi-computer-use` som evalueringskandidat | Særskilt desktop-worker; slukket ellers |
 | GitHub issue/PR | Hente scope og levere ændring | GitHub API/`gh` hos controlleren; Git i worker | Ét pilotrepo; ingen publiceringsnøgle som standard i agenten |
 | Tests og quality gates | Reproducerbar kontrol | Projektets formatter/lint/typecheck/unit/integration | Deterministisk runner på fast revision |
-| Sikkerhedskontrol | Secrets, sårbare dependencies og kodeproblemer | Gitleaks + OSV-Scanner; målrettet SAST efter sprog | Basiskontrol + udvidet defence-profil |
+| Sikkerhedskontrol | Secrets, sårbare dependencies og kodeproblemer | Gitleaks + OSV-Scanner; målrettet SAST efter sprog | Basiskontrol + udvidet security-profil |
 | Faglig security-vurdering | Validere fund og konsekvens | Separat review-session; evt. Codex Security-specialist | Scope- og risikobestemt |
 | Isolation og hemmeligheder | Begrænse en fejl eller prompt injection | Hele Pi-worker i dedikeret container/VM | Krav før ubemandede kundejobs |
 | Joblivscyklus | Start, stop, timeout, budget og genoptagelse | Én controller, jobjournal og supervisor | Uden for Pi |
@@ -117,9 +119,9 @@ Den læste [fetch-kode](https://github.com/coctostan/pi-web-tools/blob/445f9fca0
 
 [`pi-mcp-adapter` 2.36.0](https://github.com/nicobailon/pi-mcp-adapter/tree/0e88e19e6dc0a72847d4ab8740c02f42d5aeecab) er en MIT-kandidat med én proxy til on-demand værktøjsopslag. Det er bedre til vores formål end at indlæse alle mulige connectors ved start. Men den kan læse delte/projektlokale MCP-konfigurationer; factoryen skal styre præcis hvilke servere og credentials, der gives adgang til. En extension er kode med procesrettigheder. Vi har ikke kørt denne adapter eller godkendt dens dependency-kæde.
 
-## Defence kræver mere end en stærk model
+## Security kræver mere end en stærk model
 
-Defence er en profil i samme system med egen adgang og evidens, ikke endnu en platform. Basispakken bør bestå af:
+Security er et arbejdsspor i Software and Security Factory med egen adgang og evidens. Den separate Defense Factory har ansvar for løbende observation og fund fra drift; se [produktgrænsen](adoption.md#produktnavn-og-grænsen-til-defense-factory). Basispakken bør bestå af:
 
 | Kontrol | Kandidat | Rolle og grænse |
 | --- | --- | --- |
