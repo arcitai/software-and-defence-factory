@@ -9,6 +9,4 @@ These six original, portable skills are project-local Markdown. They require no 
 - [factory-security](factory-security/SKILL.md): Perform the bounded security review requested by a factory task and separate candidate findings, validation and verified remediation.
 - [factory-evaluate](factory-evaluate/SKILL.md): Run or assess a controlled comparison of factory configurations using fixed cases, evidence and complete cost accounting.
 
-The human workflow has three steps: find and scope (`triage` + `spec`), implement and prove (`implement`, with `security` when needed), and review and hand back (`review`). `evaluate` is for controlled comparisons, not a mandatory extra agent on every job. Six instructions do not require six concurrent agents. See the [BuilderIO review](../../docs/builderio-review.md) from the repository root (`docs/builderio-review.md`).
-
-The common skills work with a readable project installation record and issue/PR workflow; an Arcitai job bundle, server or dashboard is optional. Skills describe work; they do not install browsers, model endpoints, sandboxes or permissions. See [capabilities](../../config/profiles.json) through the repository root (`config/profiles.json`).
+The runtime mounts these instructions read-only for each job. Exported method files can also be deliberately adopted by an existing harness. Six skills do not require six agents. The method does not install tools, model endpoints or permissions.

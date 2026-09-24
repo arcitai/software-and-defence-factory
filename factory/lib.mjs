@@ -1,12 +1,11 @@
 import { existsSync, readFileSync, writeFileSync, mkdirSync, renameSync } from 'node:fs';
 import { resolve, dirname, join, isAbsolute } from 'node:path';
-import { fileURLToPath } from 'node:url';
 import { spawnSync, spawn } from 'node:child_process';
 import { createHash } from 'node:crypto';
 
-export const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..');
+import { ROOT, DEFAULT_STATE } from './paths.mjs';
+export { ROOT, DEFAULT_STATE };
 export const PINS = JSON.parse(readFileSync(join(ROOT, 'factory/pins.json')));
-export const DEFAULT_STATE = join(ROOT, '.factory/platform');
 export const json = path => JSON.parse(readFileSync(path, 'utf8'));
 export function save(path, value) {
   mkdirSync(dirname(path), { recursive: true, mode: 0o700 });
@@ -49,12 +48,12 @@ export async function api(state, path, body, method) {
     body: body === undefined ? undefined : JSON.stringify(body), signal: AbortSignal.timeout(5000),
   });
   const text = await response.text();
-  if (!response.ok) throw new Error(`Machinist ${response.status}: ${text}`);
+  if (!response.ok) throw new Error(`Controller ${response.status}: ${text}`);
   return text ? JSON.parse(text) : null;
 }
 export function instanceLabel(state) { return digest(resolve(state)).slice(0, 16); }
 export function containers(state) {
-  const ids = run('docker', ['ps', '-aq', '--filter', `label=arcitai.factory=${instanceLabel(state)}`]).split('\n').filter(Boolean);
+  const ids = run('docker', ['ps', '-aq', '--filter', `label=sdf.factory=${instanceLabel(state)}`]).split('\n').filter(Boolean);
   return ids.flatMap(id=>{
     const result=spawnSync('docker',['inspect',id],{encoding:'utf8'});
     if(result.error)throw result.error;
@@ -68,7 +67,7 @@ export function containers(state) {
 }
 export function stopContainers(state, jobId) {
   for (const item of containers(state)) {
-    if (jobId && item.Config.Labels['arcitai.job'] !== jobId) continue;
+    if (jobId && item.Config.Labels['sdf.job'] !== jobId) continue;
     if (item.State.Running) {
       try {run('docker', ['stop', '--time', '2', item.Id]);}
       catch(error) {if(containers(state).some(c=>c.Id===item.Id&&c.State.Running))throw error;}
@@ -77,10 +76,4 @@ export function stopContainers(state, jobId) {
       if (containers(state).some(c => c.Id === item.Id)) throw error;
     }
   }
-}
-export function generate(state, config) {
-  const q = JSON.stringify;
-  const stages = ['build','verify','review','handoff','defence'];
-  writeFileSync(join(state, 'machinist.toml'), `[server]\nlisten=${q(`127.0.0.1:${config.port}`)}\ndatabase=${q(join(state,'machinist.db'))}\nworker_token_file=${q(join(state,'worker.token'))}\nmax_concurrent_jobs=1\n\n` + stages.map(name => `[commands.${name}]\nexecutor=${q(name)}\ntimeout=${q(`${config.timeoutSeconds + 30}s`)}\n`).join('\n') + '\n[workflows.software]\nsteps=["build","verify","review",{command="handoff",approval="before"}]\n\n[workflows.defence]\nsteps=["defence"]\n', { mode: 0o600 });
-  writeFileSync(join(state, 'worker.toml'), `name=${q(`arcitai-${instanceLabel(state)}`)}\ndata_directory=${q(join(state,'worker'))}\n[control_plane]\nurl=${q(`http://127.0.0.1:${config.port}`)}\ntoken_file=${q(join(state,'worker.token'))}\n[repositories.app]\npath=${q(config.repo)}\n\n` + stages.map(name => `[executors.${name}]\ncommand=${JSON.stringify([process.execPath,join(ROOT,'factory/executor.mjs'),state,name])}\n`).join('\n'), { mode: 0o600 });
 }

@@ -13,3 +13,5 @@ coverage/
 *.sqlite
 *.sqlite-shm
 *.sqlite-wal
+
+factory/ui/
