@@ -1,28 +1,11 @@
-# Dokumentation efter behov
+# Documentation
 
-Start med [README og de tre trin](../README.md). De øvrige sider er opslag til den agent eller person, der skal udføre det konkrete arbejde.
+- [Quickstart](quickstart.md): connect a repository, configure inference, run and inspect a task.
+- [Install and update](npm.md): npm/npx, state paths, automatic updates and CI/CD.
+- [Architecture](architecture.md): components, ownership and evidence flow.
+- [Recovery](recovery.md): stopped, failed and interrupted attempts.
+- [Defence integration](defence-integration.md): private incident intake and limits.
+- [Qualification](proof.md): what was exercised and what remains unverified.
+- [Ownership](ownership.md): original code, adapted interface and licensing.
 
-| Jeg vil… | Læs |
-| --- | --- |
-| Tilslutte min app og prøve første opgave | [Adoptionsvejledning](../kit/README.md) |
-| Vurdere Fabro, Mastra og Coles VPS-setup | [Inspiration og genbrug](ui-references.md) |
-| Se den valgte retning for VPS/lokal pakke og GUI | [Standardopsætning og første slices](platform.md) |
-| Se hvorfor vi bygger på Machinist | [Motor, GUI og konkrete integrationshuller](machinist-review.md) |
-| Forstå relativ risiko og videoens OpenAI-eksempel | [Tidskoder og praktiske reviewregler](relative-risk.md) |
-| Se sammenligningen med Cole, Trycycle og gratis drift | [Fundament og kildegrundlag](foundation-review.md) |
-| Forstå produktet og forskellen på Warp/BuilderIO | [Produktform og onboarding](product-experience.md) |
-| Se hvad vi definerer, og hvad appen vælger | [Produkt og ansvar](adoption.md) |
-| Se CI/CD- og security-reglerne | [Fælles metode](../kit/policy.md) |
-| Udfylde opsætning eller aflevere beviser | [Installationsark](../kit/installation.md) · [Aflevering](../kit/delivery.md) |
-| Vælge lokal drift, sky eller inference | [Lavprisprofil](low-cost.md) · [Cloudmuligheder](cloud-setup.md) |
-| Afprøve den valgfrie lokale starter | [Demo og opsætning](setup.md) · [Arkitektur](architecture.md) · [Recovery](recovery.md) |
-| Dokumentere kvalitet, tid og pris | [Målemetode](value.md) · [Warp Scorers](warp-measurement.md) |
-| Se hvad der faktisk er afprøvet | [Kontroller og begrænsninger](proof.md) · [Workerprøver](worker-integrations.md) |
-
-## Profiler og research
-
-Valgfrie profiler: [Codex lokalt](../profiles/codex-local.md), [åbne modeller](../profiles/open-models.md), [Pi](../profiles/pi/README.md), [Cursor cloud](../profiles/cursor-cloud.md). Hver installation kvalificeres særskilt.
-
-Baggrund: [samlet research](research.md), [seks factory-videoer](video-audit.md), [BuilderIO](builderio-review.md), [Dex og vertical slices](dex-review.md), [viderebygning af valgfri runtime](next-runtime.md).
-
-[Det korte visuelle review](review.html) kan hentes og åbnes lokalt i en browser; på GitHub kan HTML vises som kildekode. [Security-politik](../SECURITY.md), [Security SDK-forbehold](security-dependency-review.md) og [ejerskab/kilder](ownership.md) beskriver de øvrige grænser.
+For the portable method, start with [the adoption guide](../kit/README.md).

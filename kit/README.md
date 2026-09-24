@@ -1,40 +1,25 @@
-# Tilslut appen og gennemfør første opgave
+# Adopt the factory method
 
-**Arcitai Software & Defence Factory** giver dit app-repo en fælles metode til udvikling, security og review. Start med den agent, du allerede bruger. Appens kode, arkitektur, CI og hosting bevares.
+Software & Defence Factory gives an existing app a shared method for development, security and review. Keep the app's architecture, code, CI, hosting and established instructions.
 
-## 1. Giv pakken til din agent
+## With the local runtime
 
-Brug den eksporterede pakke. Åbn app-repoet i din valgte agent, giv den pakkens placering, og brug denne besked:
+Use the CLI's `init` and installation workflow. Jobs receive policy and the six skills directly as read-only mounts. No global skill installation or manual copying into the app is required. Initializing an installation does not start work.
 
-> Tilslut denne app til den vedlagte factory-pakke på en branch. Læs først appens instruktioner, arkitektur, tests og CI. Følg opsætningstrinnene nedenfor, og udfyld installationsarket ud fra repoet og mine kendte valg. Bevar eksisterende filer og sammenflet bevidst. Markér manglende adgang. Brug manuel start og GitHub til issues, checks og PR’er. Vis, hvad der er tilsluttet, afprøvet eller stadig mangler. Konti, betalt drift, publicering og deployment følger mit eksisterende mandat.
+## With your existing agent
 
-Agenten udfører opsætningen; du behøver ikke udfylde hele installationsarket på forhånd. Manglende adgang blokkerer kun det trin, der kræver den.
+Export a new staging directory with `software-defence-factory kit --output NEW_DIRECTORY`. Give that directory to the app's agent and ask it to adopt the relevant method on a branch:
 
-## 2. Agentens opsætning
+> Read the app's instructions, architecture, tests and CI first. Apply the supplied factory method within its existing authority. Fill the installation record from the repository and known choices, merge intentionally, preserve existing files and report what was connected, tested or still missing. Start manually. Accounts, publishing and deployment follow my existing mandate.
 
-1. Kopiér `.factory-kit/` og relevante `.agents/skills/factory-*` ind på appens branch. Tilføj den medfølgende issue-form, hvis appen har brug for den. Sammenflet navnesammenfald; overskriv ikke projektets instruktioner eller konfiguration.
-2. Tilføj en henvisning i appens `AGENTS.md` eller agentens tilsvarende indgangspunkt: “For factory-opgaver, læs `.factory-kit/policy.md` og `.factory-kit/installation.md`; brug relevante factory-skills.” Opret kun en ny instruktionsfil, hvis appen mangler den. Bevar lokale regler og brugerens mandat.
-3. Udfyld [installationsarket](installation.md) fra eksisterende setup og kendte valg: agent, miljø, checkkommandoer, adgang, forbrug og releasepolitik. Ingen secrets i Git. Arkets tekst er dokumentation; det konfigurerer ikke tjenester.
-4. Kontrollér, at agenten kan læse de valgte skills og faktisk har de nødvendige værktøjer. Afprøv appens relevante checks. Det [inaktive CI-eksempel](examples/github-checks.yml.example) tilpasses kun, hvis det udfylder et konkret hul i appens CI.
+The agent can reference the staged instructions or intentionally adopt relevant files. If copying is appropriate, review `.factory-kit/` and the needed `.agents/skills/factory-*` folders; merge naming conflicts and preserve AGENTS.md. Add a local route only when needed. The optional issue form and CI example are inactive until deliberately adapted. No secret belongs in the installation record.
 
-De seks skills dækker triage, spec, implementering, review, security og evaluering. Brug dem, opgaven kræver. [Fælles regler](policy.md).
+The six skills cover triage, specification, implementation, review, security and evaluation. Use the ones needed; six instructions do not imply six concurrent agents. See [policy](policy.md), [installation](installation.md) and [delivery](delivery.md).
 
-## 3. Send første opgave
+## First real task
 
-Vælg en lille, eksisterende fejl eller forbedring. Beskriv:
+Choose a small existing defect or improvement. Describe the intended user behavior, allowed scope and observable acceptance check. Implement a working vertical slice, exercise the app's relevant checks and obtain a separate review of the delivered revision. A demo or copied skill files alone do not qualify an application.
 
-- Hvilken brugeradfærd skal ændres?
-- Hvad skal fungere bagefter, og hvad må ændres?
-- Hvilken test eller observation kan demonstrere resultatet?
+A PR requires the configured GitHub authority. Otherwise hand back the branch/diff and evidence with an honest status. Unknown cost/time remain unknown. Automated starts require separate qualification of triggers, deduplication, stop/restart and actual resource limits; a skill does not create a scheduler.
 
-Agenten bygger én gennemgående vertical slice, kører relevante checks og afleverer til separat review med [afleveringskortet](delivery.md). PR kræver den aftalte GitHub-adgang; mangler den, afleveres branch/diff og beviser med tydelig status. Registrér faktisk tid og forbrug, hvor de er tilgængelige. Manglende tal er ukendte.
-
-**Første prøve er bestået**, når ændringen virker, krævede checks består på den afleverede revision, og reviewet kan vurdere beviserne. En demo eller kopierede skillfiler er ikke i sig selv en bestået installation.
-
-## Når første opgave virker
-
-Vælg eventuelt automatisk start fra issues gennem agentudbyderens integration eller egen runner. Afprøv ét job, dubletter, stop og recovery før ubemandet drift. En skill starter ingen scheduler. Lokale jobs kræver en tændt maskine; et afprøvet cloudsetup kan fortsætte, når din laptop er lukket. Merge og deployment følger appens releasepolitik.
-
-Opdater pakken ved at eksportere en ny version og reviewe forskellen. Bevar projektets udfyldte installationsark. `.factory-kit/manifest.json` registrerer kildeversion og filhashes; det er provenance, ikke en signatur eller runtime-konfiguration.
-
-MIT. Pakkens LICENSE ændrer ikke appens licens. Der er ingen obligatorisk provider, global skillinstallation eller Arcitai-runtime.
+Update by exporting a new version and reviewing the differences. Preserve the app's completed installation record. The manifest records source revision and file hashes; it is provenance, not a signature or active runtime configuration. MIT applies to this method and does not change the app's license.

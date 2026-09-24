@@ -1,28 +1,28 @@
-# Aflevering — én opgave
+# Delivery record — one task
 
-Kort skabelon til PR eller privat review. Udfyld relevante felter; følsomme beviser gemmes privat og henvises kun fra en autoriseret destination.
+Use the relevant fields for a PR or private review. Sensitive artifacts stay private and are linked only from an authorized destination.
 
-- Behov, issue og accepteret scope:
-- Kort design/arkitektur ved større ændringer:
-- Base-SHA, leveret head-SHA og faktisk testet revision (kan være CI-mergecommit):
-- Harness/model/miljø og version; job-id eller logreference:
+- User need, issue and accepted scope:
+- Relevant design/contracts for a substantial change:
+- Base commit, delivered commit and actually tested revision:
+- Harness/model/environment versions and job/log reference:
 
-| Vertical slice / faktisk adfærd | Før/efter, check og revision | Status og næste skridt |
+| Slice and observable behavior | Before/after check, artifact and revision | Status and next step |
 | --- | --- | --- |
-| Udfyld for hver relevant del | Markér mocks, manglende baseline og reel integration | Afprøvet / fejlet / blokeret |
+| Complete relevant rows | Label mocks, missing baselines and live integrations | Passed / failed / blocked |
 
-- Krævede checks: kommando eller check-id, exit/resultat og bevislink:
-- Separat review af adfærd og kodevalg: reviewer, revision og disposition:
-- Security: ændringens risiko, valgte kontroller, fund og efterprøvning; eller begrundet ikke relevant:
-- Uafklarede forhold, konkrete næste skridt og recovery:
-- Leveringsstatus: lokalt resultat / PR / accepteret / merged / deployet / observeret. Angiv kun det udførte:
+- Required checks, command/check ID, exit/result and evidence:
+- Separate reviewer, revision and disposition:
+- Change risk, security checks, findings and fix verification, or justified not applicable:
+- Remaining uncertainties, recovery and next action:
+- Delivery state: local / PR / accepted / merged / deployed / observed. Report only completed actions.
 
-| Målepunkt | Værdi og dækning |
+| Measurement | Value and coverage |
 | --- | --- |
-| Kvalitet | Accepteret / ændringer / fejlet / blokeret / stadig åben; hvem vurderede hvad? |
-| Samlet direkte pris | Model, review, compute og alle forsøg. Faktisk / estimeret / ukendt; valuta og kilde |
-| Al mennesketid | Afklaring/design, hjælp, review og drift; manglende registrering |
-| Gennemløbstid | Start/slut og aktiv tid separat; ikke afsluttet betyder ingen endelig tid til accept |
-| Fejl efter accept | Konkret regression, revision og observationsperiode; ikke observeret endnu er et gyldigt svar |
+| Quality | Accepted / changes / failed / blocked / open; who assessed what? |
+| Total direct cost | Inference, review, compute and every attempt; measured / estimated / unknown |
+| All human time | Scoping/design, assistance, review and operations; identify missing coverage |
+| Elapsed time | Start/end and active time; unfinished work has no final time-to-acceptance |
+| Defects after acceptance | Regression, revision and observation window; not yet observed is valid |
 
-Grønne checks på en tidligere revision eller et model-scoretal erstatter ikke review af den leverede ændring. Merge og deployment følger installationsarkets særskilte rettigheder.
+Green checks on another revision or a model score cannot replace review of the delivered change. Merge and deployment follow the separate installation authority.

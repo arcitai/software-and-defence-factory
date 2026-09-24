@@ -1,0 +1,93 @@
+# Install and update the CLI
+
+Requires Node 22.13 or later. The method export needs no Docker. Running jobs
+also requires Git and a running Docker Engine or Docker Desktop on Linux/macOS.
+
+```sh
+npm install --global software-defence-factory
+software-defence-factory help
+```
+
+For a one-off invocation:
+
+```sh
+npx software-defence-factory@latest help
+```
+
+Both commands use the same package. A development checkout is unnecessary.
+Use `software-defence-factory kit --output /new/staging/directory` to export the portable
+method. It refuses an existing destination and does not modify an app. Use
+`software-defence-factory init --repo /path/to/app --agent codex --check "npm ci && npm test"`
+only when configuring the optional local job runner. `init` does not start jobs,
+copy skills into the app, or copy account credentials. Runtime jobs receive the
+bundled policy and skills directly. Model access is configured separately.
+
+## Persistent data
+
+The npm CLI stores private runtime data under
+`${XDG_STATE_HOME:-$HOME/.local/state}/software-defence-factory/platform`.
+The synthetic demo uses `demo-platform` beside it. `--state /absolute/path`
+selects another installation, allowing separate projects and ports. The CLI
+prints the selected path. State never lives inside an installed npm package,
+the npx cache, or your application repository.
+
+Source checkouts retain their existing `.factory/platform` and
+`.factory/demo-platform` defaults. Stop the old controller before moving an
+existing state directory. Update its `factory.json` repository path if necessary;
+start a fresh state directory for the native 0.3 runtime. Earlier engine journals are not automatically migrated; keep them separately as evidence.
+
+## Automatic updates
+
+An npm-installed CLI checks npm's `latest` stable release at most once a day
+when invoked. It downloads and activates a newer release when all registered
+installations are stopped and no executor requires reconciliation. It does not
+run a background updater or interrupt a job. Routine `status`, `stop`, `cancel`,
+`serve` and version commands do not initiate automatic downloads.
+
+```sh
+software-defence-factory update --check
+software-defence-factory update
+software-defence-factory update --auto off
+software-defence-factory update --auto on
+```
+
+Updates use npm with lifecycle scripts disabled and retain immutable releases
+under `${XDG_DATA_HOME:-$HOME/.local/share}/software-defence-factory/releases`. Failed or
+offline downloads retain the working version. Private state, model credentials,
+jobs and history are preserved. Existing processes keep their original code.
+Set `SDF_AUTO_UPDATE=0` to skip automatic network checks for a command.
+Source checkouts remain managed by Git and do not update themselves.
+
+CLI updates do not rebuild or update Docker images automatically. Stop the
+installation and run `install --state PATH` when intentionally adopting a new
+runtime image; repeat the relevant qualification before resuming jobs.
+
+## Release flow
+
+`.github/workflows/ci.yml` tests pull requests and pushes on Node 22 and 24,
+including installation from the actual npm tarball. A successful `main` push
+publishes an increased `package.json` version. Existing versions are skipped;
+registry errors fail the release instead of masquerading as a missing version.
+The workflow can also be started manually from `main`.
+
+For a release, update both manifests with `npm version patch --no-git-tag-version`,
+review the change, and push through the project's normal review flow. A code
+push without a version bump is tested but does not overwrite a published package.
+
+The first release is published by the maintainer. Then configure npm trusted
+publishing for GitHub owner `arcitai`, repository `software-and-defence-factory`,
+workflow filename `ci.yml`, with direct publishing enabled. Subsequent releases
+use short-lived OIDC authentication; no npm write token belongs in the repo or
+Z13. The source repository remains private, so npm cannot issue public source
+provenance for it. The public npm package contains an explicit runtime/method
+allowlist, excluding operational state, account data and retired research. It includes the explicitly labelled synthetic runtime fixture used by demo and qualification.
+
+Set the GitHub repository variable `NPM_PUBLISH_ENABLED=true` only after that
+first publication and trusted-publisher binding are complete. Until then CI
+still builds and tests every change, while publishing is deliberately skipped.
+After a CLI update, restart a stopped dashboard with `up --state PATH` and refresh
+the browser to load the new bundled interface. Updates do not replace the code
+of a controller that is still running.
+
+References: [npm/npx](https://docs.npmjs.com/cli/v11/commands/npx/),
+[npm trusted publishing](https://docs.npmjs.com/trusted-publishers/).

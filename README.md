@@ -1,50 +1,72 @@
-# Arcitai Software & Defence Factory
+# Software & Defence Factory
 
-**Én CLI og ét dashboard til softwarearbejde og privat incident-triage.**
-Self-hostet på [Machinist](https://github.com/owainlewis/machinist), med isolerede Docker-jobs, vertical slices, tests og separat review. Ingen Archon eller obligatorisk platformsubscription. Dit app-repo og dets deployment bevares.
+A portable method and a local runtime for taking a scoped software task through implementation, checks, independent review and an explicit handoff.
 
-**v0.2 er en testudgave.** Installation og fejlforløb er afprøvet lokalt uden modelkald. En rigtig app/modelpilot og live driftsovervågning er næste kvalificering.
+Developed by [Arcitai](https://github.com/arcitai). The CLI is **software-defence-factory**. It works with existing repositories, Codex, Pi or a configured executor. No personal context system is required.
 
-## Prøv den — uden modelnøgle
-
-Kræver **Node 22.13+, Git og kørende Docker Engine/Desktop** på macOS eller Linux. Første installation henter og bygger runtime og jobimage; afsæt diskplads og nogle minutter.
+## Start here
 
 ```sh
-git clone https://github.com/arcitai/software-and-defence-factory.git
-cd software-and-defence-factory
-npm run factory -- demo
+npm install --global software-defence-factory
+software-defence-factory help
 ```
 
-Åbn **http://127.0.0.1:7332**. En syntetisk opgave ændrer en lille fixture, kører tests og venter på din godkendelse. Se patch, checks og review under **Files**; godkend derefter handoff. Ingen model, PR, merge eller deployment bruges i demoen.
+For occasional use: `npx software-defence-factory@latest help`.
 
-Stop: `npm run factory -- stop --state .factory/demo-platform`.
+Choose the part you need:
 
-## Forbind din egen app
-
-```sh
-npm run factory -- init --repo /absolut/sti/til/app --agent codex --check "npm ci && npm test"
-npm run factory -- install
-# Tilføj kun din inference-nøgle i den private .factory/platform/model.env.
-npm run factory -- up
-npm run factory -- run --issue https://github.com/OWNER/APP/issues/123
-```
-
-Vælg appens rigtige checkkommando. Issue-import kræver `gh` med læseadgang; `run --file task.md` virker uden GitHub. [Quickstart](docs/quickstart.md) forklarer Codex/Pi, privat konfiguration, VPS og aflevering.
-
-| Del | Hvad bruger vi den til? |
+| Outcome | Command / guide |
 | --- | --- |
-| **Arcitai CLI** | Opsætning, installation, start/stop, opgaver, incident-input og kontrolleret retry |
-| **Machinist** | Dashboard, én jobkø, trin, godkendelser, historik og artefakter |
-| **Docker** | Agentens checkout, shell og tests; ingen Docker-socket eller deploynøgler i agentjobbet |
-| **Codex / Pi / egen command** | Udskiftelig agent; modellen og inferenceadgangen vælges separat |
-| **Seks skills** | Scope, vertical slices, implementering, review, security og dokumenteret værdi |
-| **GitHub / Actions** | Issues og PR’er; appens almindelige tests og CI/CD. Agentjobs kører på din vært |
-| **Defence** | Manuel, privat evidens → læseundersøgelse → uverificeret udkast. Ingen produktionshandlinger |
+| Use the method with your existing agent | `software-defence-factory kit --output ./factory-kit` — exports a new staging directory |
+| Try the runtime without inference | `software-defence-factory demo` — Docker required; synthetic sample only |
+| Connect an existing repository | [Runtime quickstart](docs/quickstart.md) |
+| Understand installation and updates | [npm and npx](docs/npm.md) |
+| Review the evidence and limits | [Qualification](docs/proof.md) |
 
-Softwareforløb: **opgave → ændring → appchecks → separat review → din godkendelse → patch og beviser**. PR-oprettelse er endnu manuel. Varighed gemmes pr. forsøg; pris og mennesketid står som ukendt, indtil de faktisk måles.
+The runtime supplies policy and six focused skills to its isolated jobs. `init` configures a private installation; it does not modify the application or start work. Model access and the application's real check command must be configured before using it for delivery.
 
-**Start her:** [Kort visuelt overblik](docs/review.html) · [Quickstart og VPS](docs/quickstart.md) · [Afprøvninger og grænser](docs/platform-proof.md).
+## How work moves
 
-Metoden kan også bruges uden platformen: [portabelt kit](kit/README.md). Den tidligere Node-prototype er bevaret via `npm start`; den deler ikke jobkø eller data med Machinist. [Arkitektur og næste slices](docs/platform.md) · [Defence-kontrakt](docs/defence-integration.md) · [Kilder og licenser](docs/ownership.md).
+```mermaid
+flowchart LR
+    A[Accepted task] --> B[Isolated implementation]
+    B --> C[Application checks]
+    C --> D[Independent review]
+    D --> E[Operator approval]
+    E --> F[Verified handoff]
+```
 
-MIT for Arcitai-koden. Machinist og agentpakker beholder deres egne licenser. Repositoryets synlighed ændres ikke af installationen.
+Each result belongs to a specific candidate commit and policy. A failed check blocks delivery. Changing the candidate or check policy invalidates earlier evidence. Approval records a handoff; publishing, merging and deployment follow the application's separate authority.
+
+The dashboard provides a task board and list, results, files, history, analytics, workers and workflow descriptions. It binds to localhost and can be reached remotely through SSH. One controller executes one job phase at a time; each job has its own checkout and bounded Docker containers.
+
+The optional **defence** workflow accepts scoped incident evidence and produces a private, read-only draft. It does not monitor production or claim verified recovery. See [defence integration](docs/defence-integration.md).
+
+## Repository map
+
+| Directory | Responsibility |
+| --- | --- |
+| `bin/` | CLI entry point |
+| `factory/` | Queue, HTTP API, isolation, evidence, updates and bundled dashboard assets |
+| `dashboard/` | Dashboard source and UI tests |
+| `kit/`, `.agents/skills/` | Portable method, adoption records and six skills |
+| `scripts/`, `tests/` | Packaging, qualification, release checks and behavioral tests |
+| `docs/` | Setup, architecture, recovery, proof and ownership |
+
+The current runtime replaces earlier prototypes. Their source and research remain in Git history; they are not part of the installed package.
+
+## Contribute
+
+Requires Node 22.13+, npm and Git. Docker is needed only for integration qualification.
+
+```sh
+npm ci --ignore-scripts
+npm run build:dashboard
+npm run check
+```
+
+CI builds the dashboard and checks Node 22/24. A version increase merged to `main` is published to npm through the configured release workflow. Installed CLIs can update on invocation when all installations are stopped. See [release and update behavior](docs/npm.md).
+
+This is a test release. Synthetic qualification demonstrates control flow and isolation, not model quality, application correctness or production readiness. Follow [AGENTS.md](AGENTS.md) for contributions and [SECURITY.md](SECURITY.md) for the trust boundaries.
+
+MIT for original code and method. Included dashboard components and fonts retain their licenses in [third-party notices](THIRD_PARTY_NOTICES.md).

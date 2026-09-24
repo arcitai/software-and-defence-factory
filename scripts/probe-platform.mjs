@@ -1,4 +1,4 @@
-// Explicit, opt-in integration qualification. Uses Docker and Machinist, never inference.
+// Explicit, opt-in integration qualification. Uses Docker and the native controller, never inference.
 import assert from 'node:assert/strict';
 import { readFileSync, writeFileSync, existsSync } from 'node:fs';
 import { resolve, join } from 'node:path';
@@ -10,7 +10,7 @@ assert.equal(original.agent,'mock','Qualification is restricted to a synthetic i
 assert.equal(readFileSync(join(original.repo,'value.txt'),'utf8'),'broken\n');
 assert(!(await api(state,'/api/v1/status')).jobs.some(j=>['queued','running','awaiting_approval'].includes(j.state)),'Finish/cancel active demo jobs before qualification');
 const results=[];
-const cli=(...args)=>stream(process.execPath,[join(ROOT,'bin/arcitai-factory.mjs'),...args,'--state',state]);
+const cli=(...args)=>stream(process.execPath,[join(ROOT,'bin/software-defence-factory.mjs'),...args,'--state',state]);
 const snapshot=async id=>(await api(state,'/api/v1/status')).jobs.find(j=>j.id===id);
 async function until(fn,ms=45000) {
   const deadline=Date.now()+ms;
@@ -48,15 +48,15 @@ try {
   await cli('approve',fail.id);await waitState(fail.id,'succeeded');record('failed app check blocks delivery; controlled retry rechecks same candidate');
 
   const cancel=await work('SYNTHETIC_TIMEOUT cancellation fixture');
-  const live=await until(()=>containers(state).find(c=>c.Config.Labels['arcitai.job']===cancel.id&&c.State.Running));
+  const live=await until(()=>containers(state).find(c=>c.Config.Labels['sdf.job']===cancel.id&&c.State.Running));
   assert(live.HostConfig.ReadonlyRootfs);assert(live.HostConfig.CapDrop.includes('ALL'));assert.equal(live.HostConfig.NetworkMode,'none');
   assert(!live.Mounts.some(m=>m.Source.includes('docker.sock')));assert(!live.Mounts.some(m=>m.Destination==='/workspace/.git'&&m.RW));
   assert.notEqual(live.Config.User.split(':')[0],'0');
   await cli('cancel',cancel.id);await waitState(cancel.id,'cancelled');
-  await until(()=>!containers(state).some(c=>c.Config.Labels['arcitai.job']===cancel.id));record('non-root container boundaries; cancel confirms container stop');
+  await until(()=>!containers(state).some(c=>c.Config.Labels['sdf.job']===cancel.id));record('non-root container boundaries; cancel confirms container stop');
 
   setConfig({timeoutSeconds:2});const timeout=await work('SYNTHETIC_TIMEOUT deadline fixture');
-  await waitState(timeout.id,'failed');assert(!containers(state).some(c=>c.Config.Labels['arcitai.job']===timeout.id));record('bounded deadline stops agent and fails the attempt');
+  await waitState(timeout.id,'failed');assert(!containers(state).some(c=>c.Config.Labels['sdf.job']===timeout.id));record('bounded deadline stops agent and fails the attempt');
   setConfig({});
 
   const input={...json(join(ROOT,'factory/examples/incident.json')),event_id:`probe-${Date.now()}`};
@@ -66,10 +66,10 @@ try {
   assert.equal(report.production_action_taken,false);record('incident deduplication, private draft and no recovery claim');
 
   const interrupted=await work('SYNTHETIC_TIMEOUT restart fixture');
-  await until(()=>containers(state).some(c=>c.Config.Labels['arcitai.job']===interrupted.id&&c.State.Running));
+  await until(()=>containers(state).some(c=>c.Config.Labels['sdf.job']===interrupted.id&&c.State.Running));
   await cli('stop');assert.equal(containers(state).length,0);await cli('up');await waitState(interrupted.id,'interrupted');
   setConfig({timeoutSeconds:2});await cli('retry',interrupted.id);await waitState(interrupted.id,'failed');
   assert.equal((await snapshot(interrupted.id)).runs.length,2);assert.equal(containers(state).length,0);record('stop/restart retains interrupted state; retry proves previous writer stopped');
-  save(join(state,'qualification.json'),{synthetic:true,platform:process.platform,arch:process.arch,engine:json(join(state,'engine.json')).pin,results});
+  save(join(state,'qualification.json'),{synthetic:true,platform:process.platform,arch:process.arch,engine:json(join(state,'engine.json')).version,results});
   console.log(`Qualified ${results.length} paths. Model quality, cost and production connectors were not measured.`);
 } finally {save(join(state,'factory.json'),original);}

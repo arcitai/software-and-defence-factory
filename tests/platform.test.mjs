@@ -51,10 +51,11 @@ test('init preserves app and refuses to overwrite an existing installation',t=>{
   const parent=instance(t),repo=join(parent,'app'),state=join(parent,'new-state');mkdirSync(repo);
   run('git',['init','-b','main',repo]);run('git',['-C',repo,'-c','user.name=Test','-c','user.email=test@localhost','commit','--allow-empty','-m','fixture']);
   const before=run('git',['-C',repo,'status','--porcelain']);
-  const args=['bin/arcitai-factory.mjs','init','--state',state,'--repo',repo,'--agent','mock','--check','true'];
-  run(process.execPath,args);const config=readFileSync(join(state,'factory.json'),'utf8');
-  assert.throws(()=>run(process.execPath,args),/Already configured/);
+  const args=['bin/software-defence-factory.mjs','init','--state',state,'--repo',repo,'--agent','mock','--check','true'];
+  const options={env:{...process.env,XDG_STATE_HOME:join(parent,'private-state')}};
+  run(process.execPath,args,options);const config=readFileSync(join(state,'factory.json'),'utf8');
+  assert.throws(()=>run(process.execPath,args,options),/Already configured/);
   assert.equal(readFileSync(join(state,'factory.json'),'utf8'),config);assert.equal(run('git',['-C',repo,'status','--porcelain']),before);
   run('git',['-C',repo,'remote','add','origin','https://github.com/example/authorized.git']);
-  assert.throws(()=>run(process.execPath,['bin/arcitai-factory.mjs','run','--state',state,'--issue','https://github.com/example/wrong/issues/1']),/does not belong/);
+  assert.throws(()=>run(process.execPath,['bin/software-defence-factory.mjs','run','--state',state,'--issue','https://github.com/example/wrong/issues/1']),/does not belong/);
 });
