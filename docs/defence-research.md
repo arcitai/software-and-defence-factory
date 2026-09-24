@@ -26,6 +26,25 @@ De to factories deler appens instruktioner, security-kontekst, sag, revisioner o
 
 **To selvstændige løsninger med fælles overdragelsesformat.** Den fysiske repo-/runtimeopdeling er endnu ikke fastlagt. En fælles server, to dashboards eller et nyt SOC er ikke en nødvendig konsekvens. Driftsprofilen kan tilsluttes uden at ændre ansvarsdelingen.
 
+## Pakningen følger Software Factory
+
+**Gustavs præcisering, 24. september:** produktnavn, installer, motor og arbejdsflade afklares i den anden session, *arcitai software factory method*. Defence skal passe ind i den valgte løsning. Denne research fastlåser derfor hverken et separat dashboard, en bestemt controller eller en ny deploymentmetode.
+
+De aktuelle [produktnoter](product-experience.md) anbefaler et installérbart kit med én afprøvet driftsprofil og vurdering af eksisterende motor/UI før mere platformkode. [Platformforslaget](platform.md) skelner mellem factoryens placering, agentens arbejdsmiljø og kundens app. Det er retning, ikke en færdig VPS-installation. Cole Medins setup er inspiration; Archon er fortsat fravalgt i projektets instruktioner.
+
+| Det skal kunne vælges | Betydning for Defence |
+| --- | --- |
+| Agent/harness | Sikkerhedsarbejdet skal kunne udføres af en kvalificeret agent gennem en afprøvet adapter. |
+| Model/inference | Valg af model eller endpoint er adskilt fra agent og factory; konkrete kombinationer kvalificeres. |
+| Egen maskine eller VPS | Genbrug den valgte installations- og driftsform, hvor den passer. Jobs får afgrænset adgang og arbejdsmiljø. |
+| GitHub eller GUI | Samme sag og evidens skal kunne bruges gennem begge arbejdsflader. En ekstra Defence-UI kræver et konkret behov. |
+
+Det vi kan definere nu, er den lille **overdragelse mellem forløbene**: sags-ID, tjeneste/miljø, relevant revision, fund og beviser, accepteret rettelsesomfang samt kriterier for efterkontrol. Tilbage kommer job-/PR-reference, faktiske checks og release-/verifikationsstatus. Det kan først være et almindeligt privat issue og links; API og automatisk routing vælges med motoren.
+
+Defence beholder sine egne sikkerhedsopgaver og kan bruges alene, men genbruger så vidt muligt opsætning, jobstyring, evidenslager og arbejdsflade. Hvis løbende overvågning vælges, skal dens placering kunne være tilgængelig, selv når brugerens laptop er slukket; agentarbejdet kan stadig udføres andetsteds.
+
+**Næste integration afhænger af den afprøvede Software Factory-pakning.** Derefter føres ét Defence-fund gennem netop den leveringsvej. Indtil da videreføres definition, sagsformat og afgrænset valideringsmetode uden at bygge en konkurrerende platform.
+
 ## Hvad andre faktisk viser
 
 | Primærkilde | Relevant observation | Konsekvens for vores forslag |
