@@ -2,6 +2,46 @@
 
 Arcitai: **Business first. Security built in.** Et fornuftigt tilbud sælger et fungerende forretningsresultat med synlige beviser og ejerskab til kunden. Kastanje-inference kan være en fortsat leverance, når dens konkrete rute giver værdi. Kunden kan vælge anden inference uden at miste metode, repository eller målinger.
 
+## Start her: fem målepunkter og en scorer
+
+Opdateret **24. september 2026** efter [Warp-gennemgangen](warp-measurement.md). Brug ét [målekort](../templates/measurement-card.md) pr. opgave og behold den eksisterende reviewpakke som bevisgrundlag. Start manuelt; dette kræver ingen ny service, GitHub Actions eller Warp-konto.
+
+| Spørgsmål | Det vi måler |
+| --- | --- |
+| Virker resultatet? | Menneskeligt accepteret resultat på aftalte kriterier og præcis revision; afvisninger og blokeringer bliver synlige |
+| Hvad kostede det? | Alle forsøg, reparationer, review/scoring og compute; vis dækning og estimater |
+| Hvor meget krævede det af mennesker? | Aktiv tid til afklaring, arkitektur, hjælp, review, accept og drift |
+| Hvor hurtigt blev det færdigt? | Gennemløbstid til accept; aktiv agenttid og ventetid holdes adskilt |
+| Holdt resultatet? | Fejl og tilbagefald efter accept med version, observationsperiode og datadækning |
+
+Tilføj først **én scorer: [Er resultatets påstande underbygget?](../evals/scorers/evidence-quality.md)** Den har `pass`, `fail` og `unknown` med begrundelse og bevislinks. En scorer, der ikke kunne køres, er `not-scored`. Den undersøger bevisgrundlaget; den samlede accept kræver fortsat alle relevante kriterier, checks og review. Udfør kendte revision-/testkontroller med kode, hvor muligt. En LLM bruges kun til den vurdering, det konkrete materiale kræver.
+
+I piloten gennemgår en person alle leverancer. Hvis en model afprøves som judge, sammenlignes dens vurdering med personens egen vurdering af de første op til ti tilgængelige, afsluttede runs. Medtag også eksempler med manglende bevis og et korrekt review uden fund. Registrér uenigheder og især **falske godkendelser**. Det er en kalibreringsprøve; ti vurderinger dokumenterer ikke en generel fejlrate.
+
+Gem scorerens version, judge/model, materiale-hash, scope/head og vurderingstid. Bevar tidligere vurderinger ved rescore. Efter piloten kan den ekstra LLM-vurdering bruge en på forhånd fastlagt, reproducerbar stikprøve for at begrænse forbrug. Påkrævede accept- og sikkerhedskontroller gælder fortsat alle leverancer. Hvis fejl undersøges særskilt, hold dem uden for den repræsentative stikprøves beståandel.
+
+Vis en fordeling som `bestået / fejlet / ukendt / ikke vurderet` med antal og dækning. Hvis en beståandel bruges, er den `pass / (pass + fail + unknown)` blandt de udvalgte runs med en faktisk vurdering; `not-scored` vises ved siden af og i dækningsbrøken. Mislykkede og afbrudte workers indgår fortsat i opgave-/forsøgsregnskabet, selv om de aldrig fik et færdigt resultat til scoring. Ingen score sammenfattes til “procent sikker”.
+
+## Kobling til bachelorens undersøgelse
+
+**Forslag til forsøgsdesign; ikke en ændring af bachelorens vedtagne spørgsmål.** Mål én sammenhængende udviklingsopgave fra faglig afklaring til accepteret resultat. Registrér, hvilke arkitekturvalg og indgreb miljøet faktisk klarede, og hvilke der krævede Gustav. Sikkerhedsarbejde efter release får eget scope og observationsvindue, så resultaterne kan analyseres separat.
+
+1. Beskriv den nuværende arbejdsgang som baseline, inklusive den AI der allerede bruges. Fastlæg kvalitetskrav, dataadgang, tidsregistrering og udvælgelse før første måling.
+2. Brug repræsentative, sammenlignelige opgaver. I et kontrolleret forsøg bruges samme frosne input med friske miljøer; variér rækkefølgen, når menneskelig læring ellers kan favorisere den anden gennemførsel. Virkelige kundeopgaver rapporteres også enkeltvis med deres forskelle.
+3. Registrér al mennesketid og årsagerne til indgreb. Planlagt accept og uplanlagt redningsarbejde adskilles, men begge tæller i den samlede indsats. Færre kode-pushes beviser ikke mindre arkitektarbejde.
+4. Sammenhold målinger med reproducerbare checks, review og observeret brug. Scorerens vurdering er én datakilde. Vis modstridende beviser og uafsluttede forløb.
+5. Beregn kun besparelse i mennesketid, når baseline er målt og sammenlignelig: `(baseline-minutter − factory-minutter) / baseline-minutter`. Begge tal omfatter den samlede aktive mennesketid. Baseline skal være større end nul, og kvaliteten skal vurderes samtidig. Uden baseline beskrives observeret indsats og læring; der opfindes ingen sparet tid.
+
+Én opgave kan afprøve metoden; tre pilotleverancer kan give foreløbige erfaringer. Det er ikke et generelt effektbevis. Opsætning, metodeudvikling og kalibrering registreres særskilt som etableringsomkostning og indgår, hvis vi beregner kundens samlede økonomi. Fordeling over fremtidige opgaver kræver en synlig antagelse.
+
+## Fra måling til en konkret forbedring
+
+Vælg én observeret fejltype, fx manglende testbevis. Undersøg dens årsag, foreslå én ændring i instruktion, værktøj eller model, og sammenlign på faste cases med samme kvalitetskrav. Adopter først efter review og gem konfigurationsversionen. Mål derefter videre i piloten. En ændring af selve rubric eller judge starter en ny måleserie; gamle og nye beståandele må ikke ukritisk sammenlignes.
+
+Brug de fem eksisterende evalcases ved en fuld konfigurationssammenligning: to konfigurationer × fem cases × tre gentagelser giver **30 workerforsøg**, plus eventuelle judges. Start kun, når spørgsmålet og budgettet begrunder det. Forsøgene er ikke kørt her. En mindre prøve kan bruges diagnostisk, men må ikke fremstå som den fulde suite.
+
+**Implementeringsstatus:** v0.1 har journal, priser/tider og import af faste evalresultater. Målekort og scorer er nu en manuel metode; automatisk judging, sampling, scorerhistorik, total mennesketid og fejl efter accept er ikke nye dashboardfunktioner. Den eksisterende `rubricPassed` på 0–4 vedrører stadig suite.jsons fire kriterier. Den nye scorers `pass` må ikke oversættes direkte til 4/4 eller automatisk accept. Detaljerne gemmes privat via reviewpakken og dens `evidence`-reference; importer og inputDigest er uændrede.
+
 ## To datasæt, to spørgsmål
 
 **Driftsopgaver:** Virker leverancen i kundens hverdag, hvor meget menneskelig indsats kræver den, og hvad koster den samlet? Opgaver har forskellig sværhedsgrad og er ikke et fair modelbenchmark.

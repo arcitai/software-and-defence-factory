@@ -1,8 +1,8 @@
 # Fra Warp-inspiration til en åben Arcitai Factory
 
-Research opdateret **22. september 2026**. Warp-gennemgangen nedenfor suppleres nu af [den dybe Pi-research](pi-research.md). **Pi er første kandidat til den åbne factory**, mens Codex er den workeradapter, der allerede findes i v0.1, og Cursor er et managed alternativ. Denne anbefaling erstatter den tidligere prioritering af Codex lokalt / Cursor i cloud. Starteren er ikke et færdigt produktionssystem eller dokumentation for modelbesparelser.
+Research samlet **24. september 2026**. Warp-gennemgangen nedenfor suppleres af [Pi-research](pi-research.md), [BuilderIO-metoden](builderio-review.md) og [Warp Scorers og måling](warp-measurement.md). **Pi er første kandidat til den åbne factory**. Pi, Codex og valgfri Codex Security er nu workeradaptere; Cursor er et managed alternativ. De nye adapteres [afprøvning er syntetisk](worker-integrations.md). Starteren er ikke et færdigt produktionssystem eller dokumentation for modelbesparelser.
 
-**Suppleret med brugerens seks videoer:** [transskriptionsbaseret kildegennemgang](video-audit.md) og [næste runtime](next-runtime.md). Machinist skal stadig afprøves som mulig controller, før en permanent egen dispatcher bygges. Pi som harness og Machinist som controller er uafhængige valg. Før/efter-bevis, miljølivscyklus og feedback fra drift er eksplicit med i planen.
+**Suppleret med brugerens seks videoer:** [transskriptionsbaseret kildegennemgang](video-audit.md) og [næste runtime](next-runtime.md). Start med en manuel pilot på eksisterende runner. Machinist undersøges kun ved et dokumenteret controllerbehov. Før/efter-bevis, miljølivscyklus og feedback fra drift er eksplicit med i planen.
 
 ## Den anbefalede form
 
@@ -30,7 +30,7 @@ Det er derfor mere end “fem skills og en agent”. Skills er et nyttigt lille 
 
 **Actions er ikke hele runtime-laget.** Den undersøgte aktuelle Oz-platformdokumentation beskriver webhook-controller og cronpolling; GitHub Actions bruges til CI. Warps eget repo indeholdt samtidig en workflow-reference til en ældre action-baseret wrapper. Kilderne er i bevægelse: kopier ikke en enkelt YAML og antag, at den repræsenterer hele det aktuelle setup. Den minimale Arcitai-starter behøver ingen Actions. [Oz platform](https://github.com/warpdotdev/oz-for-oss/blob/a2bb45f231fd56ea28c1b381999d11b277a0b0e2/docs/platform.md), [Warp-workflow](https://github.com/warpdotdev/warp/blob/c02a1887c2ffac2fe1362140acc60f1c42dd614c/.github/workflows/update-triage-local.yml).
 
-**Målinger.** Warp beskriver omkostning pr. PR, gennemløb, agentadfærd og scorere. Estimerede kreditter og LLM-vurdering er nyttige observationer, men er ikke en faktura eller uafhængigt bevis på korrekthed. “Autonomi” ud fra fravær af menneskelige kode-push måler ikke al menneskelig afklaring/review. Vores målemodel registrerer den tid eksplicit. [Measure and improve](https://docs.warp.dev/factories/measure-and-improve/).
+**Målinger.** Warp beskriver omkostning pr. PR, gennemløb, agentadfærd og scorere. Estimerede kreditter og LLM-vurdering er nyttige observationer, men er ikke en faktura eller uafhængigt bevis på korrekthed. “Autonomi” ud fra fravær af menneskelige kode-push måler ikke al menneskelig afklaring/review. Vores [måleprotokol](value.md) registrerer den samlede mennesketid manuelt i piloten; automatisk opsamling mangler. [Measure and improve](https://docs.warp.dev/factories/measure-and-improve/).
 
 **Kontrolleret sammenligning.** Warps benchmarkdokumentation beskriver faste opgaver på forskellige model/runner-konfigurationer, gentagelser og vurderingsomkostninger. Sammenligning mod tredjeparts-harnesses var endnu ikke tilgængelig i den læste dokumentation. Arcitai bør derfor etablere egne sammenlignelige cases og bevare alle forsøg. [Benchmarks](https://docs.warp.dev/factories/benchmarks/).
 
@@ -65,15 +65,15 @@ Vi starter ikke med en agent, der automatisk omskriver sine egne skills ud fra P
 
 Kastanje er en konkret produktpilot: vælg små, repræsentative forbedringer og dokumentér, om factoryen faktisk reducerer samlet indsats. Den anden pilot er en afgrænset Z13-worker med syntetiske cases. De demonstrerer to forskellige forhold: produktleverance og lokal teknisk gennemførlighed.
 
-Bachelorens allerede valgte content-case ændres ikke af dette forslag. Factory-piloten kan være supplerende empiri om AI-støttet virksomhedsudvikling, hvis det passer til den fastlagte afgrænsning. Kunden behøver heller ikke købe en “AI-platform”: tilbuddet kan være et valgt forretningsproblem, en installeret arbejdsgang, dokumenterede kontrolpunkter og en efterfølgende beslutning om drift/inference.
+Bachelorens aktuelle retning fra 23. september handler om agentmiljøets pålidelige selvstændighed, faglig afklaring før kode og den nødvendige arkitektindsats. Udvikling og sikkerhedsarbejde efter release undersøges særskilt med forbindelse mellem fund og ændringer. [Måleprotokollen](value.md#kobling-til-bachelorens-undersøgelse) er et forslag til empiri; den ændrer ikke bachelorens spørgsmål eller rapport. Kundetilbuddet kan være et valgt forretningsproblem, en installeret arbejdsgang, dokumenterede kontrolpunkter og en efterfølgende beslutning om drift/inference.
 
 Den kommercielle kæde og beviskravene er konkretiseret i [value.md](value.md). Arkitekturen muliggør Kastanje som fortsat inference-leverance, men holder kundens repository, skills og målinger portable.
 
 ## Hvad næste investering bør afgøre
 
-1. To matchede konfigurationer på de fem evalcases, mindst tre gentagelser pr. case; dokumenteret modeladgang før betalt kørsel.
-2. Tre små Kastanje-produktopgaver med faktisk commit/review/forbrug og en sammenlignelig baseline.
+1. Én manuel pilot på en kvalificeret workerprofil, med fastlagte kriterier, baseline og et målekort. Udvid til tre repræsentative Kastanje-opgaver, når forløbet virker.
+2. Undersøg en konkret fejltype; sammenlign to konfigurationer på faste cases, når spørgsmålet og budgettet begrunder det. En fuld suite er fem cases med mindst tre gentagelser pr. konfiguration.
 3. Prøv én rigtig cloudoverdragelse og stop/recovery, eller én isoleret lokal modelrute på Z13. Lad pilotbehovet vælge rækkefølge.
-4. Vælg genbrug eller viderebygning af runtime ud fra [den afgrænsede motorprøve](next-runtime.md#før-vi-vælger-en-permanent-motor), før en permanent dispatcher, provider-reconciliation og automatiske PR-/check-skrivninger implementeres.
+4. Overvej [en anden motor](next-runtime.md#hvis-piloten-viser-behov-for-en-anden-motor), hvis piloten viser et konkret behov. Automatisér ét gentaget trin ad gangen.
 
 Denne rækkefølge bygger et reelt tilbud uden at foregive, at en flot dashboard-demo allerede dokumenterer en billigere eller sikrere softwarefabrik.

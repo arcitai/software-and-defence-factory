@@ -54,7 +54,7 @@ Security SDK har et åbent dependencyfund i ZIP-håndteringen. Adapteren bruger 
 - [Næste runtime: samlet pipeline og prioriterede opgaver](docs/next-runtime.md) · [Reviewpakke med før/efter](templates/review-packet.md)
 - [Opsætning og en hel opgave fra start til accept](docs/setup.md)
 - [Research: Warp/Oz, alternativer og anbefalet system](docs/research.md)
-- [Målinger, benchmarks og salgspilot](docs/value.md)
+- [Start målingen: fem målepunkter, én scorer og bachelorprotokol](docs/value.md) · [Warp-kilder og tilpasning](docs/warp-measurement.md)
 - [Skills](.agents/skills/README.md) · [Profiler](config/profiles.json) · [Evalueringer](evals/suite.json)
 - [Security og tillidsgrænser](SECURITY.md) · [Recovery](docs/recovery.md)
 - [Udførte kontroller og kendte begrænsninger](docs/proof.md)

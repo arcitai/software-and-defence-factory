@@ -104,3 +104,13 @@ Read the Factory guide, configuration convention, all nine Factory skills, gener
 The [research](builderio-review.md) distinguishes instructions from host capabilities and from the larger Factory app. Updated next-runtime priorities to use the existing runner for a manual pilot before considering another controller. Added a manual human-decision template and recurrence field in the review packet. Existing skill instructions, runtime code, schemas and UI behavior were not changed; the skill index now explains the three-step presentation.
 
 All 101 local Markdown file targets resolved and `git diff --check` passed. Runtime tests were not repeated for this documentation-only change; the latest runtime validation remains the 24-test run above. No new UI behavior is claimed, and no model execution, installation, scheduler, external message, PR or deployment was performed. Review was by the authoring agent, not an independent reviewer.
+
+## Warp measurement method — 24 September 2026
+
+Read the user-opened Warp email dated 22 September in iCloud and the six official pages for Scorers, measurement/improvement, benchmarks, self-improvement, dashboard metrics and factory definitions. Inspected the MIT-licensed `warpdotdev/warp-factory-examples` at `84e7c952f1506c4bd2784d96fd40a6f4d6398cad`, including its issue-to-PR guide and two scorer definitions. No upstream code was executed. Documentation/example differences are recorded as source observations, not proven runtime defects.
+
+Read the designated bachelor's task for its current direction. Corrected the older factory research's stale description of that work; the bachelor's repository and its research questions were not changed. No raw mail, personal tracking links or private task transcript is included in this delivery.
+
+Added an original manual measurement card, an evidence-quality rubric and a before/after research protocol to the existing value guide. Updated the runtime plan and review packet to reference the method. The protocol includes all human work, unsuccessful attempts, unknown measurements, judge disagreement and post-acceptance observation. Runtime code, eval schema, fixed cases and dashboard behavior are unchanged. Automatic judging, sampling and assessment history remain proposed capabilities; no model experiment or measured saving is claimed.
+
+Checked all 37 Markdown files: **121 local file targets and eight heading anchors resolved**. `git diff --check` passed. Runtime tests were not repeated for this documentation-only change; the latest runtime validation remains the 24-test run above. No new UI, paid job, installation, automation, external message, issue, PR or deployment was performed. Review was by the authoring agent, not an independent reviewer.

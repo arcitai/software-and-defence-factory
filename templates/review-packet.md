@@ -27,6 +27,7 @@ For UI: vis handlingen og resultatet. For performance: samme data/workload, enhe
 - Reviewer/proces, vurderet head-SHA og vurderet artifact:
 - Risiko og begrundelse; evt. nødvendig specialist:
 - Konkrete findings, reparationer og efterkontrol:
+- Hvis scorer anvendes: rubric-version, judge/model, materiale-hash, klassifikation og begrundelse; separat menneskelig vurdering og uenigheder:
 - Uafklarede forhold og anbefaling: klar til accept / ændringer / uafklaret:
 
 Alle kendte findings skal have en disposition med grundlag. Review må ikke blive en ubegrænset løkke mod en bestemt numerisk score.
@@ -53,3 +54,5 @@ Alle kendte findings skal have en disposition med grundlag. Review må ikke bliv
 Den udfyldte pakke supplerer v0.1-evidensimporten. Den aktuelle importer læser **ikke** denne Markdown automatisk og håndhæver ikke alle felterne ovenfor.
 
 Det, der kræver en menneskelig beslutning, kan samles i [én kort oversigt](human-review.md) med link til denne pakke.
+
+Pilotens fem målepunkter og baseline registreres på [målekortet](measurement-card.md). Genbrug bevislinks herfra; scorerens vurdering er et supplerende signal og ændrer ikke acceptkravene.

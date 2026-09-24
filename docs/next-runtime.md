@@ -8,6 +8,8 @@ Den mindste fornuftige løsning er **én controller, én worker og ét pilotrepo
 
 **Forenkling 23. september:** behold den nuværende runner til en manuel pilot. Den synlige arbejdsgang er **find og afgræns → ret og bevis → review og aflever**. Et samlet overblik viser beslutninger, beviser og forbrug. Automatisér ét gentaget trin ad gangen efter faktisk brug; et nyt framework, endnu en controller og mange planlagte agentjobs er ikke forudsætninger.
 
+**Måling 24. september:** følg [den lille måleprotokol](value.md#start-her-fem-målepunkter-og-en-scorer): kvalitet, samlet pris, al mennesketid, gennemløbstid og fejl efter accept. Én valgfri scorer supplerer reviewet med en evidensvurdering. Brug baseline → undersøg fejl → afprøv én ændring → review → mål igen. Det bygger videre på [Warp Scorers](warp-measurement.md) uden en ny runtime eller obligatorisk evaluatormodel.
+
 ## Den samlede arbejdsgang
 
 ```mermaid
@@ -90,7 +92,7 @@ Disse er lokale opgaveudkast; de er ikke oprettet på GitHub.
 
 | Prioritet / opgave | Leverance og konkret accept |
 | --- | --- |
-| **P0 — Én manuel pilot gennem eksisterende runner** | Dry-run-triage af få aftalte issues; én reproducerbar fejl gennem de tre trin. Bevar præcis revision, beviser, alle forsøg og faktisk mennesketid. Ingen ny scheduler kræves |
+| **P0 — Én manuel pilot gennem eksisterende runner** | Dry-run-triage af få aftalte issues; én reproducerbar fejl gennem de tre trin. Fastlæg baseline og udfyld [målekort](../templates/measurement-card.md) med præcis revision, beviser, alle forsøg og samlet mennesketid. Ingen ny scheduler kræves |
 | **P0 før reel workerafvikling — Et reproducerbart, afgrænset miljø** | Én workerprofil med rigtige checks, testdata og de nødvendige capabilities. Bevis at controllerdata/administrationsnøgler ikke kan nås, og at stop virker |
 | **P0 før automatisk aflevering — Luk kvalitetssløjfen** | Implementering → konfigurerede checks → separat review → højst to reparationer → reviewpakke eller præcis blocker. Stale head, manglende check og ændret policy afvises. Manuel review bruges indtil da |
 | **P0 før betalt ubemandet brug — Forbrug og recovery** | Providerens stop efterprøves; jobs kan genstartes uden dublet, tabte artifacts eller nulstillet budget. Ukendt forbrug forbliver ukendt |

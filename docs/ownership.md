@@ -20,4 +20,6 @@ Primary sources and product claims are linked in research.md and profiles/. The 
 
 The [BuilderIO review](builderio-review.md), 23 September 2026, inspected `BuilderIO/skills` at `9e4f7beb3def2d785a6fa347fd946fd1a063f522` and selected `BuilderIO/agent-native` files at `67cf8bbeca31c3c43b795cf5b9b89b60c011421f`. Its linked YouTube transcript was read in full. The original analysis and manual decision template adapt workflow ideas; no upstream code, skills, plugin configuration or full transcript was copied into this product. No BuilderIO service is a runtime dependency.
 
+The [Warp measurement review](warp-measurement.md), 24 September 2026, used six public documentation pages and `warpdotdev/warp-factory-examples` at `84e7c952f1506c4bd2784d96fd40a6f4d6398cad` (MIT). The original evidence-quality rubric and measurement card adapt the evaluation method without copying upstream scorer files. The user-opened marketing email and the designated bachelor's task were read for context; no raw mail, tracking identifiers or private task transcript is bundled. The bachelor's repository was not changed.
+
 No remote repository, PR, issue comment, deployment, account automation or paid model job was created by this delivery. A local initial Git snapshot and source archive make the result portable; publication remains a separate chosen destination.
