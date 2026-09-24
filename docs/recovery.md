@@ -14,3 +14,10 @@ Do not remove active.json merely to unblock a job. Establish that its PID, proce
 For backup, stop the installation and copy the complete private state directory, including SQLite files, factory.json and credentials, to an authorized private destination. Restore only while stopped. Update the repository path if it moved, verify ownership/permissions and the pinned image, then inspect state before any retry. Keep previous backups; no automatic destructive schema migration is provided.
 
 Earlier experimental engines use a different journal. Start a new state directory for the native 0.3 runtime; preserve old journals separately. There is no automatic import of their jobs or approval state.
+
+Verification cleanup makes owned scratch directories traversable before removing
+them and never follows their symlinks. It runs only after container stop is
+confirmed. If a filesystem error still prevents cleanup, the attempt fails and
+retains the original check exit and private log path alongside the cleanup error.
+Inspect that retained attempt before manual removal; never substitute the source
+candidate path for the scratch path.

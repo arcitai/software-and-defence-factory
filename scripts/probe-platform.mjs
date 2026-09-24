@@ -45,6 +45,20 @@ try {
   await cli('approve',native.id);await waitState(native.id,'succeeded');setConfig({});
   record('native build scratch exceeds 1 GiB without changing the candidate; limits and cleanup verified');
 
+  for (const exitCode of [0, 17]) {
+    setConfig({check:`mkdir -p cache/nested && echo cache > cache/nested/value && ln -s /workspace cache/candidate && chmod 000 cache/nested cache && exit ${exitCode}`});
+    const readonly=await work(`Synthetic read-only cache cleanup, exit ${exitCode}`);
+    await waitState(readonly.id,exitCode===0?'awaiting_approval':'failed');
+    const run=(await snapshot(readonly.id)).runs.find(r=>r.command==='verify');
+    assert(!existsSync(join(state,'jobs',readonly.id,run.id,'check-workspace')));
+    assert.equal(readFileSync(join(state,'jobs',readonly.id,'checkout/value.txt'),'utf8'),'fixed\n');
+    assert.equal(readFileSync(join(original.repo,'value.txt'),'utf8'),'broken\n');
+    if(exitCode===0){await cli('approve',readonly.id);await waitState(readonly.id,'succeeded');}
+    else assert.match(run.error,/verify exited 17/);
+    record(`read-only cache cleanup after exit ${exitCode}; candidate symlink not followed and exit preserved`);
+  }
+  setConfig({});
+
   const changed=await work('Synthetic changed revision guard');await waitState(changed.id,'awaiting_approval');
   writeFileSync(join(state,'jobs',changed.id,'checkout/value.txt'),'changed after review\n');
   await cli('approve',changed.id);await waitState(changed.id,'failed');

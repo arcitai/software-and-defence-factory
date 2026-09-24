@@ -1,4 +1,4 @@
-import { existsSync, mkdirSync, readFileSync, writeFileSync, rmSync, lstatSync } from 'node:fs';
+import { existsSync, mkdirSync, readFileSync, writeFileSync, rmSync, lstatSync, chmodSync, readdirSync } from 'node:fs';
 import { join } from 'node:path';
 import { spawn } from 'node:child_process';
 import { ROOT, configAt, run, save, json, digest, instanceLabel, stopContainers } from './lib.mjs';
@@ -44,6 +44,15 @@ function safeRead(path) {
   if (!stat.isFile() || stat.isSymbolicLink() || stat.size > 1024 * 1024) throw new Error('Expected a regular report under 1 MiB');
   return readFileSync(path, 'utf8');
 }
+// Called only after the container has stopped. Builds may leave read-only cache
+// directories; make owned directories traversable without following symlinks.
+function removeScratch(path) {
+  if (lstatSync(path).isDirectory()) {
+    chmodSync(path, 0o700);
+    for (const name of readdirSync(path)) removeScratch(join(path, name));
+  }
+  rmSync(path, { recursive: true, force: true });
+}
 async function container(mode, input, command, writable = false, credentials = false) {
   const name = `sdf-${instanceLabel(state)}-${attempt}-${mode}`;
   const reportDir = join(folder, attempt, mode);
@@ -84,8 +93,10 @@ async function container(mode, input, command, writable = false, credentials = f
     const probe = run('docker',['ps','-aq','--filter',`name=^/${name}$`]);
     if (probe) throw error;
   }
-  if (scratch) rmSync(scratch, { recursive: true, force: true });
-  if (code !== 0) throw new Error(`${mode} exited ${code}; private log: ${logPath}`);
+  let cleanupError;
+  try { if (scratch) removeScratch(scratch); } catch (error) { cleanupError = error; }
+  if (code !== 0) throw new Error(`${mode} exited ${code}; private log: ${logPath}${cleanupError ? `; scratch cleanup requires recovery: ${cleanupError.message}` : ''}`);
+  if (cleanupError) throw cleanupError;
   return reportDir;
 }
 function brief(instruction) {
