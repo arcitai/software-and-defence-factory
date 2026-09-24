@@ -48,17 +48,22 @@ async function container(mode, input, command, writable = false, credentials = f
   const name = `sdf-${instanceLabel(state)}-${attempt}-${mode}`;
   const reportDir = join(folder, attempt, mode);
   mkdirSync(reportDir, { recursive: true, mode: 0o700 });
+  // Native builds need disk-backed scratch space, not the small temporary RAM disk.
+  // Only this attempt can write here; the candidate and its Git metadata stay read-only.
+  const scratch = mode === 'verify' ? join(folder, attempt, 'check-workspace') : null;
+  if (scratch) mkdirSync(scratch, { mode: 0o700 });
   const uid = process.getuid(), gid = process.getgid();
   const args = ['run','--name',name,'--init','--read-only','--cap-drop=ALL','--security-opt=no-new-privileges',
-    '--pids-limit=256','--memory',`${config.memoryMiB}m`,'--cpus','2', '--user',`${uid}:${gid}`,
+    '--pids-limit',String(config.pidsLimit ?? 256),'--memory',`${config.memoryMiB}m`,'--cpus',String(config.cpus ?? 2), '--user',`${uid}:${gid}`,
     '--network',config.network,'--label',`sdf.factory=${instanceLabel(state)}`,'--label',`sdf.job=${job}`,
     '--label',`sdf.run=${attempt}`,'--label',`sdf.deadline=${Date.now() + config.timeoutSeconds * 1000}`,
-    '--tmpfs','/tmp:rw,nosuid,size=1024m','--env','HOME=/tmp/home','--env',`FACTORY_PHASE=${mode}`,
+    '--tmpfs','/tmp:rw,nosuid,size=1024m','--env',`HOME=${scratch ? '/scratch/home' : '/tmp/home'}`,'--env',`FACTORY_PHASE=${mode}`,
     '--mount',`type=bind,source=${workspace},target=/workspace${writable ? '' : ',readonly'}`,
     '--mount',`type=bind,source=${join(workspace,'.git')},target=/workspace/.git,readonly`,
     '--mount',`type=bind,source=${reportDir},target=/output`,
     '--mount',`type=bind,source=${join(ROOT,'kit')},target=/factory-policy,readonly`,
     '--mount',`type=bind,source=${join(ROOT,'.agents/skills')},target=/factory-skills,readonly`];
+  if (scratch) args.push('--mount',`type=bind,source=${scratch},target=/scratch`);
   if (credentials) args.push('--env-file', join(state,'model.env'));
   args.push('-i',config.image,'timeout','--signal=KILL',`${config.timeoutSeconds}s`,'sh','-c','mkdir -p "$HOME" && exec "$@"','factory',...command);
   console.log(JSON.stringify({ phase: mode, event: 'started', synthetic: config.agent === 'mock' }));
@@ -79,6 +84,7 @@ async function container(mode, input, command, writable = false, credentials = f
     const probe = run('docker',['ps','-aq','--filter',`name=^/${name}$`]);
     if (probe) throw error;
   }
+  if (scratch) rmSync(scratch, { recursive: true, force: true });
   if (code !== 0) throw new Error(`${mode} exited ${code}; private log: ${logPath}`);
   return reportDir;
 }
@@ -109,7 +115,7 @@ try {
   } else if (phase === 'verify') {
     const meta = candidate();
     if (!config.check?.trim()) throw new Error('Configure an actual app check before software delivery');
-    const check = ['sh','-c','mkdir -p /tmp/check /tmp/home && cp -R /workspace/. /tmp/check/ && cd /tmp/check && exec sh -c "$1"','check',config.check];
+    const check = ['sh','-c','mkdir -p /scratch/check && cp -R /workspace/. /scratch/check/ && cd /scratch/check && exec sh -c "$1"','check',config.check];
     await container('verify', '', check);
     candidate();
     const proof = { head: meta.head, policyHash, command: config.check, passed: true, finishedAt: new Date().toISOString(), synthetic: meta.synthetic };
