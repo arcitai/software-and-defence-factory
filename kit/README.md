@@ -1,37 +1,40 @@
-# Sæt en eksisterende app i factoryen
+# Tilslut appen og gennemfør første opgave
 
-**Arcitai Software and Security Factory**. Denne pakke lægger en fælles arbejdsmetode ind i **dit app-repo**. Appens sprog, arkitektur, CI og hosting bevares. Du vælger agent/harness, model og arbejdsmiljø. GitHub issues, checks og PR’er kan være hele kontrolpanelet; Arcitais runner og dashboard er valgfrie.
+**Arcitai Software and Security Factory** giver dit app-repo en fælles metode til udvikling, security og review. Start med den agent, du allerede bruger. Appens kode, arkitektur, CI og hosting bevares.
 
-## Det får du
+## 1. Giv pakken til din agent
 
-- Seks portable skills til afgrænsning, specifikation, implementering, review, security og evaluering. Kun relevante skills bruges på en opgave.
-- [Fælles arbejds- og sikkerhedsregler](policy.md), inklusive vertical slices og krav til beviser.
-- [Ét installationsark](installation.md) til projektets konkrete valg og afprøvninger.
-- [En kort afleveringsskabelon](delivery.md) til PR eller privat review, inklusive de fem målepunkter.
-- Et inaktivt [GitHub CI-eksempel](examples/github-checks.yml.example). Det kræver projektets rigtige checkkommando og skal vælges eksplicit.
+Brug den eksporterede pakke. Åbn app-repoet i din valgte agent, giv den pakkens placering, og brug denne besked:
 
-Pakken starter ingen agent, ændrer ingen konti og giver ikke adgang til modeller, browsere eller deployment. Disse funktioner leveres af det valgte miljø og kontrolleres ved opsætning.
+> Tilslut denne app til den vedlagte factory-pakke på en branch. Læs først appens instruktioner, arkitektur, tests og CI. Følg opsætningstrinnene nedenfor, og udfyld installationsarket ud fra repoet og mine kendte valg. Bevar eksisterende filer og sammenflet bevidst. Markér manglende adgang. Brug manuel start og GitHub til issues, checks og PR’er. Vis, hvad der er tilsluttet, afprøvet eller stadig mangler. Konti, betalt drift, publicering og deployment følger mit eksisterende mandat.
 
-## Tilslut uden at flytte appen
+Agenten udfører opsætningen; du behøver ikke udfylde hele installationsarket på forhånd. Manglende adgang blokkerer kun det trin, der kræver den.
 
-1. Eksportér en versioneret pakke fra software-factory-repoet til en **ny mappe**. Gennemse filerne. Eksporten er staging, ikke en installer.
-2. Lav en ændring i appens egen branch: kopiér pakkens `.factory-kit/` og de ønskede `.agents/skills/factory-*`. Tilføj issue-formen, hvis projektet mangler en passende. Bevar eksisterende filer med samme navn og sammenflet bevidst.
-3. Tilføj én henvisning i appens eksisterende `AGENTS.md` eller harnessens tilsvarende indgangspunkt: “For factory-opgaver, læs `.factory-kit/policy.md` og `.factory-kit/installation.md`; brug de relevante factory-skills.” Er der ingen instruktionsfil, kan agenten oprette en lille én. Lokale projektregler og brugerens mandat bevares.
-4. Lad opsætningsagenten undersøge repoet og udfylde installationsarket fra eksisterende commands, CI, deployopsætning og kendte præferencer. Ukendte adgange markeres som manglende. Der skal ikke vælges en ny stack alene for at passe i pakken.
-5. Afprøv én lille vertical slice i det valgte miljø. Vis læste instruktioner, nødvendige tools, faktisk test, review og aflevering. Kvalificér derefter automatisk start, stop og genoptagelse, hvis det ønskes.
+## 2. Agentens opsætning
 
-**Agentprompt til opsætningen:**
+1. Kopiér `.factory-kit/` og relevante `.agents/skills/factory-*` ind på appens branch. Tilføj den medfølgende issue-form, hvis appen har brug for den. Sammenflet navnesammenfald; overskriv ikke projektets instruktioner eller konfiguration.
+2. Tilføj en henvisning i appens `AGENTS.md` eller agentens tilsvarende indgangspunkt: “For factory-opgaver, læs `.factory-kit/policy.md` og `.factory-kit/installation.md`; brug relevante factory-skills.” Opret kun en ny instruktionsfil, hvis appen mangler den. Bevar lokale regler og brugerens mandat.
+3. Udfyld [installationsarket](installation.md) fra eksisterende setup og kendte valg: agent, miljø, checkkommandoer, adgang, forbrug og releasepolitik. Ingen secrets i Git. Arkets tekst er dokumentation; det konfigurerer ikke tjenester.
+4. Kontrollér, at agenten kan læse de valgte skills og faktisk har de nødvendige værktøjer. Afprøv appens relevante checks. Det [inaktive CI-eksempel](examples/github-checks.yml.example) tilpasses kun, hvis det udfylder et konkret hul i appens CI.
 
-> Tilslut denne app til den vedlagte factory-pakke. Bevar eksisterende arkitektur, instruktioner, CI og deployment. Udfyld installationsarket ud fra repoet og mine kendte valg; markér manglende adgang frem for at gætte. Brug GitHub som arbejdsflade. Tilføj kun manglende integrationsdele. Start med én lille, afgrænset opgave med beviser. Aktivering af konti, betalt drift, merge og deployment følger mit eksisterende mandat.
+De seks skills dækker triage, spec, implementering, review, security og evaluering. Brug dem, opgaven kræver. [Fælles regler](policy.md).
 
-Et harness skal enten opdage skills-mapperne eller få de valgte filer eksplicit. Verificér det; kopiering alene beviser ikke discovery. Én installation kan bruge en managed cloud-agent, en anden Pi eller Codex på en dedikeret maskine. En lokal maskine skal være tændt for at udføre lokale jobs. Et cloudjob kræver ikke, at din laptop er tændt, men automatisk start kræver en valgt trigger, som faktisk kører i skyen.
+## 3. Send første opgave
 
-## Når det kører
+Vælg en lille, eksisterende fejl eller forbedring. Beskriv:
 
-**Issue → afgrænsning → godkendt opgave → agent → checks og review → PR → release efter projektets politik.** En label er et signal; autoriseret aktør, scope, værktøjer og forbrug kontrolleres af den valgte integration. Hold kun én integration ansvarlig for at starte samme opgave.
+- Hvilken brugeradfærd skal ændres?
+- Hvad skal fungere bagefter, og hvad må ændres?
+- Hvilken test eller observation kan demonstrere resultatet?
 
-Vælg én af tre driftsformer i installationsarket: manuel start, providerens egne automations eller egen runner. Manuel start er et gyldigt første setup. Automatisk start må først kaldes afprøvet efter en rigtig hændelsesprøve; stop og recovery prøves særskilt. En skill er ikke en scheduler.
+Agenten bygger én gennemgående vertical slice, kører relevante checks og afleverer til separat review med [afleveringskortet](delivery.md). PR kræver den aftalte GitHub-adgang; mangler den, afleveres branch/diff og beviser med tydelig status. Registrér faktisk tid og forbrug, hvor de er tilgængelige. Manglende tal er ukendte.
 
-Opdater ved at eksportere en ny pakke og reviewe forskellen i app-repoet. `manifest.json` i den eksporterede `.factory-kit/` angiver kildeversion og filhashes; det er provenance, ikke en signatur eller en runtime-konfiguration. Projektets udfyldte installationsark skal bevares.
+**Første prøve er bestået**, når ændringen virker, krævede checks består på den afleverede revision, og reviewet kan vurdere beviserne. En demo eller kopierede skillfiler er ikke i sig selv en bestået installation.
 
-MIT. Kilderepoets LICENSE kopieres med som `.factory-kit/LICENSE`; den ændrer ikke appens licens. Ingen tredjepartsskill eller cloudtjeneste er indbygget i denne pakke.
+## Når første opgave virker
+
+Vælg eventuelt automatisk start fra issues gennem agentudbyderens integration eller egen runner. Afprøv ét job, dubletter, stop og recovery før ubemandet drift. En skill starter ingen scheduler. Lokale jobs kræver en tændt maskine; et afprøvet cloudsetup kan fortsætte, når din laptop er lukket. Merge og deployment følger appens releasepolitik.
+
+Opdater pakken ved at eksportere en ny version og reviewe forskellen. Bevar projektets udfyldte installationsark. `.factory-kit/manifest.json` registrerer kildeversion og filhashes; det er provenance, ikke en signatur eller runtime-konfiguration.
+
+MIT. Pakkens LICENSE ændrer ikke appens licens. Der er ingen obligatorisk provider, global skillinstallation eller Arcitai-runtime.

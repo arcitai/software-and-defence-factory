@@ -4,6 +4,38 @@ For at tilslutte en eksisterende app uden egen controller: start med [den portab
 
 Vil du starte uden stor lokal maskine, så læs først [cloudoversigten med komponentvalg](cloud-setup.md). Den skelner mellem en manuel Codex Cloud-pilot og vores endnu ikke tilsluttede Pi/sandbox-profil. Opskriften nedenfor beskriver den eksisterende lokale kerne.
 
+## Prøv demoen
+
+Kræver Node.js **22.13+** med `node:sqlite` (afprøvet på 22.21.1 og 22.22.3). Dashboardets kerne kræver ingen eksterne npm-pakker, ingen build, ingen GitHub Actions og intet modelkald ved start. Security-workerens SDK installeres separat efter behov.
+
+```sh
+npm start
+```
+
+Åbn **http://127.0.0.1:4317**. Demodata er tydeligt mærkede. Prøv en klar opgave: **Forbered job → Simulér demokørsel → Acceptér resultat**. Vælg **Vis egne data** for en tom lokal kø, eller opret en opgave. Tilstand gemmes under `.factory/` og overlever genstart. Node 22 viser en forventet advarsel om sin eksperimentelle SQLite-API.
+
+```sh
+npm run check
+npm run doctor
+```
+
+### Hvad er med i den valgfrie runtime?
+
+| Del | Implementeret i v0.1 |
+| --- | --- |
+| Arbejdsflade | Opret, søg, filtrér, ændr acceptkriterier/profil, godkend scope, forbered job, annullér/anmod om stop, gennemse beviser og acceptér lokalt |
+| GitHub | Læs åbne issues og PR’er, links til kodeplatformen, signeret issue-webhook, delivery-deduplikering og maintainer-gate |
+| Jobjournal | SQLite, revisionskontrol, scope-hash, forsøg, commit, checks, security-disposition, omkostninger, tid og hændelser |
+| Worker | Codex CLI, Pi RPC og valgfri Security SDK; ét aktivt lokalt job, timeout, stop, private artifacts og evidensimport. Nye adaptere er syntetisk afprøvet |
+| Cloud | Cursor v1-jobpayload og konkret opskrift til label-baseret Automation/API; konto og cloudafvikling er ikke forbundet |
+| Metode | Seks originale project-local skills og seks profiler: Codex, Codex/Ollama, Codex/Kastanje, Cursor cloud, Codex Security og Pi custom |
+| Målinger | Pris pr. opgave/accept, aktiv tid, reviewtid, forsøg, prisdækning og tydelige estimater; JSON-eksport |
+| Evaluering | Fem faste cases, verifier-rubric, input-hash, import og visning af virkelige resultater; ingen modelresultater opfundet |
+
+**Det er en kørbar starter med en bevidst manuel overdragelse til eksterne tjenester.** UI’et starter ikke betalte agenter, opretter ikke PR’er og udfører ikke merge/deploy. Automatisk provider-polling, fuld GitHub-reconciliation, udgiftsstop i kroner, autentificering og flere samtidige workers er viderebygning. Se [arkitektur og grænser](architecture.md).
+
+Security kan bruge en valgt specialist, inklusive Codex Security hvor tilgængelig. Det valg kræver ikke, at resten af installationen bruger Codex. Starterens valgfrie Security SDK har et åbent dependencyfund, beskrevet i [pilotforbeholdene](security-dependency-review.md).
+
 ## Start lokalt eller på egen VM
 
 `npm start` giver en komplet lokal demo uden nøgler. En VM kan køre samme proces under en service manager; brug persistent lokal disk og SSH-portforward:
