@@ -1,6 +1,6 @@
 // Explicit, opt-in integration qualification. Uses Docker and the native controller, never inference.
 import assert from 'node:assert/strict';
-import { readFileSync, writeFileSync, existsSync } from 'node:fs';
+import { readFileSync, writeFileSync, existsSync, mkdtempSync } from 'node:fs';
 import { resolve, join } from 'node:path';
 import { api, configAt, save, json, containers, sleep, stream, run, ROOT } from '../factory/lib.mjs';
 import { admitIncident } from '../factory/incident.mjs';
@@ -101,7 +101,7 @@ try {
   await cli('stop');assert.equal(containers(state).length,0);await cli('up');await waitState(interrupted.id,'interrupted');
   setConfig({timeoutSeconds:2});await cli('retry',interrupted.id);await waitState(interrupted.id,'failed');
   assert.equal((await snapshot(interrupted.id)).runs.length,2);assert.equal(containers(state).length,0);record('stop/restart retains interrupted state; retry proves previous writer stopped');
-  const other=join(state,'second-installation');
+  const other=mkdtempSync(join(state,'second-installation-'));
   await stream(process.execPath,[join(ROOT,'bin/software-defence-factory.mjs'),'init','--state',other,'--repo',original.repo,'--agent','mock','--check',original.check,'--port','7350']);
   await stream(process.execPath,[join(ROOT,'bin/software-defence-factory.mjs'),'install','--state',other]);
   assert.equal(run('docker',['image','inspect','--format','{{.Id}}',original.image]),original.image);
