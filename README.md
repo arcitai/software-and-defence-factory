@@ -6,6 +6,8 @@ Developed by [Arcitai](https://github.com/arcitai). The CLI is **software-defenc
 
 ## Start here
 
+Install the published [npm package](https://www.npmjs.com/package/software-defence-factory). The CLI includes the dashboard; no source checkout is needed.
+
 ```sh
 npm install --global software-defence-factory
 software-defence-factory help
