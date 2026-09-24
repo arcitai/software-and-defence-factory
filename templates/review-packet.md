@@ -2,6 +2,16 @@
 
 Dette er en **manuel artifactskabelon**, ikke et nyt API eller et krav om alle felter for enhver lille opgave. Udfyld relevante felter; brug `unknown` eller `ikke relevant — begrundelse`. Private logs og billedbeviser gemmes på en godkendt privat destination. Henvisning til et artifact er ikke automatisk uploadtilladelse.
 
+## Før kode — kort ved større ændringer
+
+- Behov: berørt bruger, ønsket adfærd og hvordan succes observeres:
+- System: eksisterende dele, datavej og berørte grænser:
+- Kodevalg: placering, vigtige typer/signaturer, kald og testpåstande:
+- Første lille forløb: hvad kan køres og kontrolleres fra ende til ende?
+- Væsentlige usikre valg: anbefaling, grundlag og eventuelt nødvendig afklaring:
+
+Genbrug accepteret scope og beslutninger. Agenten udfylder rutinen inden for sit mandat; omfanget følger konsekvens og usikkerhed. Små, tydelige rettelser kræver ikke et særskilt designforløb. Mockup eller diagram medtages, når det afklarer adfærd. [Metodegrundlag](../docs/dex-review.md).
+
 ## Resultat og identitet
 
 - Forretningsbehov og berørt bruger:
@@ -25,12 +35,15 @@ For UI: vis handlingen og resultatet. For performance: samme data/workload, enhe
 - Krævede checks fra den accepterede kontrolplan:
 - Faktisk kommando/check-identitet, start/slut, exitkode og logreference:
 - Reviewer/proces, vurderet head-SHA og vurderet artifact:
+- Kodevalg vurderet: ansvar, afhængigheder, kontrakter, fejlhåndtering og væsentlige designafvigelser:
 - Risiko og begrundelse; evt. nødvendig specialist:
 - Konkrete findings, reparationer og efterkontrol:
 - Hvis scorer anvendes: rubric-version, judge/model, materiale-hash, klassifikation og begrundelse; separat menneskelig vurdering og uenigheder:
 - Uafklarede forhold og anbefaling: klar til accept / ændringer / uafklaret:
 
 Alle kendte findings skal have en disposition med grundlag. Review må ikke blive en ubegrænset løkke mod en bestemt numerisk score.
+
+Ved en reproducerbar fejl: dokumentér at den målrettede prøve afslører fejlen før rettelsen og består efter. Kontroller årsagen til før-fejlen; eksisterende regressionstests må gerne bestå på begge versioner.
 
 ## Forbrug og tid
 
@@ -50,6 +63,8 @@ Alle kendte findings skal have en disposition med grundlag. Review må ikke bliv
 - Ved tilbagevendende fejl: oprindelig opgave, tidligere fix, faktisk releaseversion og ny reproduktion:
 - Hvis driftssignal opstår: privat evidens, deduplikeringsnøgle og scoped opgave:
 - Stop/oprydning: processtatus, bevarede commits/artifacts og credential-status:
+
+**Fortsættelse ved overdragelse:** senest afprøvede del og revision, gældende beslutninger, åbne forhold samt næste konkrete handling. Henvis til beviser frem for at kopiere hele logs. Opdatér ved meningsfulde milepæle; en ny session skal kunne fortsætte uden at genåbne afklarede rutinevalg.
 
 Den udfyldte pakke supplerer v0.1-evidensimporten. Den aktuelle importer læser **ikke** denne Markdown automatisk og håndhæver ikke alle felterne ovenfor.
 

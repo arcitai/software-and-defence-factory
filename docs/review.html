@@ -69,7 +69,7 @@
   <header>
     <div class="meta"><span class="brand">ARCITAI / FACTORY</span><span>Til Gustav · 2 minutters review · 24. september 2026</span></div>
     <h1>Byg én opgave helt igennem.</h1>
-    <p class="intro">Vi har en kørbar starter. Næste etape skal forbinde delene til et enkelt forløb, som vi kan afprøve og måle.</p>
+    <p class="intro">Vi har en kørbar starter. Næste etape: afklar de vigtigste designvalg og forbind delene i små forløb, vi kan afprøve og måle.</p>
   </header>
 
   <aside class="recommendation" aria-label="Anbefalet beslutning">
@@ -86,6 +86,17 @@
     </div>
   </section>
 
+  <section aria-labelledby="method-title">
+    <h2 id="method-title">Det nye fra Dex og playbooken</h2>
+    <ol class="flow" aria-label="Fire perspektiver på større ændringer">
+      <li><b>1. Behov</b>Hvem hjælper vi, og hvad skal virke?</li>
+      <li><b>2. Arkitektur</b>Hvor passer ændringen ind?</li>
+      <li><b>3. Kodevalg</b>Hvilke kontrakter og tests er vigtige?</li>
+      <li><b>4. Små leverancer</b>Byg og afprøv ét forløb ad gangen.</li>
+    </ol>
+    <p class="small" style="margin-top:12px">Samles i én kort opgavebeskrivelse med usikre valg og gemt næste skridt. Agenten håndterer rutinen; du involveres ved væsentlige, uafklarede beslutninger.</p>
+  </section>
+
   <section aria-labelledby="build-title">
     <h2 id="build-title">Etape 1 · Det bygger jeg som det næste</h2>
     <div class="scope">
@@ -96,30 +107,24 @@
       </ul>
       <div class="finish">
         <h3>Etapen er færdig, når …</h3>
-        <p>Én afgrænset opgave kan følges fra krav til reviewpakke med præcis kodeversion, testbeviser og målinger. Ukendte tal står som ukendte.</p>
+        <p>Én afgrænset opgave kan følges fra krav til review af både adfærd og kodevalg, med præcis kodeversion, beviser og målinger. Ukendte tal står som ukendte.</p>
         <p class="small">Prøven skal også vise, at fejlede checks og forældede beviser stopper accept. En syntetisk prøve dokumenterer integration; en rigtig modelkørsel dokumenteres særskilt.</p>
       </div>
     </div>
-    <ol class="flow" aria-label="Opgavens forløb">
-      <li><b>1. Afgræns</b>Krav og kontrolplan</li>
-      <li><b>2. Udfør</b>Én worker ad gangen</li>
-      <li><b>3. Kontrollér</b>Checks og separat review</li>
-      <li><b>4. Tag stilling</b>Din accept på beviser</li>
-    </ol>
   </section>
 
   <section aria-labelledby="later-title">
     <h2 id="later-title">Derefter, i denne rækkefølge</h2>
     <div class="roadmap">
-      <p><b>2 / Kastanje som produktpilot</b>Tre små opgaver. Mål al mennesketid mod nuværende praksis; brug erfaringerne i bacheloren.</p>
+      <p><b>2 / Kastanje som produktpilot</b>Tre små opgaver; én videreudvikler tidligere leveret kode. Mål mennesketid, omarbejde og regressioner til bacheloren.</p>
       <p><b>3 / Automatisér gentagelserne</b>Forbind issues og PR’er tættere. Tilføj automatisk scoring, når vurderingerne er kalibreret.</p>
       <p><b>4 / Kvalificér driften</b>Kastanje/EU-inference eller lokal Z13-model efter pilotbehov. Afprøv recovery og forbrugsgrænser.</p>
     </div>
   </section>
 
   <footer>
-    <p><strong>Din beslutning:</strong> Er etape 1 det rigtige næste byggetrin? Ret gerne retningen; detaljerne kan jeg håndtere. Dette overblik starter ingen jobs, merge eller deployment.</p>
-    <p>Grundlag: eksisterende repository, <a href="proof.md">afprøvninger</a>, <a href="next-runtime.md">byggeplan</a> og <a href="value.md">målemetode</a>. Ingen ny ekstern research. Planen forudsætter adgang til et egnet worker-miljø og en konkret modelrute før en rigtig pilot. Siden virker offline og kan læses uden farver, grafik eller JavaScript.</p>
+    <p><strong>Til dit review:</strong> retning, afgrænsning og rækkefølge. De praktiske detaljer kan jeg håndtere. Dette er en opdateret plan; etape 1 er endnu ikke færdigbygget.</p>
+    <p>Grundlag: <a href="dex-review.md">Dex, video og gist</a>, <a href="proof.md">afprøvninger</a>, <a href="next-runtime.md">byggeplan</a> og <a href="value.md">målemetode</a>. En rigtig pilot kræver et egnet worker-miljø og en konkret modelrute. Siden virker offline uden JavaScript.</p>
   </footer>
 </main>
 </body>

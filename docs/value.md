@@ -42,6 +42,14 @@ Brug de fem eksisterende evalcases ved en fuld konfigurationssammenligning: to k
 
 **Implementeringsstatus:** v0.1 har journal, priser/tider og import af faste evalresultater. Målekort og scorer er nu en manuel metode; automatisk judging, sampling, scorerhistorik, total mennesketid og fejl efter accept er ikke nye dashboardfunktioner. Den eksisterende `rubricPassed` på 0–4 vedrører stadig suite.jsons fire kriterier. Den nye scorers `pass` må ikke oversættes direkte til 4/4 eller automatisk accept. Detaljerne gemmes privat via reviewpakken og dens `evidence`-reference; importer og inputDigest er uændrede.
 
+## Kan vi ændre det igen?
+
+Suppler piloten med et lille, senere krav på tidligere accepteret kode, inspireret af [Dex-gennemgangen og SlopCodeBench](dex-review.md). Det kan være en af de tre Kastanje-opgaver. Behold de fem målepunkter: registrér nødvendig omarbejdning, nye regressioner, afklarings-/reviewtid og om de tidligere krav stadig holder. Vis også ventetid på review; flere workers hjælper ikke nødvendigvis, hvis det er dér, køen opstår.
+
+I en kontrolleret sammenligning fastlægges kravrækkefølge og bedømmelse på forhånd. Hver konfiguration udvikler sin egen kode videre; næste krav afsløres først ved det relevante trin. Giv samme trin og ressourcer, og medregn omkostningen for hele forløbet. I en virkelig pilot beskrives nye krav og kontekst som observeret; det kaldes ikke et kontrolleret forsøg.
+
+Gem denne prøve separat fra de fem eksisterende, uafhængige evalcases. Den nuværende importer understøtter ikke en ny sekventiel suite automatisk. En enkelt videreudvikling er en diagnostisk observation, ikke en generel vedligeholdelsesscore eller en fuld SlopCodeBench-kørsel. Evidensscoreren undersøger fortsat dokumentationen, og en høj vurdering erstatter ikke kode- og designreview.
+
 ## To datasæt, to spørgsmål
 
 **Driftsopgaver:** Virker leverancen i kundens hverdag, hvor meget menneskelig indsats kræver den, og hvad koster den samlet? Opgaver har forskellig sværhedsgrad og er ikke et fair modelbenchmark.

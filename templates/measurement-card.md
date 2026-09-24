@@ -23,6 +23,8 @@ Manuel skabelon. Udfyld kun relevante felter og link til [reviewpakken](review-p
 
 **Indgreb undervejs:** registrér fase, årsag, kort handling og aktiv varighed. Skeln mellem aftalt menneskelig godkendelse og uplanlagt hjælp. Registrér også login-/miljøhjælp og ændringer af krav; undgå dobbeltregning med tidsfelterne ovenfor. Det samlede tidsforbrug skal omfatte begge slags indgreb.
 
+**Hvis opgaven videreudvikler en tidligere levering:** henvis til opgave og accepteret revision; notér omarbejde, eventuelle regressioner og om tidligere krav stadig holder. Ved et kontrolleret forsøg angives også det på forhånd fastlagte trin og tidspunktet, hvor kravet blev givet. Tid og pris tælles i felterne ovenfor, ikke en ekstra gang. [Forsøgets begrænsninger](../docs/value.md#kan-vi-ændre-det-igen).
+
 ## Scorer og beslutning
 
 - Scorer/version, judge/model, tidspunkt og digest for vurderet materiale:

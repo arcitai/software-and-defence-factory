@@ -4,6 +4,8 @@ Research samlet **24. september 2026**. Warp-gennemgangen nedenfor suppleres af 
 
 **Suppleret med brugerens seks videoer:** [transskriptionsbaseret kildegennemgang](video-audit.md) og [næste runtime](next-runtime.md). Start med en manuel pilot på eksisterende runner. Machinist undersøges kun ved et dokumenteret controllerbehov. Før/efter-bevis, miljølivscyklus og feedback fra drift er eksplicit med i planen.
 
+**Dex og playbooken, 24. september:** [Artikel, billeder, fuld videotransskription og den supplerende gist](dex-review.md) er gennemgået. Planen samler behov, arkitektur og kodevalg før større ændringer, bygger små gennemgående leverancer og afprøver et senere krav på samme kode. Den eksisterende reviewpakke bærer metoden; der tilføjes ingen obligatorisk række af godkendelser eller ny runtime.
+
 ## Den anbefalede form
 
 Ét produkt: **Arcitai Software & Defence Factory**. Én metode og arbejdsflade, to arbejdsspor, flere udskiftelige harness-/modelprofiler. Start med en operatør og et pilotrepo. GitHub er den første forge-adapter; kernen ejer ikke GitHub-specifikke agentantagelser. Kastanje bliver både en pilotcase og en valgfri inference-rute.

@@ -1,6 +1,6 @@
 # Fra starter til en factory, der kan arbejde uden opsyn
 
-Beslutningsforslag efter [videogennemgangen](video-audit.md), [Pi-research](pi-research.md) og [BuilderIO-gennemgangen 23. september 2026](builderio-review.md). Dette er **næste versions kontrakt og prioritering**, ikke funktioner, som v0.1 allerede har. [Arkitekturen](architecture.md) beskriver den kørende kode.
+Beslutningsforslag efter [videogennemgangen](video-audit.md), [Pi-research](pi-research.md), [BuilderIO-gennemgangen](builderio-review.md) og [Dex’ designmetode og den supplerende playbook](dex-review.md). Dette er **næste versions kontrakt og prioritering**, ikke funktioner, som v0.1 allerede har. [Arkitekturen](architecture.md) beskriver den kørende kode.
 
 **Implementeret 22. september:** Pi RPC og Security SDK er nu tilsluttet den eksisterende CLI-runner og syntetisk afprøvet. [Aktuel worker-status](worker-integrations.md). Det implementerer ikke i sig selv den ubemandede pipeline nedenfor.
 
@@ -11,6 +11,10 @@ Den mindste fornuftige løsning er **én controller, én worker og ét pilotrepo
 **Måling 24. september:** følg [den lille måleprotokol](value.md#start-her-fem-målepunkter-og-en-scorer): kvalitet, samlet pris, al mennesketid, gennemløbstid og fejl efter accept. Én valgfri scorer supplerer reviewet med en evidensvurdering. Brug baseline → undersøg fejl → afprøv én ændring → review → mål igen. Det bygger videre på [Warp Scorers](warp-measurement.md) uden en ny runtime eller obligatorisk evaluatormodel.
 
 ## Den samlede arbejdsgang
+
+**Design før større ændringer:** udfyld fire korte punkter i [reviewpakken](../templates/review-packet.md): behov/succesmål, berørte systemgrænser, vigtigste kodekontrakter og første afprøvelige del. Undersøg eksisterende kode og markér væsentlige, usikre valg. Omfanget følger konsekvens og usikkerhed. Tydelige små rettelser kan bruge det eksisterende scope direkte. Saml relevante beslutninger; fire perspektiver medfører ikke fire obligatoriske godkendelser eller nye agenter.
+
+**Byg gennem systemet i små dele:** start med én synlig handling og dens nødvendige datavej. Forbind de eksisterende lag, afprøv adfærd og fejltilstand, og udvid derefter. Brug kun mocks, når de afklarer noget; markér præcist, hvor rigtig afvikling endnu mangler. Gem kort status, beviser, beslutninger og næste skridt i samme reviewpakke, så en senere session kan fortsætte. Ekstra planmapper og tvungne genstarter efter hver del er ikke standard.
 
 ```mermaid
 flowchart TD
@@ -74,6 +78,8 @@ Vælg review efter **konsekvensen af ændringen**: brugeradfærd, auth/rettighed
 
 En [reviewpakke](../templates/review-packet.md) samler behovet, basen, resultatets fulde SHA, før/efter, checks, review og pris. UI-beviser skal vise den relevante handling. Performancebeviser skal bruge samme workload, miljø og gentagelser. En sikkerhedsrettelse skal demonstrere, at den konkrete uønskede adfærd er stoppet, og at forventet adfærd fortsat virker. Manglende baseline beskrives ærligt.
 
+Review vurderer også kodevalgene: placering af ansvar, afhængigheder, kontrakter og fejlhåndtering. Dokumentér væsentlige afvigelser fra det aftalte design. For en reproducerbar fejl skal den målrettede prøve fejle af den rigtige årsag før rettelsen og bestå efter; eksisterende regressionstests skal fortsat kunne bestå. Grønne checks og en evidensscore dokumenterer ikke alene, at koden er let at videreudvikle.
+
 Tests skal svare til en godkendt kontrolplan. En ikke-tom liste af selvvalgte checks kan stadig være utilstrækkelig. v0.1 validerer importerede checkformater og revisioner; næste version skal også kontrollere **hvilke checks der kræves**, deres identitet og om de faktisk blev udført af verifieren. En agent må ikke sænke sin egen kontrolplan ved at redigere tests eller factory-policy.
 
 Review, PR-merge, deployment og produktionsobservation har hver sin status. En integration/rebase kan ændre resultatet: kontroller den integrerede revision igen. En ekstern 5/5-score og et grønt screenshot kan supplere, men ikke erstatte, test af adgangskontrol eller vurdering af datamigrationer. Merge/deploy automatiseres først under en konkret, særskilt releasepolitik.
@@ -92,12 +98,12 @@ Disse er lokale opgaveudkast; de er ikke oprettet på GitHub.
 
 | Prioritet / opgave | Leverance og konkret accept |
 | --- | --- |
-| **P0 — Én manuel pilot gennem eksisterende runner** | Dry-run-triage af få aftalte issues; én reproducerbar fejl gennem de tre trin. Fastlæg baseline og udfyld [målekort](../templates/measurement-card.md) med præcis revision, beviser, alle forsøg og samlet mennesketid. Ingen ny scheduler kræves |
+| **P0 — Én manuel pilot gennem eksisterende runner** | Kort behov/design/kontrolplan; én reproducerbar fejl gennem hele forløbet i små afprøvelige dele. Fastlæg baseline og udfyld [målekort](../templates/measurement-card.md) med præcis revision, beviser, alle forsøg og samlet mennesketid. Review omfatter både adfærd og kodevalg |
 | **P0 før reel workerafvikling — Et reproducerbart, afgrænset miljø** | Én workerprofil med rigtige checks, testdata og de nødvendige capabilities. Bevis at controllerdata/administrationsnøgler ikke kan nås, og at stop virker |
 | **P0 før automatisk aflevering — Luk kvalitetssløjfen** | Implementering → konfigurerede checks → separat review → højst to reparationer → reviewpakke eller præcis blocker. Stale head, manglende check og ændret policy afvises. Manuel review bruges indtil da |
 | **P0 før betalt ubemandet brug — Forbrug og recovery** | Providerens stop efterprøves; jobs kan genstartes uden dublet, tabte artifacts eller nulstillet budget. Ukendt forbrug forbliver ukendt |
 | **P1 — GitHub-pipeline og synligt forbrug** | Pagination/reconciliation, issue/PR-identitet, konkret aktørkontrol, versionsspor og automatisk usage, hvor API giver det. Én ejer af eventrouting |
-| **P1 — Tre rigtige Kastanje-opgaver** | En bug, en mindre forbedring og en afgrænset security-rettelse. Samme dokumentationskrav og målt samlet mennesketid før/efter; derefter manuelt tilbageblik og valg af ét trin at automatisere |
+| **P1 — Tre rigtige Kastanje-opgaver** | En bug, en mindre forbedring og en afgrænset security-rettelse; mindst én bygger videre på tidligere leveret kode. Registrér omarbejde, regressioner, reviewventetid og al mennesketid. Brug [prøven med et senere krav](value.md#kan-vi-ændre-det-igen), og vælg derefter ét gentaget trin at automatisere |
 | **P2 — Drift og begrænset parallelitet** | Først read-only releasefeedback. Derefter separate workspaces og integrationskø, hvis ventetid og økonomi begrunder flere writers |
 | **Kun ved dokumenteret behov — Ny controller** | Afprøv scenarierne ovenfor, sammenlign vedligehold og migrér til én autoritativ runtime. Ingen parallel kø som ekstra lag |
 
