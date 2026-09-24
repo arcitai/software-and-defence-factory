@@ -12,6 +12,16 @@ Dette er en **manuel artifactskabelon**, ikke et nyt API eller et krav om alle f
 
 Genbrug accepteret scope og beslutninger. Agenten udfylder rutinen inden for sit mandat; omfanget følger konsekvens og usikkerhed. Små, tydelige rettelser kræver ikke et særskilt designforløb. Mockup eller diagram medtages, når det afklarer adfærd. [Metodegrundlag](../docs/dex-review.md).
 
+## Vertical slices — byg, afprøv, udvid
+
+En slice leverer én lille, observerbar adfærd gennem de nødvendige lag. Afprøv den, før næste del tilføjes. En lille rettelse kan være én slice; API, CLI og security-arbejde behøver ikke en skærm. Knyt nødvendigt grundarbejde til den næste fungerende del.
+
+| Slice: hvad kan faktisk gøres? | Bevis og revision, inkl. relevant fejl/regression | Status | Næste skridt |
+| --- | --- | --- | --- |
+| Kort adfærd og afgrænsning | Handling/check og privat reference; markér eventuelle mocks | Afprøvet / fejlet / blokeret / ikke afprøvet | Næste udvidelse eller konkret blocker |
+
+Genbrug bevislinks fra resten af pakken. Slice-status er et teknisk kontrolpunkt; den ændrer ikke scope og erstatter ikke opgavens samlede accept. Agenten fortsætter inden for mandatet uden en ny godkendelsesrunde for hver slice.
+
 ## Resultat og identitet
 
 - Forretningsbehov og berørt bruger:

@@ -14,6 +14,14 @@ This repository owns a local, single-operator factory starter. Read README.md an
 - UI acceptance does not merge or deploy. External messages and changes require existing user authority for that destination.
 - The v0.1 HTTP service has no multi-user authentication. Preserve loopback binding, Host/Origin checks, CSRF and signed webhook validation. Do not expose it publicly as a shortcut.
 
+## Develop in vertical slices
+
+Vertical slices are the required development approach for this factory and its implementation jobs. Build one small, observable behavior through the layers it actually needs, verify it, then extend it. An API, CLI or security repair can be a complete slice without a UI. Small fixes can be a single slice.
+
+Before a substantial change, identify the first runnable path and its checks. Do not organize delivery as all database work, then all services, then all UI with integration postponed. Keep necessary migrations, refactors or setup bounded and tied to the next slice. Mocks can clarify a path but must not count as evidence that the real integration works.
+
+At each slice boundary, exercise the behavior and relevant failure/regression paths, preserve evidence and revision, and record the next step. Keep the integrated result working before expanding it. Continue through the accepted scope without a new human approval per slice; escalate material scope or authority changes. A completed slice is not completion of a larger job, nor permission to merge or deploy.
+
 ## Verification and handback
 
 Exercise changed behavior and its meaningful failure paths. UI changes require browser inspection at desktop and narrow widths. Do not add tests that merely repeat wording. Record actual evidence and limitations in docs/proof.md. Follow docs/recovery.md for interrupted workers or database restore. The evaluation fixture is intentionally flawed and must never be imported into runtime code.

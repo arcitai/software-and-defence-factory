@@ -14,7 +14,11 @@ Den mindste fornuftige løsning er **én controller, én worker og ét pilotrepo
 
 **Design før større ændringer:** udfyld fire korte punkter i [reviewpakken](../templates/review-packet.md): behov/succesmål, berørte systemgrænser, vigtigste kodekontrakter og første afprøvelige del. Undersøg eksisterende kode og markér væsentlige, usikre valg. Omfanget følger konsekvens og usikkerhed. Tydelige små rettelser kan bruge det eksisterende scope direkte. Saml relevante beslutninger; fire perspektiver medfører ikke fire obligatoriske godkendelser eller nye agenter.
 
-**Byg gennem systemet i små dele:** start med én synlig handling og dens nødvendige datavej. Forbind de eksisterende lag, afprøv adfærd og fejltilstand, og udvid derefter. Brug kun mocks, når de afklarer noget; markér præcist, hvor rigtig afvikling endnu mangler. Gem kort status, beviser, beslutninger og næste skridt i samme reviewpakke, så en senere session kan fortsætte. Ekstra planmapper og tvungne genstarter efter hver del er ikke standard.
+**Vertical slices er en styrende udviklingsregel:** byg én lille, observerbar adfærd gennem de nødvendige lag, afprøv den og udvid derefter. Udviklingen må ikke opdeles i hele databasen → hele backend → hele frontend med integration til sidst. Nødvendigt grundarbejde holdes afgrænset og knyttet til den næste fungerende slice. En CLI, API eller sikkerhedsrettelse behøver ikke en UI; små rettelser kan være én slice.
+
+**Før næste slice:** den aktuelle datavej skal virke, relevante fejl-/regressionsprøver skal være afklaret, og bevis, revision og næste skridt gemmes i reviewpakken. Skeln mellem en tidlig prøve med mocks og den rigtige integration. Agenten fortsætter gennem accepteret scope uden en menneskelig godkendelse for hver slice. Først når hele scope er opfyldt, kan opgaven afleveres som færdig.
+
+Eksempel fra factoryen: start med at kunne køre én forberedt opgave gennem den kvalificerede worker og se dens faktiske status. Udvid derefter med fejl/stop og til sidst krævede beviser frem til review. Hver del afprøves gennem de relevante eksisterende lag og bevarer de gældende stop- og acceptgrænser; ingen del omgår dem for at blive hurtigere færdig. Dette er en byggeorden, ikke udførte pilotresultater.
 
 ```mermaid
 flowchart TD
