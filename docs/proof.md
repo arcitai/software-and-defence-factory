@@ -51,3 +51,19 @@ all 11 paths, including success and exit-17 checks that create mode-000 cache
 directories with symlinks to the read-only candidate. Both leave no scratch and
 preserve the candidate; the failed check remains failed with its original exit.
 The 20 package/runtime tests and 39 dashboard tests also passed.
+
+## 0.3.4 — retained image pins and comparison bases
+
+The npm-packed candidate passed all 12 Linux Docker qualification paths. A second
+installation rebuilt the shared job-image tag; the first installation's original
+image ID still inspected and executed successfully, and its controller restarted
+with the same pin. Retention tags preserve exact images rather than silently
+changing another installation's configuration.
+
+The native-build fixture verified that `FACTORY_BASE_REVISION` matches protected
+candidate metadata and differs from the changed candidate head. This enables
+application diff checks without restoring a writable remote or substituting HEAD.
+The read-only candidate, scratch cleanup, failure, timeout, retry and stale-review
+guards also passed. All 20 runtime/package and 39 dashboard tests passed.
+This is deterministic runtime proof; application and model qualification remain
+separate.
