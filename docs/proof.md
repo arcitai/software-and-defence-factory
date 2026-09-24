@@ -67,3 +67,12 @@ The read-only candidate, scratch cleanup, failure, timeout, retry and stale-revi
 guards also passed. All 20 runtime/package and 39 dashboard tests passed.
 This is deterministic runtime proof; application and model qualification remain
 separate.
+
+## 0.3.5 — repeatable qualification
+
+Repeating 0.3.4 qualification on the same synthetic state exposed a collision
+with the first run's fixed secondary-installation directory. Version 0.3.5 uses
+a fresh private fixture for each invocation. The installed npm candidate passed
+all 12 Docker paths twice against one state, retaining both histories and the
+cross-install image assertions. All 20 runtime/package and 39 dashboard tests
+passed; application execution code is unchanged from 0.3.4.
