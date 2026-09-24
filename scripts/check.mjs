@@ -6,11 +6,11 @@ function walk(path) {
     f.isDirectory() ? (f.name === "node_modules" ? [] : walk(join(path, f.name))) : [join(path, f.name)],
   );
 }
-for (const file of ["src", "scripts", "public", "tests", "experiments"]
+for (const file of ["src", "scripts", "public", "tests", "experiments", "factory", "bin"]
   .flatMap(walk)
   .filter((f) => f.endsWith(".mjs")))
   execFileSync(process.execPath, ["--check", file], { stdio: "pipe" });
-for (const file of ["config", "evals", "profiles", "experiments"]
+for (const file of ["config", "evals", "profiles", "experiments", "factory"]
   .flatMap(walk)
   .filter((f) => f.endsWith(".json")))
   JSON.parse(readFileSync(file, "utf8"));

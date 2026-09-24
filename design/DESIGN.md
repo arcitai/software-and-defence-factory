@@ -1,4 +1,4 @@
-# Arcitai Software and Security Factory visual direction
+# Arcitai Software & Defence Factory visual direction
 
 Audience: a business/technical owner deciding what needs attention, whether a result is supported by evidence and which setup is appropriate. Primary task: move a clearly scoped job through implementation and review with visible quality/cost boundaries.
 

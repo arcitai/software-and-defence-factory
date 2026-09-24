@@ -1,5 +1,7 @@
 # Delivery evidence — 21 September 2026
 
+> Dette er historik for prototype og research. Se [v0.2-platformens afprøvning](platform-proof.md) for den nye CLI/Machinist-pakke.
+
 Status: a runnable local starter with documented integration boundaries. Source-level checks, deterministic integration tests and browser interaction checks passed. No paid model benchmark, production customer job or independent security audit was performed.
 
 ## Executed checks
@@ -161,7 +163,7 @@ The optional runtime code and active GitHub integration were not changed. No app
 
 ## Product naming and Defense boundary — 24 September 2026
 
-Applied the owner-selected **Arcitai Software and Security Factory** name to the README, instructions, research/design headings, review page, dashboard, CLI display and exported kit. The issue form, label blueprint and optional Pi profile now use `security` for this product's work track. Stable repository/package/storage identifiers and third-party source titles are preserved. No existing external labels or installed app copies were migrated.
+Applied the owner-selected **Arcitai Software & Defence Factory** name to the README, instructions, research/design headings, review page, dashboard, CLI display and exported kit. The issue form, label blueprint and optional Pi profile now use `security` for this product's work track. Stable repository/package/storage identifiers and third-party source titles are preserved. No existing external labels or installed app copies were migrated.
 
 Documented the separate proposed Defense Factory responsibility for ongoing operational monitoring, logs, incidents and dependency/advisory observation, including software built elsewhere. Scoped findings can come here for verified repairs and return to operations for confirmation after release. Security work here still includes post-release changes; this naming update adds no runtime integration or monitoring service.
 
@@ -173,7 +175,7 @@ Inspected the updated review and dashboard in the browser at measured CSS widths
 
 Investigated OpenAI's Defense Factory definition, architecture/workflow text, Daybreak use cases, product-direction job description and the official Codex Security plugin quickstart. Compared selected Cloudflare harness sections, Ramp's February workflow and May model/pipeline study, and Google's Chrome security lifecycle. Read Marco Lancini's X post and mrinal's reply directly in the browser. Detailed coverage and limitations are in [defence-research.md](defence-research.md); no upstream implementation or full article is redistributed.
 
-The resulting proposal separates responsibility rather than imposing a pre-/post-release boundary: the existing Software and Security Factory delivers changes, while the separately proposed Defence solution owns continuing security investigation and remediation follow-up. Operational monitoring is an attached profile. Repository/runtime division and providers remain undecided. No existing product instruction was silently rewritten to make this proposal binding.
+The resulting proposal separates responsibility rather than imposing a pre-/post-release boundary: the existing Software & Defence Factory delivers changes, while the separately proposed Defence solution owns continuing security investigation and remediation follow-up. Operational monitoring is an attached profile. Repository/runtime division and providers remain undecided. No existing product instruction was silently rewritten to make this proposal binding.
 
 The operations code begun before that research is explicitly retained under `experiments/defence-operations/`, outside active skills, runtime and the software export allowlist. It reads a synthetic fixture and produces draft records only. The first slice covered grouping, replay conflicts, source/customer/environment scope and missing coverage; after four passing tests, the next slice added submitted recovery-record checks. Five behavioral tests cover these paths, including wrong release, missing/skipped/failed checks, inadequate or stale observation and lack of sensor freshness. A consistent record is only ready for closure review, never an authenticated production result or automatically closed case.
 

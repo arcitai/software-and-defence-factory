@@ -1,11 +1,14 @@
 {
   "name": "arcitai-factory",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "private": true,
   "type": "module",
   "license": "MIT",
   "engines": { "node": ">=22.13.0" },
+  "bin": { "arcitai-factory": "bin/arcitai-factory.mjs" },
   "scripts": {
+    "factory": "node bin/arcitai-factory.mjs",
+    "probe:platform": "node scripts/probe-platform.mjs",
     "start": "node src/server.mjs",
     "test": "node --test tests/*.test.mjs",
     "check": "node scripts/check.mjs && node --test tests/*.test.mjs",

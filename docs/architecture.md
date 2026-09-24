@@ -1,6 +1,6 @@
-# Software and Security Factory: to arbejdsspor
+# Software & Defence Factory: to arbejdsspor
 
-Software and Security Factory har én fælles kerne med et software-spor og et security-spor. Begge har opgaver, scopes, jobs, artifacts, review, målinger og menneskelig accept. Security-fund kan kræve strengere privat scope, anden model og separate verifikationsmiljøer. Det begrunder særskilte worker-profiler. Den separate **Defense Factory** har ansvar for løbende overvågning og fund fra drift, også for software bygget andre steder. Den kan aflevere afgrænsede rettelsesopgaver hertil; [produktgrænse og overdragelse](adoption.md#produktnavn-og-grænsen-til-defense-factory).
+Software & Defence Factory har én fælles kerne med et software-spor og et security-spor. Begge har opgaver, scopes, jobs, artifacts, review, målinger og menneskelig accept. Security-fund kan kræve strengere privat scope, anden model og separate verifikationsmiljøer. Det begrunder særskilte worker-profiler. Den separate **Defense Factory** har ansvar for løbende overvågning og fund fra drift, også for software bygget andre steder. Den kan aflevere afgrænsede rettelsesopgaver hertil; [produktgrænse og overdragelse](adoption.md#produktnavn-og-grænsen-til-defense-factory).
 
 ```mermaid
 flowchart LR

@@ -1,6 +1,6 @@
 # Tilslut appen og gennemfør første opgave
 
-**Arcitai Software and Security Factory** giver dit app-repo en fælles metode til udvikling, security og review. Start med den agent, du allerede bruger. Appens kode, arkitektur, CI og hosting bevares.
+**Arcitai Software & Defence Factory** giver dit app-repo en fælles metode til udvikling, security og review. Start med den agent, du allerede bruger. Appens kode, arkitektur, CI og hosting bevares.
 
 ## 1. Giv pakken til din agent
 

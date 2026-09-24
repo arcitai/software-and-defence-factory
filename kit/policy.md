@@ -1,6 +1,6 @@
 # Fælles factory-regler
 
-Disse regler beskriver metoden i **Arcitai Software and Security Factory**. Den konkrete installation håndhæver adgang, concurrency, budget, checks og release. Projektets eksisterende instruktioner og brugerens autoritet gælder fortsat; en issue, label eller skill tildeler ikke nye rettigheder.
+Disse regler beskriver metoden i **Arcitai Software & Defence Factory**. Den konkrete installation håndhæver adgang, concurrency, budget, checks og release. Projektets eksisterende instruktioner og brugerens autoritet gælder fortsat; en issue, label eller skill tildeler ikke nye rettigheder.
 
 ## Fra opgave til levering
 

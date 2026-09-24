@@ -1,0 +1,75 @@
+// Explicit, opt-in integration qualification. Uses Docker and Machinist, never inference.
+import assert from 'node:assert/strict';
+import { readFileSync, writeFileSync, existsSync } from 'node:fs';
+import { resolve, join } from 'node:path';
+import { api, configAt, save, json, containers, sleep, stream, ROOT } from '../factory/lib.mjs';
+import { admitIncident } from '../factory/incident.mjs';
+
+const state=resolve(process.argv[2] || '.factory/demo-platform'),original=configAt(state);
+assert.equal(original.agent,'mock','Qualification is restricted to a synthetic installation');
+assert.equal(readFileSync(join(original.repo,'value.txt'),'utf8'),'broken\n');
+assert(!(await api(state,'/api/v1/status')).jobs.some(j=>['queued','running','awaiting_approval'].includes(j.state)),'Finish/cancel active demo jobs before qualification');
+const results=[];
+const cli=(...args)=>stream(process.execPath,[join(ROOT,'bin/arcitai-factory.mjs'),...args,'--state',state]);
+const snapshot=async id=>(await api(state,'/api/v1/status')).jobs.find(j=>j.id===id);
+async function until(fn,ms=45000) {
+  const deadline=Date.now()+ms;
+  while(Date.now()<deadline){const value=await fn();if(value)return value;await sleep(250);}
+  throw new Error('Timed out waiting for the required state');
+}
+const waitState=(id,wanted)=>until(async()=>{const job=await snapshot(id);if(job.state===wanted)return job;if(['failed','blocked','cancelled','interrupted'].includes(job.state)&&job.state!==wanted)throw new Error(`${id}: expected ${wanted}, got ${job.state}: ${job.runs.at(-1).error}`);});
+const submit=(workflow,spec)=>api(state,'/api/v1/jobs',{workflow,repository:'app',spec,title:`Qualification: ${spec.slice(0,60)}`});
+const work=spec=>submit('software',spec);
+const record=name=>{results.push({name,passed:true});console.log(`PASS ${name}`);};
+const setConfig=changes=>save(join(state,'factory.json'),{...original,...changes});
+
+try {
+  const pass=await work('Synthetic complete vertical slice');await waitState(pass.id,'awaiting_approval');
+  const folder=join(state,'jobs',pass.id),candidate=json(join(folder,'candidate.json'));
+  assert.equal(json(join(folder,'checks.json')).head,candidate.head);assert.equal(json(join(folder,'review.json')).head,candidate.head);
+  assert.equal(readFileSync(join(folder,'checkout/value.txt'),'utf8'),'fixed\n');
+  assert.equal(readFileSync(join(original.repo,'value.txt'),'utf8'),'broken\n');
+  await cli('approve',pass.id);await waitState(pass.id,'succeeded');
+  assert.equal(json(join(folder,'accepted.json')).head,candidate.head);record('software: exact revision, isolated checkout, checks, review, approval, handoff');
+
+  const changed=await work('Synthetic changed revision guard');await waitState(changed.id,'awaiting_approval');
+  writeFileSync(join(state,'jobs',changed.id,'checkout/value.txt'),'changed after review\n');
+  await cli('approve',changed.id);await waitState(changed.id,'failed');
+  assert(!existsSync(join(state,'jobs',changed.id,'accepted.json')));record('changed candidate cannot inherit earlier approval');
+
+  const policy=await work('Synthetic policy change guard');await waitState(policy.id,'awaiting_approval');
+  setConfig({check:'true'});await cli('approve',policy.id);await waitState(policy.id,'failed');
+  assert(!existsSync(join(state,'jobs',policy.id,'accepted.json')));setConfig({});record('changed check policy cannot inherit earlier approval');
+
+  setConfig({check:'exit 17'});
+  const fail=await work('Synthetic failing check');await waitState(fail.id,'failed');
+  assert.equal((await snapshot(fail.id)).runs.at(-1).command,'verify');
+  setConfig({});await cli('retry',fail.id);await waitState(fail.id,'awaiting_approval');
+  await cli('approve',fail.id);await waitState(fail.id,'succeeded');record('failed app check blocks delivery; controlled retry rechecks same candidate');
+
+  const cancel=await work('SYNTHETIC_TIMEOUT cancellation fixture');
+  const live=await until(()=>containers(state).find(c=>c.Config.Labels['arcitai.job']===cancel.id&&c.State.Running));
+  assert(live.HostConfig.ReadonlyRootfs);assert(live.HostConfig.CapDrop.includes('ALL'));assert.equal(live.HostConfig.NetworkMode,'none');
+  assert(!live.Mounts.some(m=>m.Source.includes('docker.sock')));assert(!live.Mounts.some(m=>m.Destination==='/workspace/.git'&&m.RW));
+  assert.notEqual(live.Config.User.split(':')[0],'0');
+  await cli('cancel',cancel.id);await waitState(cancel.id,'cancelled');
+  await until(()=>!containers(state).some(c=>c.Config.Labels['arcitai.job']===cancel.id));record('non-root container boundaries; cancel confirms container stop');
+
+  setConfig({timeoutSeconds:2});const timeout=await work('SYNTHETIC_TIMEOUT deadline fixture');
+  await waitState(timeout.id,'failed');assert(!containers(state).some(c=>c.Config.Labels['arcitai.job']===timeout.id));record('bounded deadline stops agent and fails the attempt');
+  setConfig({});
+
+  const input={...json(join(ROOT,'factory/examples/incident.json')),event_id:`probe-${Date.now()}`};
+  const first=await admitIncident(state,input,submit),again=await admitIncident(state,input,submit);
+  assert.equal(first.id,again.id);assert(again.deduplicated);await waitState(first.id,'succeeded');
+  const report=json(join(state,'jobs',first.id,'incident-report.json'));assert.equal(report.case_state,'open');assert.equal(report.verification,'not_performed');
+  assert.equal(report.production_action_taken,false);record('incident deduplication, private draft and no recovery claim');
+
+  const interrupted=await work('SYNTHETIC_TIMEOUT restart fixture');
+  await until(()=>containers(state).some(c=>c.Config.Labels['arcitai.job']===interrupted.id&&c.State.Running));
+  await cli('stop');assert.equal(containers(state).length,0);await cli('up');await waitState(interrupted.id,'interrupted');
+  setConfig({timeoutSeconds:2});await cli('retry',interrupted.id);await waitState(interrupted.id,'failed');
+  assert.equal((await snapshot(interrupted.id)).runs.length,2);assert.equal(containers(state).length,0);record('stop/restart retains interrupted state; retry proves previous writer stopped');
+  save(join(state,'qualification.json'),{synthetic:true,platform:process.platform,arch:process.arch,engine:json(join(state,'engine.json')).pin,results});
+  console.log(`Qualified ${results.length} paths. Model quality, cost and production connectors were not measured.`);
+} finally {save(join(state,'factory.json'),original);}

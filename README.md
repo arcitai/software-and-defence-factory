@@ -1,52 +1,50 @@
-# Arcitai Software and Security Factory
+# Arcitai Software & Defence Factory
 
-**Business first. Security and quality built in.**
+**Én CLI og ét dashboard til softwarearbejde og privat incident-triage.**
+Self-hostet på [Machinist](https://github.com/owainlewis/machinist), med isolerede Docker-jobs, vertical slices, tests og separat review. Ingen Archon eller obligatorisk platformsubscription. Dit app-repo og dets deployment bevares.
 
-Giv din eksisterende app en fast arbejdsgang fra **issue til verificeret ændring og review**. Pakken samler skills, udvikling i vertical slices og security-checks. Du bruger din valgte agent og beholder appens repository, CI og hosting.
+**v0.2 er en testudgave.** Installation og fejlforløb er afprøvet lokalt uden modelkald. En rigtig app/modelpilot og live driftsovervågning er næste kvalificering.
 
-```text
-Issue → afgrænsning → byg og test → security/review → PR
-```
+## Prøv den — uden modelnøgle
 
-## Kom i gang med én app
-
-### 1. Hent pakken
-
-Kræver adgang til dette repo, Git og Node.js 22.13+. Kør i den mappe, hvor du vil have factory-kilden:
+Kræver **Node 22.13+, Git og kørende Docker Engine/Desktop** på macOS eller Linux. Første installation henter og bygger runtime og jobimage; afsæt diskplads og nogle minutter.
 
 ```sh
-git clone https://github.com/arcitai/software-factory.git
-cd software-factory
-node scripts/export-kit.mjs ../my-app-factory-kit
+git clone https://github.com/arcitai/software-and-defence-factory.git
+cd software-and-defence-factory
+npm run factory -- demo
 ```
 
-Det laver en lille pakke i en **ny mappe**. Din app ændres først i næste trin. Har du allerede klonet repoet, kan du nøjes med eksportkommandoen.
+Åbn **http://127.0.0.1:7332**. En syntetisk opgave ændrer en lille fixture, kører tests og venter på din godkendelse. Se patch, checks og review under **Files**; godkend derefter handoff. Ingen model, PR, merge eller deployment bruges i demoen.
 
-### 2. Lad din agent tilslutte appen
+Stop: `npm run factory -- stop --state .factory/demo-platform`.
 
-Åbn **appens eget repo** i din sædvanlige agent. Giv den stien til `my-app-factory-kit` og denne besked:
+## Forbind din egen app
 
-> Tilslut denne app til factory-pakken. Følg pakkens START-HERE.md. Bevar eksisterende instruktioner, arkitektur, CI og deployment. Brug mine kendte valg, udfyld installationsarket, og vis ændringen på en branch. Markér manglende adgang. Start manuelt med én lille opgave, som kan testes og reviewes.
+```sh
+npm run factory -- init --repo /absolut/sti/til/app --agent codex --check "npm ci && npm test"
+npm run factory -- install
+# Tilføj kun din inference-nøgle i den private .factory/platform/model.env.
+npm run factory -- up
+npm run factory -- run --issue https://github.com/OWNER/APP/issues/123
+```
 
-[Opsætning og første opgave →](kit/README.md)
+Vælg appens rigtige checkkommando. Issue-import kræver `gh` med læseadgang; `run --file task.md` virker uden GitHub. [Quickstart](docs/quickstart.md) forklarer Codex/Pi, privat konfiguration, VPS og aflevering.
 
-### 3. Prøv en rigtig opgave
+| Del | Hvad bruger vi den til? |
+| --- | --- |
+| **Arcitai CLI** | Opsætning, installation, start/stop, opgaver, incident-input og kontrolleret retry |
+| **Machinist** | Dashboard, én jobkø, trin, godkendelser, historik og artefakter |
+| **Docker** | Agentens checkout, shell og tests; ingen Docker-socket eller deploynøgler i agentjobbet |
+| **Codex / Pi / egen command** | Udskiftelig agent; modellen og inferenceadgangen vælges separat |
+| **Seks skills** | Scope, vertical slices, implementering, review, security og dokumenteret værdi |
+| **GitHub / Actions** | Issues og PR’er; appens almindelige tests og CI/CD. Agentjobs kører på din vært |
+| **Defence** | Manuel, privat evidens → læseundersøgelse → uverificeret udkast. Ingen produktionshandlinger |
 
-Vælg én lille fejl eller forbedring fra appens backlog. Bed agenten om at løse den med pakkens metode. Review ændringen, de faktiske checks og registreret tid/forbrug. **Første milepæl er én verificeret vertical slice afleveret til review.**
+Softwareforløb: **opgave → ændring → appchecks → separat review → din godkendelse → patch og beviser**. PR-oprettelse er endnu manuel. Varighed gemmes pr. forsøg; pris og mennesketid står som ukendt, indtil de faktisk måles.
 
-Når den vej virker, tilsluttes automatisk start fra issues i det valgte agentmiljø. GitHub kan være hele kontrolpanelet.
+**Start her:** [Kort visuelt overblik](docs/review.html) · [Quickstart og VPS](docs/quickstart.md) · [Afprøvninger og grænser](docs/platform-proof.md).
 
-**Produktmålet:** én færdigsamlet factory på Machinist til VPS eller egen maskine, med fælles dashboard for software, security og valgfrie Defense-forløb. Forbind repo/model, afprøv miljøet og send første issue. Den samlede udgivelse skal stadig bygges; trinene ovenfor bruger det eksisterende metodekit. [Kort review](docs/review.html) · [Byggeretning](docs/platform.md).
+Metoden kan også bruges uden platformen: [portabelt kit](kit/README.md). Den tidligere Node-prototype er bevaret via `npm start`; den deler ikke jobkø eller data med Machinist. [Arkitektur og næste slices](docs/platform.md) · [Defence-kontrakt](docs/defence-integration.md) · [Kilder og licenser](docs/ownership.md).
 
-## Det følger med
-
-- **Seks skills:** afgrænsning, specifikation, implementering, review, security og evaluering.
-- **Projektets opsætning:** ét installationsark, en issue-form og et inaktivt CI-eksempel.
-- **Dokumenteret kvalitet og værdi:** checks, afleveringskort samt pris, tid og menneskelig indsats.
-- **Valgfrit dashboard og lokal runner:** [prøv demoen](docs/setup.md#prøv-demoen).
-
-**Status: v0.1.** Pakken og den lokale starter er afprøvet med syntetiske cases. En rigtig app-/modelpilot mangler endnu. Skills installerer ikke værktøjer eller cloudautomation; den valgte integration skal afprøves. Der er intet obligatorisk Arcitai-abonnement.
-
-[Læs mere efter behov](docs/README.md) · [Warp, BuilderIO og vores produktform](docs/product-experience.md) · [Security](SECURITY.md)
-
-MIT. Agent-, model- og hostingvalg er åbne. [Defense deler platformen](docs/adoption.md#produktnavn-og-grænsen-til-defense-factory) med egne workflows, beviser og rettigheder.
+MIT for Arcitai-koden. Machinist og agentpakker beholder deres egne licenser. Repositoryets synlighed ændres ikke af installationen.

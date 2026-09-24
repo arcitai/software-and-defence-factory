@@ -2,7 +2,7 @@
 
 **Valgt byggeretning · 24. september 2026:** Genbrug Machinist som fundament for en færdigsamlet Arcitai-pakke. Installér, forbind repo/model, afprøv miljøet og send første issue til review. VPS er første driftsprofil; samme Linux-baserede pakke skal kunne køre lokalt. Archon er fravalgt.
 
-**Status:** Vi har metode, seks skills og en lokal prototype. Machinists nyere motor og GUI er [undersøgt og lokalt testet](machinist-review.md). Den samlede Arcitai-installation, isolerede agentjobs og rigtige model-/apppilot mangler stadig.
+**Status v0.2:** CLI, pinnet Machinist-installation, isolerede Docker-jobs og to workflows er implementeret som testudgave. Software afleverer patch og revisionsbundne checks/review; manuel incident-triage afleverer et privat uverificeret udkast. [Quickstart](quickstart.md) · [Faktisk proof](platform-proof.md). Automatisk PR, issue-polling, model-/apppilot og live connectors mangler. Nedenfor beskrives også produktmålet.
 
 ## Hvad samler platformen?
 
@@ -14,15 +14,15 @@
 
 Samme installation og dashboard; adgang, private beviser og tilladte handlinger følger arbejdsforløbet. Defense skal også kunne undersøge software bygget andetsteds. Et incident kan skyldes kode, drift eller sikkerhed. En HTTP 500-fejl er ikke i sig selv en sårbarhed. Første incidentprofil undersøger og foreslår; produktionsindgreb kræver eget mandat.
 
-## Hvad følger med?
+## Pakken og dens næste udvidelser
 
 | Del | Standard i den første udgivelse |
 | --- | --- |
 | Factory og GUI | Machinists kontrolplan, worker og eksisterende GUI; Arcitai samler opsætningen og workflowpakken |
-| Agentens computer | Separat jobcontainer på dedikeret vært; checkout, shell, filer, tests og browser ved behov |
+| Agentens computer | Separat jobcontainer på dedikeret vært; checkout, shell, Node og Python; browser kræver et tilpasset image |
 | Agent og model | Kvalificér Codex-adapteren først og derefter Pi på samme kontrakt. Modeladgang vælges separat |
 | Arbejdsflade | Opgaver, Review, Målinger og Opsætning; GitHub kan også bruges direkte |
-| Levering | Branch, PR og beviser; appens eksisterende CI/CD og hosting bevares |
+| Levering | Patch og beviser nu; branch/PR oprettes manuelt. Appens CI/CD bevares |
 | Vedvarende drift | Start/stop, én aktiv worker, journal, recovery, opdatering og backup |
 | Defense | Valgfrie undersøgelses-/incidentforløb på samme platform, med særskilt adgang til følsomme beviser |
 
@@ -38,7 +38,7 @@ flowchart LR
   D[Defense-sag] --> F
 ```
 
-Machinist skal eje kørsler, forsøg og stop; vores gamle Node-journal må ikke også starte jobs. GitHub ejer issues, PR’er og branchregler. Agentjob afskærmes fra controllerdisk, Docker-socket, private evaluatorressourcer og admin-/deploynøgler. Denne isolation er et integrationskrav; Machinists standardexecutor giver den ikke alene.
+Machinist skal eje kørsler, forsøg og stop; vores gamle Node-journal må ikke også starte jobs. GitHub ejer issues, PR’er og branchregler. Agentjob afskærmes fra controllerdisk, Docker-socket, private evaluatorressourcer og admin-/deploynøgler. Arcitais Docker-adapter håndhæver disse mounts; profilen er til én betroet operatør, ikke kvalificeret multi-tenant isolation.
 
 ## Hvor kører den?
 
@@ -60,14 +60,14 @@ Dashboardets vigtigste spørgsmål er: **Hvad kører? Hvad kræver mig? Hvad ble
 
 **Risiko er relativ:** vurder ændringens konsekvens i den konkrete app, eksponering, recovery og usikkerhed. Det styrer checks og specialistreview. Lille diff eller soloprojekt betyder ikke automatisk lav risiko. [Den konkrete regel og videonoter](relative-risk.md).
 
-## Byg og bevis i tre vertical slices
+## Videre fra testudgaven i vertical slices
 
 1. **Repo → fungerende miljø i GUI.** Pak Machinist med vores workflow og isolerede jobmiljø. Kør én rigtig bruger-/API-prøve: baseline består, en relevant bevidst fejl opdages, manglende checks/forkert revision bliver ikke grønne. Prøv stop, mistet worker og restart uden to writers.
 2. **Manuel issue → verificeret PR.** Agenten bygger ændringen, særskilt review kontrollerer revisionen, og den betroede leveringsdel åbner PR. Registrér tid, forbrug og menneskelig indsats. Afprøv Pi som alternativ før løftet om udskiftelighed.
 3. **Issue → samme vej uden åben laptop.** Forbind GitHub-polling til workflowet med deduplikering og gemt budget/recovery. Machinists nuværende triggers starter commands; workflowkoblingen skal bygges. Automatisk start kommer efter den observerede første opgave. Merge/deploy følger appens politik.
 
-**Næste selvstændige slice:** ét driftsignal → read-only undersøgelse → privat sag med beviser → forslag eller softwareissue → opfølgning på release. Brug samme motor. Google Cloud-demonstrationen er inspiration, ikke en færdig Machinist-connector.
+**Næste Defence-udvidelse efter manuel evidens-triage:** ét live driftsignal → read-only undersøgelse → privat sag med beviser → forslag eller softwareissue → opfølgning på release. Brug samme motor. Google Cloud-demonstrationen er inspiration, ikke en færdig Machinist-connector.
 
-**Udgivelsen er klar**, når en ren Linux-VM og et lokalt Linux-miljø kan gennemføre den vej uden manuel sammenkobling. En Docker-indpakket demoside er ikke nok. GUI-adgang starter privat; bekvem fjernadgang med login skal kvalificeres særskilt. Den portable metodepakke kan fortsat bruges alene.
+**Den bredere produktudgivelse er klar**, når en ren Linux-VM og et lokalt Linux-miljø kan gennemføre den vej uden manuel sammenkobling. En Docker-indpakket demoside er ikke nok. GUI-adgang starter privat; bekvem fjernadgang med login skal kvalificeres særskilt. Den portable metodepakke kan fortsat bruges alene.
 
 Fabro, Mastra, Cole og Trycycle er [inspiration](foundation-review.md). [Machinist-gennemgangen](machinist-review.md) beskriver de konkrete integrationshuller. Den eksisterende starter bevares indtil erstatningen er bevist; to platforme skal ikke vedligeholdes permanent.

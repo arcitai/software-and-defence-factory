@@ -1,4 +1,4 @@
-# Seks videoer: hvad skal Arcitai Software and Security Factory tage med?
+# Seks videoer: hvad skal Arcitai Software & Defence Factory tage med?
 
 Gennemgået **21. september 2026**. Alle seks engelske, automatisk genererede YouTube-transskriptioner er hentet og læst. Beskrivelserne er åbnet, forkortede tekniske links er fulgt, og udvalgt kildekode er undersøgt. Undertekster kan fejlskrive navne og modeller; modelpriser og rangeringer i videoerne bruges derfor ikke som aktuelle benchmarks. Dette er en arkitektur- og kildegennemgang, ikke en fuld sikkerhedsaudit af de eksterne projekter.
 

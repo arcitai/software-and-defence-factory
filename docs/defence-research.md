@@ -12,7 +12,7 @@ Daybreak-siden nævner både sikkerhed under udvikling, defensive operationer og
 
 ## Vores foreslåede ansvarsdeling
 
-Dette er **vores produktforslag**, ikke en standardiseret opdeling fra OpenAI. Software Factory er her kort for det eksisterende produkt **Arcitai Software and Security Factory**. Defence er en selvstændig løsning.
+Dette er **vores produktforslag**, ikke en standardiseret opdeling fra OpenAI. Software Factory er her kort for det eksisterende produkt **Arcitai Software & Defence Factory**. Defence er et særskilt ansvar i den fælles pakke. Det tidligere forslag om selvstændig pakning er overhalet af den nye [integrationskontrakt](defence-integration.md).
 
 | Del | Ejer arbejdet med | Eksempel |
 | --- | --- | --- |

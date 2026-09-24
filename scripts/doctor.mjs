@@ -2,7 +2,7 @@ import { spawnSync } from "node:child_process";
 import { profiles } from "../src/domain.mjs";
 const commands = ["git", "codex", "ollama", "agent", "pi"];
 console.log(
-  "Arcitai Software and Security Factory preflight inventory (no models started, no credentials read)",
+  "Arcitai Software & Defence Factory preflight inventory (no models started, no credentials read)",
 );
 for (const c of commands) {
   const r = spawnSync(c, ["--version"], { encoding: "utf8", timeout: 5000 });

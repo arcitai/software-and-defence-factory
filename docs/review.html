@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="color-scheme" content="light">
-  <title>Arcitai Software and Security Factory · Dit korte review</title>
+  <title>Arcitai Software &amp; Defence Factory · Dit korte review</title>
   <style>
     :root { color-scheme: light; --ink:#192820; --muted:#506158; --paper:#f5f5ef; --line:#d5dcd3; --green:#225641; }
     * { box-sizing:border-box; }
@@ -71,27 +71,28 @@
       .recommendation { color:var(--ink); background:white; border:2px solid var(--green); }
       a { color:inherit; }
     }
+    .recommendation a { color: inherit; text-decoration: underline; }
   </style>
 </head>
 <body>
 <main>
   <header>
-    <div class="meta"><span class="brand">ARCITAI / SOFTWARE AND SECURITY FACTORY</span><span>Til Gustav · 3 minutters review · 24. september 2026</span></div>
+    <div class="meta"><span class="brand">ARCITAI / SOFTWARE &amp; DEFENCE FACTORY</span><span>Til Gustav · 3 minutters review · 24. september 2026</span></div>
     <h1>Én factory. Ét dashboard.</h1>
-    <p class="intro">En færdigsamlet pakke på Machinist til software, security og Defense. Kør den på en VPS eller egen maskine, og behold dit repo, din agent, model og apphosting.</p>
+    <p class="intro">En testbar pakke på Machinist til software, security og Defence. Kør den på en VPS eller egen maskine, og behold dit repo, din agent, model og apphosting.</p>
   </header>
 
   <aside class="recommendation" aria-label="Den valgte retning">
     <strong>Genbrug Machinist. Saml Arcitai-arbejdsgangene ovenpå.</strong>
-    Start pakken → forbind repo og model → afprøv miljøet → send første issue. Standardvalg følger med; tilpasning er mulig. Den samlede pakke skal stadig bygges.
+    Prøv først <code>npm run factory -- demo</code>: isoleret ændring → tests → separat review → din godkendelse. Derefter forbindes egen app og model. <a href="quickstart.md">Quickstart og VPS</a>.
   </aside>
 
   <section aria-labelledby="workflows-title">
     <h2 id="workflows-title">Tre arbejdsforløb på samme platform</h2>
     <div class="status">
-      <article class="card"><h3>Software</h3><p>Issue → vertical slices → tests og review → verificeret PR. Én lille adfærd fra ende til ende, før næste udvidelse.</p></article>
+      <article class="card"><h3>Software</h3><p>Opgave → vertical slice → tests og review → patch til din PR. Én lille adfærd fra ende til ende, før næste udvidelse.</p></article>
       <article class="card"><h3>Security</h3><p>Undersøgelse → valideret fund → rettelse og bevis. Specialist og kontroller vælges efter ændringens risiko.</p></article>
-      <article class="card"><h3>Defense og drift</h3><p>Alarm → diagnose → forslag eller ny softwareopgave → opfølgning. Kan også dække software bygget andetsteds.</p></article>
+      <article class="card"><h3>Defence og drift</h3><p>Manuel evidens → privat triage-udkast → review og eventuel softwareopgave. Kan også dække software bygget andetsteds.</p></article>
     </div>
     <p class="note">Fælles jobstyring, historik og målinger. Egne rettigheder og private beviser pr. forløb. Første incidentprofil undersøger og foreslår; en 500-fejl er ikke automatisk et sikkerhedsproblem.</p>
   </section>
@@ -99,15 +100,15 @@
   <section aria-labelledby="stack-title">
     <h2 id="stack-title">Hvad bruger vi til hvad?</h2>
     <table>
-      <caption>Valgt byggeretning — ikke en allerede færdig installation</caption>
+      <caption>v0.2-testudgave — konkrete standarder, åbne tilvalg</caption>
       <thead><tr><th scope="col">Del</th><th scope="col">Valg og ansvar</th></tr></thead>
       <tbody>
         <tr><th scope="row">Motor og dashboard</th><td>Machinist: kø, workflows, worker, godkendelser og historik. Genbrug GUI’en først.</td></tr>
         <tr><th scope="row">Arbejdsgange</th><td>Arcitais seks skills, projektkontekst, reviewregler og beviser. Risiko vurderes i den konkrete app.</td></tr>
-        <tr><th scope="row">Agent og model</th><td>Codex først, Pi som næste portabilitetsprøve. Andre harnesses via kvalificerede executors; inference vælges separat.</td></tr>
-        <tr><th scope="row">Agentens computer</th><td>Isolerede jobs på dedikeret Linux-VPS eller lokalt Linux-miljø. Browser ved behov; ingen GPU nødvendig med ekstern inference.</td></tr>
+        <tr><th scope="row">Agent og model</th><td>Codex og Pi er installeret i jobimaget. Egen command/image er muligt. Modeladgang og kvalitet skal afprøves i piloten.</td></tr>
+        <tr><th scope="row">Agentens computer</th><td>Docker-jobs på Mac eller Linux/VPS. Browser kræver et tilpasset image; ingen GPU nødvendig med ekstern inference.</td></tr>
         <tr><th scope="row">GitHub og Actions</th><td>Issues, PR’er og almindelig CI/CD. Langvarigt agentarbejde kører på worker; appens eksisterende deployment bevares.</td></tr>
-        <tr><th scope="row">Dokumenteret værdi</th><td>Kvalitet, samlet pris, mennesketid, gennemløbstid og fejl efter accept. Vis manglende data; tokens er ikke det samme som pris.</td></tr>
+        <tr><th scope="row">Dokumenteret værdi</th><td>Forsøg, checks, review og varighed gemmes. Pris, modelusage og mennesketid er endnu ukendt; syntetiske tests er ikke kundeværdi.</td></tr>
       </tbody>
     </table>
     <p class="note">VPS’en fortsætter, når laptoppen lukkes. Lokal drift kræver en vågen maskine. Cloudflare Sandbox er et muligt senere tilvalg med betaling; ingen obligatorisk platformsubscription eller Archon.</p>
@@ -120,18 +121,18 @@
   </section>
 
   <section aria-labelledby="build-title">
-    <h2 id="build-title">Byg og bevis i vertical slices</h2>
+    <h2 id="build-title">Næste pilot i vertical slices</h2>
     <div class="roadmap">
-      <p><b>1. Repo → fungerende miljø</b>Vis et rigtigt appcheck i Machinist. Afprøv isolation, relevant testfejl, stop og genstart.</p>
-      <p><b>2. Issue → verificeret PR</b>Kør én reel ændring med separat review, korrekt revision og målte resultater.</p>
-      <p><b>3. Drift uden åben laptop</b>Forbind issue-polling til workflowet. Afprøv dubletter, mistet worker og vedvarende budget.</p>
+      <p><b>1. Test installationen</b>Kør demoen. Miljø, reviewgate, fejl, stop og genstart er kvalificeret lokalt uden modelkald.</p>
+      <p><b>2. Forbind én rigtig app</b>Vælg model og appchecks. Lever én lille ændring som patch og opret PR gennem appens normale flow.</p>
+      <p><b>3. Afprøv VPS</b>Kør samme pakke som systemd-service med privat SSH-adgang. Automatisk issue-polling er en senere udvidelse.</p>
     </div>
-    <p class="note"><strong>Derefter:</strong> ét driftsignal → read-only incidentundersøgelse → privat sag → forslag eller softwareissue. Samme motor og dashboard.</p>
+    <p class="note"><strong>Defence:</strong> manuel evidens-triage er med. En live telemetry-connector og verificeret recovery er endnu ikke implementeret.</p>
   </section>
 
   <footer>
-    <p><strong>Status:</strong> metodekit og prototype findes. Machinist er bygget og testet lokalt med syntetiske processer. Arcitai-installation, rigtig model-/apppilot og incidentconnector er endnu ikke færdige. Owains Google Cloud-demo er separat kode, ikke en indbygget Machinist-connector.</p>
-    <p><a href="platform.md">Byggeretning</a> · <a href="machinist-review.md">Machinist og integrationshuller</a> · <a href="relative-risk.md">Video og risiko</a> · <a href="foundation-review.md">Kilder og drift</a> · <a href="proof.md">Afprøvninger</a>. Siden virker offline uden JavaScript.</p>
+    <p><strong>Status:</strong> CLI, Machinist-dashboard, Docker-isolation og manuelle workflows er klar til pilotafprøvning. Rigtige modelkald, Linux-VPS og production connectors er ikke kvalificeret. Ingen automatisk PR, merge, deployment eller recovery.</p>
+    <p><a href="platform.md">Byggeretning</a> · <a href="machinist-review.md">Machinist og integrationshuller</a> · <a href="relative-risk.md">Video og risiko</a> · <a href="foundation-review.md">Kilder og drift</a> · <a href="platform-proof.md">Afprøvninger og grænser</a>. Siden virker offline uden JavaScript.</p>
   </footer>
 </main>
 </body>

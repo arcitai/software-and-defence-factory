@@ -1,16 +1,18 @@
 # Én factory med en portabel metode
 
+> Denne side beskriver det portable metodekit. Den nye Machinist-pakke starter i [quickstart](quickstart.md).
+
 **Gældende retning, 24. september 2026:** En færdigsamlet factory på Machinist med samme installation/dashboard til software, security og valgfrie Defense-forløb. Den portable metodepakke kan fortsat bruges alene i et eksisterende app-repo. Appens kode, CI og hosting bliver, hvor de er; agent og model vælges pr. installation.
 
 **Byggeretning:** Genbrug [Machinists motor og GUI](machinist-review.md); kvalificér én VPS-/lokalprofil i [gennemgående slices](platform.md). Den færdige Arcitai-pakke er endnu ikke udgivet. Dokumentationen nedenfor beskriver især den eksisterende metodepakke.
 
 ## Produktnavn og grænsen til Defense Factory
 
-Det fulde navn er **Arcitai Software and Security Factory**. “Factoryen” og “factory-pakken” er korte henvisninger til samme produkt. Security er indbygget i udviklingen og et særskilt arbejdsspor, når en opgave kræver specialistarbejde.
+Det fulde navn er **Arcitai Software & Defence Factory**. “Factoryen” og “factory-pakken” er korte henvisninger til samme produkt. Security er indbygget i udviklingen og et særskilt arbejdsspor, når en opgave kræver specialistarbejde.
 
 | Arbejdsområde | Ansvar |
 | --- | --- |
-| **Software and Security Factory** — dette repo | Afklare, designe, bygge og rette software i vertical slices; teste, reviewe og verificere security før levering og ved senere ændringer |
+| **Software & Defence Factory** — dette repo | Afklare, designe, bygge og rette software i vertical slices; teste, reviewe og verificere security før levering og ved senere ændringer |
 | **Defense** — valgfrit forløb på samme platform | Løbende sikkerhedsundersøgelse og opfølgning; en driftsprofil kan behandle logs, incidents og dependencies/advisories. Også software bygget uden vores factory |
 
 **Samarbejde:** Defense registrerer et fund → afleverer en afgrænset issue med berørt system/revision, konsekvens, bevis og acceptkriterier → denne factory leverer en verificeret rettelse/PR → release følger appens politik → Defense efterprøver effekten i drift. Følsomme beviser bliver i den aftalte private kanal. Et fund giver ikke i sig selv ret til produktionsændringer.
