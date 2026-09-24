@@ -2,7 +2,7 @@
 import assert from 'node:assert/strict';
 import { readFileSync, writeFileSync, existsSync } from 'node:fs';
 import { resolve, join } from 'node:path';
-import { api, configAt, save, json, containers, sleep, stream, ROOT } from '../factory/lib.mjs';
+import { api, configAt, save, json, containers, sleep, stream, run, ROOT } from '../factory/lib.mjs';
 import { admitIncident } from '../factory/incident.mjs';
 
 const state=resolve(process.argv[2] || '.factory/demo-platform'),original=configAt(state);
@@ -36,6 +36,9 @@ try {
   const native=await work('Synthetic disk-backed build verification');
   const checking=await until(()=>containers(state).find(c=>c.Config.Labels['sdf.job']===native.id&&c.State.Running&&c.Config.Env.includes('FACTORY_PHASE=verify')));
   assert.equal(checking.HostConfig.NanoCpus,4000000000);assert.equal(checking.HostConfig.PidsLimit,1024);
+  const nativeCandidate=json(join(state,'jobs',native.id,'candidate.json'));
+  assert.notEqual(nativeCandidate.base,nativeCandidate.head);
+  assert(checking.Config.Env.includes(`FACTORY_BASE_REVISION=${nativeCandidate.base}`));
   assert(checking.Mounts.some(m=>m.Destination==='/scratch'&&m.RW));
   assert(checking.Mounts.some(m=>m.Destination==='/workspace'&&!m.RW));
   await waitState(native.id,'awaiting_approval');
@@ -43,7 +46,7 @@ try {
   assert(!existsSync(join(state,'jobs',native.id,verification.id,'check-workspace')));
   assert(!existsSync(join(state,'jobs',native.id,'checkout/large-build-fixture')));
   await cli('approve',native.id);await waitState(native.id,'succeeded');setConfig({});
-  record('native build scratch exceeds 1 GiB without changing the candidate; limits and cleanup verified');
+  record('native build scratch exceeds 1 GiB; immutable base, read-only candidate, limits and cleanup verified');
 
   for (const exitCode of [0, 17]) {
     setConfig({check:`mkdir -p cache/nested && echo cache > cache/nested/value && ln -s /workspace cache/candidate && chmod 000 cache/nested cache && exit ${exitCode}`});
@@ -98,6 +101,13 @@ try {
   await cli('stop');assert.equal(containers(state).length,0);await cli('up');await waitState(interrupted.id,'interrupted');
   setConfig({timeoutSeconds:2});await cli('retry',interrupted.id);await waitState(interrupted.id,'failed');
   assert.equal((await snapshot(interrupted.id)).runs.length,2);assert.equal(containers(state).length,0);record('stop/restart retains interrupted state; retry proves previous writer stopped');
+  const other=join(state,'second-installation');
+  await stream(process.execPath,[join(ROOT,'bin/software-defence-factory.mjs'),'init','--state',other,'--repo',original.repo,'--agent','mock','--check',original.check,'--port','7350']);
+  await stream(process.execPath,[join(ROOT,'bin/software-defence-factory.mjs'),'install','--state',other]);
+  assert.equal(run('docker',['image','inspect','--format','{{.Id}}',original.image]),original.image);
+  run('docker',['run','--rm','--init','--network','none',original.image,'node','-e','process.exit(0)']);
+  await cli('stop');setConfig({});await cli('up');
+  record('a second installation rebuild preserves the first pinned image and controller restart');
   save(join(state,'qualification.json'),{synthetic:true,platform:process.platform,arch:process.arch,engine:json(join(state,'engine.json')).version,results});
   console.log(`Qualified ${results.length} paths. Model quality, cost and production connectors were not measured.`);
 } finally {save(join(state,'factory.json'),original);}

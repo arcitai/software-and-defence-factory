@@ -73,6 +73,7 @@ async function container(mode, input, command, writable = false, credentials = f
     '--mount',`type=bind,source=${join(ROOT,'kit')},target=/factory-policy,readonly`,
     '--mount',`type=bind,source=${join(ROOT,'.agents/skills')},target=/factory-skills,readonly`];
   if (scratch) args.push('--mount',`type=bind,source=${scratch},target=/scratch`);
+  if (mode === 'verify') args.push('--env',`FACTORY_BASE_REVISION=${git('rev-parse',`${metadata().base}^{commit}`)}`);
   if (credentials) args.push('--env-file', join(state,'model.env'));
   args.push('-i',config.image,'timeout','--signal=KILL',`${config.timeoutSeconds}s`,'sh','-c','mkdir -p "$HOME" && exec "$@"','factory',...command);
   console.log(JSON.stringify({ phase: mode, event: 'started', synthetic: config.agent === 'mock' }));

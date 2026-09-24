@@ -26,6 +26,8 @@ software-defence-factory install --state /private/state/my-app
 software-defence-factory doctor --state /private/state/my-app
 ```
 
+Verification commands receive `FACTORY_BASE_REVISION`, the resolved commit recorded as the candidate base. Diff-based checks should compare against this revision; the isolated checkout has no origin remote. The value comes from protected controller metadata, not the task text.
+
 Replace the check with the application's actual verification command. `init` does not edit the app, copy global skills or start work. It creates factory.json, worker.token and model.env with private permissions. Each installation has one repository and a distinct state path/port. `--agent pi` selects Pi; `--agent custom --command-json '["executable","argument"]'` selects an available command in the job image. The bundled image provides Node, Git, Codex and Pi. Other toolchains require an intentionally built compatible image; do not claim Rust/mobile/browser capabilities from this image alone.
 
 Configure inference credentials in the private model.env file. Do not copy the operator's entire account environment or authentication folders. Codex uses its supported API credential environment; Pi uses the selected provider's configuration. Use `--model` with init for a specific model. Task-level model overrides are supported only for Codex/Pi and do not prove that the provider serves that model.

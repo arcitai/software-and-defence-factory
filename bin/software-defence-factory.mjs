@@ -46,13 +46,25 @@ function init(repo, agent='codex', check='', port=7331) {
   console.log(`Configured ${state}\nApp files were not changed. Only committed code is cloned into jobs.`);
 }
 
+function retainImage(reference) {
+  let image;
+  try { image=run('docker',['image','inspect','--format','{{.Id}}',reference]); }
+  catch(error) { if(/No such image|No such object/.test(error.message))return null;throw error; }
+  if(!/^sha256:[a-f0-9]{64}$/.test(image))throw new Error('Docker returned an unexpected image identity');
+  // Containerd can drop an untagged manifest when the shared build tag moves.
+  // Keep the exact object reachable; existing installations retain their pins.
+  run('docker',['tag',image,`software-defence-factory-retained:${image.slice(7)}`]);
+  return image;
+}
 async function install() {
   const config=configAt(state);
   if(existsSync(join(state,'supervisor.json'))&&alive(json(join(state,'supervisor.json')).pid))throw new Error('Stop the factory before installing or updating its runtime');
   if (!['darwin','linux'].includes(process.platform)||!['arm64','x64'].includes(process.arch)) throw new Error('Use macOS/Linux arm64/amd64, or WSL2');
   run('docker',['info','--format','{{.ServerVersion}}']);
+  retainImage(config.image);retainImage(PINS.jobImage);
   await stream('docker',['build','-t',PINS.jobImage,join(ROOT,'factory/image')]);
-  config.image=run('docker',['image','inspect','--format','{{.Id}}',PINS.jobImage]);
+  config.image=retainImage(PINS.jobImage);
+  if(!config.image)throw new Error('Built job image is unavailable');
   save(join(state,'factory.json'),config);save(join(state,'engine.json'),{runtime:'native-node',version:VERSION,image:config.image});
   console.log('Installed. Job image is pinned to its local image ID. No model call made.');
 }

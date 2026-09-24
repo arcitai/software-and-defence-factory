@@ -60,7 +60,11 @@ Source checkouts remain managed by Git and do not update themselves.
 
 CLI updates do not rebuild or update Docker images automatically. Stop the
 installation and run `install --state PATH` when intentionally adopting a new
-runtime image; repeat the relevant qualification before resuming jobs.
+runtime image; repeat the relevant qualification before resuming jobs. Install retains the old and new
+image IDs under `software-defence-factory-retained` tags, so another installation
+rebuilding the shared tag cannot remove an existing installation's pinned image.
+These retained images are recovery data; remove them only after confirming no
+installation or retained attempt needs them.
 
 ## Release flow
 
