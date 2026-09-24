@@ -4,6 +4,8 @@
 
 En åben, self-hostable starter til en software- og security-factory. GitHub ejer issues, kode og PR’er. Factoryen samler opgaver, jobforsøg, review og dokumenteret værdi. Harness og inference vælges hver for sig.
 
+**Start her til review:** [Kort visuelt overblik — status og næste byggetrin](docs/review.html). Åbn filen i en browser; den virker offline.
+
 ## Prøv dashboardet
 
 Kræver Node.js **22.13+** med `node:sqlite` (afprøvet på 22.21.1 og 22.22.3). Dashboardets kerne kræver ingen eksterne npm-pakker, ingen build, ingen GitHub Actions og intet modelkald ved start. Security-workerens SDK installeres separat efter behov.

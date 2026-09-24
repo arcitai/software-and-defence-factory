@@ -114,3 +114,9 @@ Read the designated bachelor's task for its current direction. Corrected the old
 Added an original manual measurement card, an evidence-quality rubric and a before/after research protocol to the existing value guide. Updated the runtime plan and review packet to reference the method. The protocol includes all human work, unsuccessful attempts, unknown measurements, judge disagreement and post-acceptance observation. Runtime code, eval schema, fixed cases and dashboard behavior are unchanged. Automatic judging, sampling and assessment history remain proposed capabilities; no model experiment or measured saving is claimed.
 
 Checked all 37 Markdown files: **121 local file targets and eight heading anchors resolved**. `git diff --check` passed. Runtime tests were not repeated for this documentation-only change; the latest runtime validation remains the 24-test run above. No new UI, paid job, installation, automation, external message, issue, PR or deployment was performed. Review was by the authoring agent, not an independent reviewer.
+
+## Short decision overview — 24 September 2026
+
+Added a self-contained Danish HTML overview for Gustav: current implementation, synthetic-only evidence, the recommended next build stage and its completion criteria. The roughly two-minute overview uses the existing repository sources; it is a proposal, not a completed runtime increment. README links to the offline file.
+
+Inspected desktop and narrow browser renderings. The browser reported CSS widths of 2000 and 375 respectively; document width matched viewport width in both. Status labels remain meaningful without color, the workflow reflows vertically, and keyboard Tab reached the first source link. Temporary viewport settings were reset. The page has no JavaScript or external asset dependencies. Runtime tests were not repeated because runtime behavior is unchanged.

@@ -1,0 +1,126 @@
+<!doctype html>
+<html lang="da">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light">
+  <title>Arcitai Factory · Dit korte review</title>
+  <style>
+    :root { color-scheme: light; --ink:#192820; --muted:#506158; --paper:#f5f5ef; --line:#d5dcd3; --green:#225641; }
+    * { box-sizing:border-box; }
+    body { margin:0; color:var(--ink); background:var(--paper); font:16px/1.5 system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif; }
+    main { max-width:1080px; margin:auto; padding:32px 36px 28px; }
+    h1,h2,h3,p { margin:0; }
+    h1 { font-size:clamp(30px,4.5vw,46px); line-height:1.13; letter-spacing:-.035em; margin:12px 0; }
+    h2 { font-size:20px; letter-spacing:-.015em; margin-bottom:12px; }
+    h3 { font-size:17px; margin-bottom:6px; }
+    p { text-wrap:pretty; }
+    a { color:#1c6048; text-underline-offset:3px; }
+    a:focus-visible { outline:3px solid #875200; outline-offset:4px; border-radius:2px; }
+    .meta { display:flex; justify-content:space-between; gap:8px 20px; flex-wrap:wrap; color:var(--muted); font-size:13px; }
+    .brand { font-weight:750; letter-spacing:.08em; }
+    .intro { max-width:760px; color:var(--muted); font-size:18px; }
+    .recommendation { margin:22px 0; padding:17px 20px; border-radius:12px; background:var(--green); color:white; }
+    .recommendation strong { display:block; font-size:18px; margin-bottom:3px; }
+    section { margin-top:24px; }
+    .status { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:12px; }
+    .card { padding:16px; border:1px solid var(--line); background:#fff; border-radius:10px; }
+    .tag { display:inline-block; font-size:12px; font-weight:750; letter-spacing:.025em; padding:3px 8px; border-radius:5px; margin-bottom:9px; }
+    .built { background:#e1efe5; color:#244c36; }
+    .tested { background:#f8edcf; color:#67470b; }
+    .next { background:#e8edf4; color:#34495e; }
+    .card p { font-size:15px; }
+    .flow { list-style:none; display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:20px; padding:0; margin:14px 0 0; }
+    .flow li { position:relative; background:#e9eee7; padding:10px 12px; border-radius:6px; font-size:14px; }
+    .flow li:not(:last-child)::after { content:'→'; position:absolute; right:-17px; top:11px; color:var(--muted); }
+    .flow b { display:block; font-size:15px; }
+    .scope { display:grid; grid-template-columns:1.1fr 1fr; gap:28px; }
+    .scope ul { margin:0; padding-left:20px; }
+    .scope li { margin-bottom:8px; padding-left:3px; }
+    .finish { border-left:3px solid #9bb6a1; padding-left:18px; }
+    .finish p + p { margin-top:10px; }
+    .small { font-size:14px; color:var(--muted); }
+    .roadmap { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:20px; border-top:1px solid var(--line); padding-top:16px; }
+    .roadmap p { font-size:14px; }
+    .roadmap b { display:block; margin-bottom:3px; font-size:15px; }
+    footer { border-top:1px solid var(--line); margin-top:24px; padding-top:13px; color:var(--muted); font-size:12px; }
+    footer p + p { margin-top:6px; }
+    @media (max-width:680px) {
+      main { padding:22px 18px; }
+      .status,.scope,.roadmap { grid-template-columns:1fr; gap:12px; }
+      .flow { grid-template-columns:1fr; gap:15px; }
+      .flow li:not(:last-child)::after { content:'↓'; left:15px; right:auto; top:auto; bottom:-18px; }
+      .intro { font-size:17px; }
+      .finish { margin-top:6px; }
+      .recommendation { padding:16px; }
+    }
+    @media print {
+      body { background:white; font-size:11pt; }
+      main { max-width:none; padding:0; }
+      h1 { font-size:26pt; }
+      section { margin-top:16px; break-inside:avoid; }
+      .recommendation { color:var(--ink); background:white; border:2px solid var(--green); }
+      a { color:inherit; }
+    }
+  </style>
+</head>
+<body>
+<main>
+  <header>
+    <div class="meta"><span class="brand">ARCITAI / FACTORY</span><span>Til Gustav · 2 minutters review · 24. september 2026</span></div>
+    <h1>Byg én opgave helt igennem.</h1>
+    <p class="intro">Vi har en kørbar starter. Næste etape skal forbinde delene til et enkelt forløb, som vi kan afprøve og måle.</p>
+  </header>
+
+  <aside class="recommendation" aria-label="Anbefalet beslutning">
+    <strong>Mit forslag: gå videre med etape 1 nedenfor.</strong>
+    Ét system til software og security. Pi som første worker, Codex Security som valgfri specialist. Model og hosting skal fortsat kunne skiftes.
+  </aside>
+
+  <section aria-labelledby="status-title">
+    <h2 id="status-title">Hvor er vi nu?</h2>
+    <div class="status">
+      <article class="card"><span class="tag built">BYGGET</span><h3>Det lokale fundament</h3><p>Dashboard, opgaver, GitHub-læsning, jobjournal, stop, evidensimport og lokal accept.</p></article>
+      <article class="card"><span class="tag tested">SYNTETISK AFPRØVET</span><h3>Agentforbindelserne</h3><p>Pi- og Security-adaptere virker med kontrollerede testdata. En rigtig model- og kundepilot mangler.</p></article>
+      <article class="card"><span class="tag next">BESKREVET · MANUELT</span><h3>Værdien og kvaliteten</h3><p>Fem målepunkter og én scorer er klar som metode. Automatisk scoring og de nye dashboardfelter mangler.</p></article>
+    </div>
+  </section>
+
+  <section aria-labelledby="build-title">
+    <h2 id="build-title">Etape 1 · Det bygger jeg som det næste</h2>
+    <div class="scope">
+      <ul>
+        <li><strong>Én brugbar Pi-profil:</strong> afgrænset arbejdsmiljø, modelprøve og browserværktøj til UI-opgaver.</li>
+        <li><strong>Et samlet opgaveforløb:</strong> forbind runner, krævede checks og reviewpakke; vis fejl og stop tydeligt.</li>
+        <li><strong>Et lille resultatoverblik:</strong> kvalitet, pris, mennesketid, gennemløbstid og fejl efter accept. Scorer registreres først manuelt.</li>
+      </ul>
+      <div class="finish">
+        <h3>Etapen er færdig, når …</h3>
+        <p>Én afgrænset opgave kan følges fra krav til reviewpakke med præcis kodeversion, testbeviser og målinger. Ukendte tal står som ukendte.</p>
+        <p class="small">Prøven skal også vise, at fejlede checks og forældede beviser stopper accept. En syntetisk prøve dokumenterer integration; en rigtig modelkørsel dokumenteres særskilt.</p>
+      </div>
+    </div>
+    <ol class="flow" aria-label="Opgavens forløb">
+      <li><b>1. Afgræns</b>Krav og kontrolplan</li>
+      <li><b>2. Udfør</b>Én worker ad gangen</li>
+      <li><b>3. Kontrollér</b>Checks og separat review</li>
+      <li><b>4. Tag stilling</b>Din accept på beviser</li>
+    </ol>
+  </section>
+
+  <section aria-labelledby="later-title">
+    <h2 id="later-title">Derefter, i denne rækkefølge</h2>
+    <div class="roadmap">
+      <p><b>2 / Kastanje som produktpilot</b>Tre små opgaver. Mål al mennesketid mod nuværende praksis; brug erfaringerne i bacheloren.</p>
+      <p><b>3 / Automatisér gentagelserne</b>Forbind issues og PR’er tættere. Tilføj automatisk scoring, når vurderingerne er kalibreret.</p>
+      <p><b>4 / Kvalificér driften</b>Kastanje/EU-inference eller lokal Z13-model efter pilotbehov. Afprøv recovery og forbrugsgrænser.</p>
+    </div>
+  </section>
+
+  <footer>
+    <p><strong>Din beslutning:</strong> Er etape 1 det rigtige næste byggetrin? Ret gerne retningen; detaljerne kan jeg håndtere. Dette overblik starter ingen jobs, merge eller deployment.</p>
+    <p>Grundlag: eksisterende repository, <a href="proof.md">afprøvninger</a>, <a href="next-runtime.md">byggeplan</a> og <a href="value.md">målemetode</a>. Ingen ny ekstern research. Planen forudsætter adgang til et egnet worker-miljø og en konkret modelrute før en rigtig pilot. Siden virker offline og kan læses uden farver, grafik eller JavaScript.</p>
+  </footer>
+</main>
+</body>
+</html>
