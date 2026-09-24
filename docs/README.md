@@ -6,7 +6,10 @@ Start med [README og de tre trin](../README.md). De øvrige sider er opslag til 
 | --- | --- |
 | Tilslutte min app og prøve første opgave | [Adoptionsvejledning](../kit/README.md) |
 | Vurdere Fabro, Mastra og Coles VPS-setup | [Inspiration og genbrug](ui-references.md) |
-| Se forslaget til en selvhostbar platform | [Platformens ansvar og første slices](platform.md) |
+| Se den valgte retning for VPS/lokal pakke og GUI | [Standardopsætning og første slices](platform.md) |
+| Se hvorfor vi bygger på Machinist | [Motor, GUI og konkrete integrationshuller](machinist-review.md) |
+| Forstå relativ risiko og videoens OpenAI-eksempel | [Tidskoder og praktiske reviewregler](relative-risk.md) |
+| Se sammenligningen med Cole, Trycycle og gratis drift | [Fundament og kildegrundlag](foundation-review.md) |
 | Forstå produktet og forskellen på Warp/BuilderIO | [Produktform og onboarding](product-experience.md) |
 | Se hvad vi definerer, og hvad appen vælger | [Produkt og ansvar](adoption.md) |
 | Se CI/CD- og security-reglerne | [Fælles metode](../kit/policy.md) |

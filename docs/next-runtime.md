@@ -1,18 +1,10 @@
 # Viderebygning af den valgfrie runtime
 
-**Aktuelt:** [Den portable pakke](adoption.md) kan tages i brug med en valgt agent. **Mulig videreudvikling:** en [selvhostbar platform med guided opsætning](platform.md), som styrer issue → agent → verificeret PR, mens appens eksisterende pipeline ejer deployment. Afsnittene herunder er tekniske muligheder; de vælger ikke en bestemt cloududbyder. Metoden kan fortsat bruges uden egen runtime. [Den aktuelle anbefaling](product-experience.md) er først én afprøvet standardopsætning, med Fabro som kandidat til genbrug af motor/UI. Archon er fravalgt af ejeren.
+**Gældende byggeretning, 24. september 2026:** [én VPS-/lokalpakke på Machinist med fælles dashboard](platform.md) til software, security og valgfrie Defense-workflows. Den portable metode kan fortsat bruges alene. Archon er fravalgt. [Machinist-gennemgangen](machinist-review.md) beskriver aktuelle muligheder og integrationshuller; [fundamentgennemgangen](foundation-review.md) sammenligner de øvrige kilder.
 
-Beslutningsforslag efter [videogennemgangen](video-audit.md), [Pi-research](pi-research.md), [BuilderIO-gennemgangen](builderio-review.md) og [Dex’ designmetode og den supplerende playbook](dex-review.md). Dette er **næste versions kontrakt og prioritering**, ikke funktioner, som v0.1 allerede har. [Arkitekturen](architecture.md) beskriver den kørende kode.
+Dette dokument er teknisk baggrund. Start med én Machinist-controller, én worker og ét pilotrepo. Genbrug dens UI og kvalificér vores metode, harness-wrappers og isolationsgrænse. Den eksisterende Node/SQLite-prototype og dens [syntetisk afprøvede adaptere](worker-integrations.md) bevares indtil erstatningen er bevist; de må ikke samtidig eje aktive jobs. [Arkitekturen](architecture.md) beskriver den nuværende kode, ikke en gennemført migration. Andre cloudprofiler nedenfor er alternativer, ikke parallelle byggeprojekter.
 
-**Implementeret 22. september:** Pi RPC og Security SDK er nu tilsluttet den eksisterende CLI-runner og syntetisk afprøvet. [Aktuel worker-status](worker-integrations.md). Det implementerer ikke i sig selv den ubemandede pipeline nedenfor.
-
-Når egen runtime er nødvendig, er den mindste fornuftige løsning **én controller, én worker og ét pilotrepo**. GitHub er indgangen til arbejdet og hjem for kode/PR. Runtime ejer kørsler, låse og stop. Dashboardet viser denne tilstand. Skills beskriver faglig metode; de skal ikke være eneste håndhævelse af budgetter, checks eller adgang.
-
-**Forenkling 23. september:** behold den nuværende runner til en manuel pilot. Den synlige arbejdsgang er **find og afgræns → ret og bevis → review og aflever**. Et samlet overblik viser beslutninger, beviser og forbrug. Automatisér ét gentaget trin ad gangen efter faktisk brug; et nyt framework, endnu en controller og mange planlagte agentjobs er ikke forudsætninger.
-
-**Måling 24. september:** følg [den lille måleprotokol](value.md#start-her-fem-målepunkter-og-en-scorer): kvalitet, samlet pris, al mennesketid, gennemløbstid og fejl efter accept. Én valgfri scorer supplerer reviewet med en evidensvurdering. Brug baseline → undersøg fejl → afprøv én ændring → review → mål igen. Det bygger videre på [Warp Scorers](warp-measurement.md) uden en ny runtime eller obligatorisk evaluatormodel.
-
-**Præcisering efter ejerens korrektion, 24. september:** ingen bestemt cloudadapter er forhåndsvalgt som produktets næste trin. Pi/Daytona, Codex Cloud, Cursor, lokal Z13 og egen sky er eksempler på installationer. Kvalificér den valgte apps faktiske behov først; genbrug en managed integrations runtime, hvor den allerede løser opgaven. GitHub kan være hele kontrolpanelet.
+Vertical slices, separat review og [de fem værdimålinger](value.md#start-her-fem-målepunkter-og-en-scorer) bevares. Første driftsprofil ændrer ikke projektets merge-/deploymandat, og flere agenter må aldrig eje samme jobtilstand.
 
 ## Den samlede arbejdsgang
 
@@ -43,9 +35,11 @@ flowchart TD
 
 Implementering kan bruge Codex, Cursor eller en anden egnet harness. Security kan tilføje en specialist til samme pipeline. Små rettelser behøver ikke en separat planner-agent. Tests og venten på kendte eksterne tilstande udføres af kode. En agent tilkaldes, når noget kræver vurdering eller reparation.
 
-## Hvis piloten viser behov for en anden motor
+<a id="hvis-piloten-viser-behov-for-en-anden-motor"></a>
 
-**Machinist er en mulig senere controller-kandidat**, med Sandcastle som alternativ byggesten, hvis hovedbehovet er agent-/sandboxadaptere. Det tidligere forslag om at afprøve Machinist før piloten er nedprioriteret: dokumentér først en konkret begrænsning i nuværende runner og forventet mindre vedligehold. **Pi er en mulig harness-kandidat**; controller og harness løser forskellige opgaver. Pi’s syntetiske RPC-prøve er gennemført, men erstatter ikke controller-/recovery-prøven nedenfor. Ved et muligt skifte begrænses prøven til ét syntetisk repo, ingen providerbetaling og ingen produktionsadgang i første fase.
+## Kvalificér den valgte Machinist-motor
+
+**Machinist er valgt som fundament**, fordi den nyere version allerede har kontrolplan, GUI, workflows, godkendelser og VPS-drift. Vores arbejde er en færdigsamlet, kvalificeret pakke ovenpå. **Pi er en harness-kandidat**; motor og harness løser forskellige opgaver. Pi’s tidligere RPC-prøve er syntetisk og beviser ikke en Machinist-integration. Første prøve bruger ét syntetisk repo uden modelbetaling eller produktionsadgang; derefter følger en rigtig appopgave.
 
 | Afprøvning | Bestået når |
 | --- | --- |
@@ -56,12 +50,13 @@ Implementering kan bruge Codex, Cursor eller en anden egnet harness. Security ka
 | Portabilitet | Samme workflow kan bruge en testadapter og derefter Pi eller Codex uden at ændre kundens scope/accept |
 | Vedligehold | Adapteren erstatter mere kode, end den tilfører; ingen anden scheduler ejer samme aktive levering |
 
-Kilden til kandidatens muligheder og begrænsninger står i [Machinist-afsnittet](video-audit.md#machinist-undersøg-før-vi-genopfinder-runtime). Vi har kun læst koden; denne afprøvning er **ikke udført**. Hvis kandidaten vælges, bliver dens runtime-status autoritativ. Arcitais UI kan vise den via en adapter; den eksisterende lokale forsøgsjournal må ikke konkurrere om jobclaim. Gem en eksport og definér migreringen, før en kø flyttes.
+Den [aktuelle gennemgang](machinist-review.md) og [prøveprotokol](proof.md) skelner mellem upstreamtests, en lokal syntetisk procesprøve og den stadig manglende Arcitai-/modelpilot. Brug workflows: rå commands kan blive genkørt efter mistet lease, og indbyggede triggers starter endnu commands. Gem eksport og definér migrationen, før en aktiv kø flyttes. Machinist bliver eneste ejer af jobtilstand.
 
 ## Eksempler på deploymentprofiler
 
 | Profil | Controller og worker | Inference | Første brug / grænse |
 | --- | --- | --- | --- |
+| VPS/lokal standard under opbygning | Machinist-controller/GUI og én afgrænset worker på dedikeret Linux-miljø | Valgt modeladgang; lokal inference efter kvalifikation | Se [de prioriterede slices](platform.md). Pakning, sikker jobgrænse og samlet onboarding skal bygges |
 | Hurtig managed pilot | Codex Cloud styrer sin egen opgave; manuel forbindelse til vores review/metode | Tjenestens tilgængelige modeller | Hurtig start uden egen server. Konto/adgang skal prøves; ikke vores automatiske issue-pipeline |
 | Egen styring med åben worker | Eksisterende Node/SQLite-controller på lille VM; Pi i Daytona-sandbox pr. job | Valgt ekstern API; Kastanje/EU efter kvalifikation | Pi-image, fjernprotokol, artifact-import og recovery skal bygges. UI via privat SSH-portforward |
 | Andre managed alternativer | Cursor Cloud Agent eller Agents API med hosted sandbox | Den valgte tjenestes muligheder | Cursor ved færdig computer-use; Agents API ved eget dashboard med OpenAI-harness. Særskilt adgang/afregning; vælg én relevant integration |
@@ -105,7 +100,7 @@ Review, PR-merge, deployment og produktionsobservation har hver sin status. En i
 
 ## Feedback uden en selvændrende produktionsmaskine
 
-Løbende overvågning af produktion hører til drift eller den separate **Defense Factory**; den bygges ikke ind som krav i denne runtime. Denne factory modtager feedback og leverer verificerede rettelser. Efter en reel pilotrelease aftales read-only målinger af få signaler med den ansvarlige: fejlrate, svartid og kundens valgte forretningsmål. Registrér baseline, release-SHA, observationsvindue og kontaktperson. Et signal bliver en deduplikeret opgave med reproduktion og konsekvens. Rå kundelogs og sårbarheder bliver i det godkendte private scope.
+Løbende undersøgelser og driftsalarmer kan tilsluttes som **Defense-workflows på samme platform**, med egne rettigheder og private beviser. Det er valgfrit og kræver ikke en anden controller. Softwareforløbet modtager afgrænsede opgaver og leverer verificerede rettelser. Første driftsintegration læser få aftalte signaler: fejlrate, svartid og et relevant forretningsmål. Registrér baseline, release-SHA, observationsvindue og ansvarlig. Et signal bliver en deduplikeret sag med reproduktion og konsekvens; en 500-fejl er ikke automatisk et sikkerhedsfund. Rå kundelogs og sårbarheder bliver i godkendt privat scope. Rollback/produktionsændring kræver konkret handlingsmandat.
 
 Saml nødvendige menneskelige beslutninger i [én lille oversigt](../templates/human-review.md), inklusive ældre uafsluttet arbejde og manglende datadækning. Efter pilotleverancer laves et manuelt tilbageblik: kom samme fejl igen efter en verificeret release, eller manglede der bevis for første fix? Automatisér kun dette, hvis gentagelsen er nyttig. Kendt status og venten indsamles af kode; modeller bruges til vurdering og diagnose.
 
@@ -124,6 +119,6 @@ Disse er lokale opgaveudkast; de er ikke oprettet på GitHub.
 | **P1 — GitHub-pipeline og synligt forbrug** | Pagination/reconciliation, issue/PR-identitet, konkret aktørkontrol, versionsspor og automatisk usage, hvor API giver det. Én ejer af eventrouting |
 | **P1 — Tre rigtige Kastanje-opgaver** | En bug, en mindre forbedring og en afgrænset security-rettelse; mindst én bygger videre på tidligere leveret kode. Registrér omarbejde, regressioner, reviewventetid og al mennesketid. Brug [prøven med et senere krav](value.md#kan-vi-ændre-det-igen), og vælg derefter ét gentaget trin at automatisere |
 | **P2 — Drift og begrænset parallelitet** | Først read-only releasefeedback. Derefter separate workspaces og integrationskø, hvis ventetid og økonomi begrunder flere writers |
-| **Kun ved dokumenteret behov — Ny controller** | Afprøv scenarierne ovenfor, sammenlign vedligehold og migrér til én autoritativ runtime. Ingen parallel kø som ekstra lag |
+| **Før produktudgivelse — Machinist som eneste motor** | Afprøv scenarierne ovenfor, versionsfastlås, kontrollér backup/restore og erstat eksisterende jobstyring. Ingen parallel kø som ekstra lag |
 
 Kastanje som inference-produkt og Z13 som hardwarepilot kan testes uafhængigt. Bachelorens eksisterende afgrænsning ændres ikke her. Kundetilbuddet bør være én fungerende arbejdsgang med dokumenteret kvalitet og ejerskab, ikke et løfte om fuld autonomi eller et bestemt modelabonnement.

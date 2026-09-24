@@ -36,7 +36,7 @@ Vælg én lille fejl eller forbedring fra appens backlog. Bed agenten om at løs
 
 Når den vej virker, tilsluttes automatisk start fra issues i det valgte agentmiljø. GitHub kan være hele kontrolpanelet.
 
-**Produktretning:** gør pakken nem at installere med én afprøvet standardopsætning. Genbrug en egnet motor og UI, hvor det hjælper; en egen platform er en mulig videreudvikling. [Vurdering og næste skridt](docs/product-experience.md).
+**Produktmålet:** én færdigsamlet factory på Machinist til VPS eller egen maskine, med fælles dashboard for software, security og valgfrie Defense-forløb. Forbind repo/model, afprøv miljøet og send første issue. Den samlede udgivelse skal stadig bygges; trinene ovenfor bruger det eksisterende metodekit. [Kort review](docs/review.html) · [Byggeretning](docs/platform.md).
 
 ## Det følger med
 
@@ -49,4 +49,4 @@ Når den vej virker, tilsluttes automatisk start fra issues i det valgte agentmi
 
 [Læs mere efter behov](docs/README.md) · [Warp, BuilderIO og vores produktform](docs/product-experience.md) · [Security](SECURITY.md)
 
-MIT. Agent-, model- og hostingvalg er åbne. Løbende overvågning hører til den separate [Defense Factory](docs/adoption.md#produktnavn-og-grænsen-til-defense-factory).
+MIT. Agent-, model- og hostingvalg er åbne. [Defense deler platformen](docs/adoption.md#produktnavn-og-grænsen-til-defense-factory) med egne workflows, beviser og rettigheder.

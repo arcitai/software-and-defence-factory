@@ -1,63 +1,73 @@
-# En selvhostbar Software and Security Factory
+# Én factory, ét dashboard, flere arbejdsforløb
 
-**Mulig videreudvikling, 24. september 2026 — ikke implementeret endnu.** [Anbefalingen](product-experience.md) er først et installérbart kit med én afprøvet driftsprofil og en vurdering af eksisterende motor/UI. Beskrivelsen her afgrænser, hvad en egen platform kan blive. Archon er fravalgt. Byg en lille platform, hvor man tilslutter et repo, vælger et agentmiljø og får opgaver frem til en verificeret PR. Appens eksisterende CI/CD og hosting bliver stående. Den portable metodepakke kan også bruges alene.
+**Valgt byggeretning · 24. september 2026:** Genbrug Machinist som fundament for en færdigsamlet Arcitai-pakke. Installér, forbind repo/model, afprøv miljøet og send første issue til review. VPS er første driftsprofil; samme Linux-baserede pakke skal kunne køre lokalt. Archon er fravalgt.
 
-## Hvor afgrænser Warp sig?
+**Status:** Vi har metode, seks skills og en lokal prototype. Machinists nyere motor og GUI er [undersøgt og lokalt testet](machinist-review.md). Den samlede Arcitai-installation, isolerede agentjobs og rigtige model-/apppilot mangler stadig.
 
-Warp er et platformprodukt i Early Access med opsætning, koordinering, agentkørsler og målinger. [Oversigt](https://docs.warp.dev/factories/). Deres normale arbejdsflow ender i en PR med beviser til menneskelig handoff. Spec-godkendelse og spørgsmål er workflowpolitik; mergekrav håndhæves gennem repoets rettigheder og branchregler. [Sådan virker flowet](https://docs.warp.dev/factories/how-factories-work/).
+## Hvad samler platformen?
 
-**Vores slutning:** Den grænse gør det muligt at arbejde med apps, der deployes til eksempelvis Azure eller Vercel, uden at factoryen implementerer en separat hostingplatform. Det er en arkitektonisk slutning, ikke en påstand om, at vi har testet alle kombinationer hos Warp. Har opgaven brug for preview, private testservices eller deploymentværktøjer, kræver de stadig konkret adgang og konfiguration.
+| Arbejdsforløb | Fra behov til resultat |
+| --- | --- |
+| **Software** | Issue → vertical slices → tests og review → verificeret PR |
+| **Security** | Undersøgelse → valideret fund → rettelse og bevis |
+| **Defense og drift** | Signal/alarm → undersøgelse → forslag til indgreb eller en scoped softwareopgave → opfølgning |
 
-## Tre ting, der kan ligge forskellige steder
+Samme installation og dashboard; adgang, private beviser og tilladte handlinger følger arbejdsforløbet. Defense skal også kunne undersøge software bygget andetsteds. Et incident kan skyldes kode, drift eller sikkerhed. En HTTP 500-fejl er ikke i sig selv en sårbarhed. Første incidentprofil undersøger og foreslår; produktionsindgreb kræver eget mandat.
 
-| Del | Eksempel | Ansvar |
-| --- | --- | --- |
-| **Factory-platformen** | Egen maskine eller en lille server | Opsætning, jobstatus, routing, review, adgang, beviser og målinger |
-| **Agentens arbejdsmiljø** | Isoleret lokal worker, egen VM eller valgt cloudtjeneste | Checkout, agent/harness, filer, værktøjer, testdata og tests. Inference vælges særskilt |
-| **Kundens app** | Eksisterende Azure-, Vercel- eller anden installation | Produktion, appens data og eksisterende deployment-/rollbackpolitik |
+## Hvad følger med?
 
-Factory-platformen behøver ikke en GPU, når modellen kører andetsteds. En model på egen maskine kan være en profil. Agent-, model- og workerunderstøttelse skal afprøves for den konkrete kombination.
+| Del | Standard i den første udgivelse |
+| --- | --- |
+| Factory og GUI | Machinists kontrolplan, worker og eksisterende GUI; Arcitai samler opsætningen og workflowpakken |
+| Agentens computer | Separat jobcontainer på dedikeret vært; checkout, shell, filer, tests og browser ved behov |
+| Agent og model | Kvalificér Codex-adapteren først og derefter Pi på samme kontrakt. Modeladgang vælges separat |
+| Arbejdsflade | Opgaver, Review, Målinger og Opsætning; GitHub kan også bruges direkte |
+| Levering | Branch, PR og beviser; appens eksisterende CI/CD og hosting bevares |
+| Vedvarende drift | Start/stop, én aktiv worker, journal, recovery, opdatering og backup |
+| Defense | Valgfrie undersøgelses-/incidentforløb på samme platform, med særskilt adgang til følsomme beviser |
 
 ```mermaid
 flowchart LR
-  I[Issue eller manuel opgave] --> F[Selvhostet factory]
-  F --> W[Valgt agentmiljø]
-  W --> P[Ændring, checks og PR]
-  P --> H[Review og mergepolitik]
-  H --> C[Appens eksisterende CI/CD]
-  C --> A[Azure / Vercel / anden host]
-  P --> F
+  G[GitHub issue] --> F[Factory og GUI]
+  F --> W[Isoleret agentjob]
+  W --> M[Valgt model]
+  W --> V[Tests og separat review]
+  V --> P[PR og beviser]
+  P --> G
+  P --> C[Appens CI/CD og hosting]
+  D[Defense-sag] --> F
 ```
 
-## Hvad skal ind i appen?
+Machinist skal eje kørsler, forsøg og stop; vores gamle Node-journal må ikke også starte jobs. GitHub ejer issues, PR’er og branchregler. Agentjob afskærmes fra controllerdisk, Docker-socket, private evaluatorressourcer og admin-/deploynøgler. Denne isolation er et integrationskrav; Machinists standardexecutor giver den ikke alene.
 
-| Factoryen håndterer | Projektet angiver eller beholder |
+## Hvor kører den?
+
+| Placering | Betydning |
 | --- | --- |
-| Tilslut repo og læs issues/PR-status | Repo, branch og afgrænset Git-adgang |
-| Start, følg og stop agentjob | Afprøvet workerprofil, agent/model og tilladte værktøjer |
-| Reproducerbar opgave og verificering | Setup-/testkommandoer, testservices og forventede checks |
-| Security og separat review | Risikokriterier, privat fundkanal og relevante specialister |
-| Vis review, PR og eventuelle previewlinks | Eksisterende CI/CD, preview, merge og deploymentregler |
-| Registrér tid, forsøg og kendt forbrug | Tilgængelige målekilder; ukendte tal forbliver ukendte |
+| **Linux-VPS — standard** | Fortsætter, når din laptop er lukket. Dedikeret vært, persistent disk og ét projekt først |
+| **Mac eller ROG Flow** | Samme pakke i et egnet Linux-miljø. Mac kræver VM/container-runtime; Windows kan bruge WSL2. Jobs afhænger af, at maskinen er vågen |
+| **Cloudflare — senere profil** | Sandbox kan levere Linux-jobmiljøet, men kræver betalt plan/forbrug og tilpasning af storage; det er ingen gratis VPS |
 
-Den første version behøver derfor ingen “vælg Azure/Vercel”-opsætning. Den kan læse checkstatus og links fra repoet. En agent må ændre deploymentkode som en almindelig reviewbar opgave; udførelsen i produktion følger stadig appens politik. Hvis hosting allerede bygger en preview ved PR eller deployer efter merge, bruges den integration.
+En VPS behøver ingen GPU, når modellen kører andetsteds. Lokale modeller er et separat tilvalg, der skal afprøves på maskinen. Gratis Oracle-VM kan være en pilotmulighed med kapacitets-/driftsforbehold. [Priser og kildegrundlag](foundation-review.md#drift-og-pris).
 
-## Sådan bør opsætningen opleves
+## Så enkelt skal opsætningen være
 
-**Start platformen → tilslut repo → vælg worker → kontrollér setup → send første opgave.**
+**Start pakken → forbind repo/model → afprøv miljø → send første issue.**
 
-Målet er en dokumenteret start med eksempelvis Docker Compose på egen maskine/server og en browserguide. Der findes endnu ingen sådan Compose-pakke eller wizard i repoet. Guiden skal kunne foreslå opsætning fra repoet, vise manglende adgang og afprøve checkkommandoerne. En manuel mulighed for usædvanlige stacks skal være tilgængelig. Secrets gemmes adskilt fra appens kode og agentens skriveområde.
+Opsætningen finder projektets eksisterende instruktioner og checkkommandoer, foreslår standarder, gemmer credentials privat og afprøver adgangen. Manglende forudsætninger vises konkret. Brugeren skal ikke selv sammenkoble scripts og databaser.
 
-Provideruafhængighed opnås gennem få konkrete adaptere med samme krav til start, status, stop og aflevering. Ét abonnement bliver ikke automatisk en cloud-API, og adgang til en model beviser ikke browser- eller sandboxfunktioner. Start med én afprøvet profil og test udskifteligheden med en anden bagefter.
+Dashboardets vigtigste spørgsmål er: **Hvad kører? Hvad kræver mig? Hvad blev leveret? Hvad kostede det?** Genbrug Machinists flade først; tilføj Arcitai-felter og enkel opsætning, hvor piloten viser behov. Appens formål og brugerrejser kommer fra dens eksisterende brief/tests. Designretningen er et forslag, ikke et krav om at omskrive upstream-UI’en.
 
-## Byg i tre vertical slices
+**Risiko er relativ:** vurder ændringens konsekvens i den konkrete app, eksponering, recovery og usikkerhed. Det styrer checks og specialistreview. Lille diff eller soloprojekt betyder ikke automatisk lav risiko. [Den konkrete regel og videonoter](relative-risk.md).
 
-1. **Repo → fungerende testmiljø.** Brugeren tilslutter ét repo, vælger den første workerprofil og får et rigtigt checkout med bestået setup/check. Konfiguration gemmes, manglende adgang vises, og eksisterende appfiler bevares. Start med én operatør og privat/lokal adgang; offentlig fjernadgang kræver autentificering.
-2. **Én opgave → verificeret PR.** Manuel start gennem hele vejen: scope, isoleret worker, ændring, tests, security-vurdering, separat review og PR. Vis status, beviser, pris/tid hvor kendt og et faktisk fungerende stop. En rigtig Kastanje-opgave er pilot; syntetiske prøver er supplerende bevis.
-3. **Issue-trigger → samme leveringsvej.** Tilføj én trigger, deduplikering og genoptagelse efter afbrydelse. Ukendt workerstatus må ikke skabe en ekstra writer. Tilknyt checks til den faktiske PR-revision, og afprøv budget-/stopgrænser før ubemandet betalt brug. GitHub og dashboardet viser samme job og resultat.
+## Byg og bevis i tre vertical slices
 
-Hver slice gennemføres og afprøves, før næste udvides. Den nuværende Node/SQLite-starter giver UI, journal, scopes og lokale adaptere; GitHub-adgangen er primært læsning. Wizard, sikker skriveadgang, automatisk PR-aflevering, fjernworkerprotokol og komplet recovery er reelt arbejde, der stadig mangler. [Aktuel arkitektur](architecture.md).
+1. **Repo → fungerende miljø i GUI.** Pak Machinist med vores workflow og isolerede jobmiljø. Kør én rigtig bruger-/API-prøve: baseline består, en relevant bevidst fejl opdages, manglende checks/forkert revision bliver ikke grønne. Prøv stop, mistet worker og restart uden to writers.
+2. **Manuel issue → verificeret PR.** Agenten bygger ændringen, særskilt review kontrollerer revisionen, og den betroede leveringsdel åbner PR. Registrér tid, forbrug og menneskelig indsats. Afprøv Pi som alternativ før løftet om udskiftelighed.
+3. **Issue → samme vej uden åben laptop.** Forbind GitHub-polling til workflowet med deduplikering og gemt budget/recovery. Machinists nuværende triggers starter commands; workflowkoblingen skal bygges. Automatisk start kommer efter den observerede første opgave. Merge/deploy følger appens politik.
 
-**Vigtig forskel til Warp:** vores mål er, at også koordinering og journal kan drives selvstændigt. Warps selvhosting flytter udførelsen, mens Warp fortsat driver koordinering og lagrer run-data. [Deres infrastrukturgrænse](https://docs.warp.dev/factories/infrastructure-and-security/).
+**Næste selvstændige slice:** ét driftsignal → read-only undersøgelse → privat sag med beviser → forslag eller softwareissue → opfølgning på release. Brug samme motor. Google Cloud-demonstrationen er inspiration, ikke en færdig Machinist-connector.
 
-Løbende produktionsovervågning og incidentarbejde tilhører den separate [Defense Factory](adoption.md#produktnavn-og-grænsen-til-defense-factory), som kan aflevere fund til rettelse her.
+**Udgivelsen er klar**, når en ren Linux-VM og et lokalt Linux-miljø kan gennemføre den vej uden manuel sammenkobling. En Docker-indpakket demoside er ikke nok. GUI-adgang starter privat; bekvem fjernadgang med login skal kvalificeres særskilt. Den portable metodepakke kan fortsat bruges alene.
+
+Fabro, Mastra, Cole og Trycycle er [inspiration](foundation-review.md). [Machinist-gennemgangen](machinist-review.md) beskriver de konkrete integrationshuller. Den eksisterende starter bevares indtil erstatningen er bevist; to platforme skal ikke vedligeholdes permanent.

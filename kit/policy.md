@@ -27,6 +27,8 @@ Ved Actions: mindst mulige permissions, gennemgåede action-versioner fastlåst 
 
 ## Hvornår kommer security ind?
 
+**Risiko er relativ til ændringen og systemet.** Vurder konsekvens, eksponering, mulighed for at opdage/gendanne og usikkerhed. Et soloprojekt eller en lille diff er ikke automatisk lav risiko. Brug installationsarkets kontekst, vurder først ved triage og igen på den faktiske diff. Ukendt risiko kræver afklaring; den bliver ikke lav som standard. Nye commits eller ændrede forudsætninger kræver relevant ny kontrol. Vurderingen bestemmer bevis og reviewomfang, men tildeler ikke merge-/deployrettigheder.
+
 | Udløser | Krævet håndtering |
 | --- | --- |
 | Appen tilsluttes | Beskriv data, adgang, dependencies og vigtigste tillidsgrænser. Vælg relevante basiskontroller og privat fundkanal |
@@ -39,7 +41,7 @@ Codex Security kan levere specialistarbejdet, hvor det er tilgængeligt. Andre a
 
 ## Samarbejde med Defense Factory
 
-**Defense Factory** er en separat løsning til løbende overvågning, logs, incidents og dependency-/advisory-opfølgning på systemer i drift, også software bygget uden denne pakke. Den er ikke en forudsætning for adoption. Et fund overdrages som en afgrænset opgave med system/revision, konsekvens, bevis og acceptkriterier. Denne factory verificerer rettelsen og afleverer PR/beviser; release følger appens politik, og drift/Defense kontrollerer effekten. Følsomme detaljer bliver i den private fundkanal. Security-arbejde her omfatter også rettelser efter release.
+**Defense** kan dele factoryens installation og dashboard som et valgfrit arbejdsforløb med egne rettigheder. Det ejer løbende undersøgelser og opfølgning; en driftsprofil behandler logs, incidents og dependency-/advisory-signaler, også fra software bygget uden denne pakke. Et fund bliver en afgrænset softwareopgave med system/revision, konsekvens, bevis og acceptkriterier. Softwareforløbet verificerer rettelsen og afleverer PR/beviser; release følger appens politik, og drift/Defense kontrollerer effekten. Følsomme detaljer bliver i den private fundkanal. Fælles dashboard giver ikke ekstra produktionsadgang. Security-arbejde her omfatter også rettelser efter release.
 
 ## Dokumenteret værdi
 

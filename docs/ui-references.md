@@ -1,10 +1,10 @@
 # Fabro, Mastra og Cole: hvad bruger vi inspirationen til?
 
-Undersøgt **24. september 2026**. Kode og dokumentation er læst; Fabros to repository-skærmbilleder er visuelt gennemgået. Ingen af systemerne er installeret eller afprøvet med vores agent/model. Visuel inspiration er ikke bevis på driftskvalitet.
+Undersøgt **24. september 2026**. **Senere præcisering samme dag:** [standardretningen](platform.md) genbruger nu Machinist på VPS/lokalt; se [den nyere undersøgelse](machinist-review.md). Fabros serverguide er mærket private early access; eksterne agenter bruger ACP. Coles separate skills-repo har også en Archon-fri runner. Se den samlede [fundamentgennemgang](foundation-review.md), før tabellens tidligere kandidater vælges. Kode og dokumentation er læst; Fabros to repository-skærmbilleder er visuelt gennemgået. Ingen af systemerne er installeret eller afprøvet med vores agent/model. Visuel inspiration er ikke bevis på driftskvalitet.
 
 | Kilde | Det relevante | Vores anvendelse |
 | --- | --- | --- |
-| **Fabro** | Selvhostbar server, opsætning og web-UI til workflows og runs | Stærkeste kandidat her til både UI-inspiration og en praktisk prøve som motor. Sammenlign før vi bygger de samme funktioner selv |
+| **Fabro** | Selvhostbar server, opsætning og web-UI til workflows og runs | UI-inspiration; den nyere Machinist-vurdering styrer motorvalget |
 | **Mastra Studio** | Arbejdsflade til agenter/workflows, separate oversigter for metrics, traces og logs samt evaluering | Brug adskillelsen mellem dagligt overblik og teknisk fejlsøgning. Indfør ikke hele frameworket alene for at få dashboardet |
 | **Cole Medins factory** | Agentstyret installation, projektets mission, brugerrejser, uafhængig verifikation og en konkret VPS-guide | Brug opsætnings- og driftsmønstrene. **Archon er fravalgt**; hans komplette factory kræver den motor og kan derfor ikke overtages uændret |
 
@@ -38,4 +38,4 @@ Læst ved [`e167ddc`](https://github.com/coleam00/ai-software-factory/tree/e167d
 
 Fabros rodlicens er [MIT](https://github.com/fabro-sh/fabro/blob/a2b39a2408d2f35b8882099728217254c24f0c7a/LICENSE.md). Mastras [licensfil](https://github.com/mastra-ai/mastra/blob/4cb2f12d05b0de71a22127a76a16c1732bb674ec/LICENSE.md) skelner mellem Apache-2.0-indhold, tredjepartsdele og `ee/` med særskilt licens. Der blev ikke fundet en rodlicens i Coles undersøgte træ. Der er ikke kopieret kildekode eller assets ind i Arcitai-produktet.
 
-Anbefalingen er [kit + én afprøvet driftsprofil](product-experience.md). Afprøv Fabro som kandidat til genbrug før et nyt platformbyggeri. Et bestemt runtime-valg må ikke gøre de portable skills, projektets acceptkriterier eller beviser afhængige af den motor.
+Retningen er [én samlet VPS-/lokalpakke](platform.md) på Machinist, med dens GUI som første arbejdsflade. Fabro og Mastra leverer fortsat UI-inspiration. Et bestemt runtime-valg må ikke gøre de portable skills, projektets acceptkriterier eller beviser afhængige af den motor.

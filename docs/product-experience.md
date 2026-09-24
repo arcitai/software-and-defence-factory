@@ -1,11 +1,11 @@
 # Produktet skal være let at tage i brug
 
-**Anbefaling, 24. september 2026:** Gør Arcitai til et installérbart, åbent factory-kit med én afprøvet standardopsætning. Metode og diagram forklarer arbejdet; opsætningen skal føre til en rigtig opgave og reviewbare beviser. En selvhostbar platform er mulig, men genbrug af en eksisterende motor og UI bør afprøves før en ny platform bygges.
+**Præciseret retning, 24. september 2026:** En færdigsamlet, installérbar factory med fungerende standardvalg, VPS som første driftsprofil og samme pakke til en lokal maskine. Brugeren forbinder repo/modeladgang; opsætningen udfører og verificerer det gentagne arbejde. Metodekittet er fundament og kan også bruges separat. Genbrug Machinist som motor og GUI, og saml software, security og valgfrie Defense-forløb i samme installation. Afprøv isolerede agentjobs og onboarding før udgivelse. Den korte [byggeretning](platform.md) er gældende; [Cole/Shapiro- og driftsgennemgangen](foundation-review.md) begrunder valgene. Den aktuelle [Machinist-gennemgang](machinist-review.md) beskriver valget og integrationshullerne. Fabro er UI-inspiration.
 
 | Produktform | Fordel | Vurdering nu |
 | --- | --- | --- |
 | Metode, diagram og anbefalinger | Let at forstå, dele og bruge på tværs af værktøjer | Godt grundlag; brugeren har stadig opsætningsarbejde |
-| **Installérbart kit + afprøvet driftsprofil** | Et konkret setup med kendte begrænsninger; metode og valg forbliver portable | **Anbefalet første produkt** |
+| **Færdigsamlet factory + afprøvet driftsprofil** | Installation og første opgave uden manuel sammenkobling; tilpasninger bagefter | **Valgt produktmål; endnu ikke en færdig udgivelse** |
 | Egen komplet platform | Samlet onboarding, jobstyring og UI | Mulig senere; kræver vedligehold af login, opdateringer, isolation, recovery og integrationer |
 
 En anbefalet standard er et dokumenteret, afprøvet valg for én målgruppe. Den gør ikke samme provider obligatorisk for alle installationer. **Archon er eksplicit fravalgt.** Cole Medins opskrift kan inspirere opsætning og VPS-drift; hans runtime installeres ikke som del af vores produkt.
@@ -35,11 +35,8 @@ Vores nuværende eksport er sikker staging i en ny mappe, men kræver stadig age
 
 ## Næste konkrete skridt for Arcitai
 
-1. **Afprøv en motor før vi bygger mere platform.** Fabro er en relevant kandidat, fordi det har selvhosting, opsætning og UI. Sammenhold den med vores eksisterende lokale runner på én afgrænset vej: repo → agent → tests → review/PR, inklusive stop, recovery, adgang og faktisk forbrug. Ingen ny permanent afhængighed før dette virker. [Kilder og vurdering](ui-references.md).
-2. **Tilslut Kastanje som pilot** med en konkret valgt agent og ét fungerende miljø. Første start er manuel. Gennemfør én vertical slice fra en rigtig issue, inklusive security-vurdering, særskilt review og pris/tid, hvor data findes.
-3. **Pak den afprøvede vej**, så næste installation har én kort guide og agentstyret eller guided opsætning. Tilbyd VPS som en valgfri driftsprofil. Bevar appens eksisterende deployment.
-4. **Automatisér én issue-indgang**, når den manuelle vej virker. Tilføj kun eget UI dér, hvor GitHub og den valgte motors UI efterlader et dokumenteret behov.
+Følg de tre gennemgående slices i [byggeretningen](platform.md): fungerende appmiljø og GUI, én rigtig ændring til PR og dernæst vedvarende issue-start. Genbrug Machinists kerne og flade; hver ny funktion skal bevise en del af den faktiske leveringsvej. Den eksisterende Node-prototype bevares indtil erstatningen er afprøvet. Kastanje er den foreslåede apppilot.
 
-En egen platform bliver relevant, hvis de afprøvede alternativer ikke kan levere nødvendige åbne worker-/modelvalg, privat datavej, review eller enkel opsætning, og en lille egen løsning kræver mindre vedligehold. Udvid efter dokumenteret behov; [platformforslaget](platform.md) viser den mulige grænse og de nødvendige slices.
+Fabros selvhosting ser relevant ud, men den aktuelle serverguide er mærket private early access, og eksterne agenter kræver en kvalificeret ACP-integration. Derfor vælges Machinist nu som fundament, mens Fabro forbliver inspiration. [Kilder og afvejning](foundation-review.md#gui-isolation-og-fravalg).
 
-Dette er en anbefaling. Ingen Fabro-/Mastra-/Archon-installation, VPS-oprettelse, modelpilot eller betalt drift er udført med researchen.
+Docker-pakken, onboarding-wizarden og den komplette automatiske pipeline er endnu ikke implementeret. Ingen Fabro-/Mastra-/Archon-installation, VPS-oprettelse, modelpilot eller betalt drift er udført med researchen.

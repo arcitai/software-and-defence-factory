@@ -46,7 +46,7 @@ For UI: vis handlingen og resultatet. For performance: samme data/workload, enhe
 - Faktisk kommando/check-identitet, start/slut, exitkode og logreference:
 - Reviewer/proces, vurderet head-SHA og vurderet artifact:
 - Kodevalg vurderet: ansvar, afhængigheder, kontrakter, fejlhåndtering og væsentlige designafvigelser:
-- Risiko og begrundelse; evt. nødvendig specialist:
+- Risiko i denne app: konsekvens, eksponering, opdagelse/recovery og usikkerhed; begrundelse, nødvendig specialist og krævede beviser på den vurderede revision:
 - Konkrete findings, reparationer og efterkontrol:
 - Hvis scorer anvendes: rubric-version, judge/model, materiale-hash, klassifikation og begrundelse; separat menneskelig vurdering og uenigheder:
 - Uafklarede forhold og anbefaling: klar til accept / ændringer / uafklaret:

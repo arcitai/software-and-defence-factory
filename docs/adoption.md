@@ -1,21 +1,21 @@
-# Én metodepakke, flere måder at køre den på
+# Én factory med en portabel metode
 
-**Gældende retning, 24. september 2026:** Arcitai Software and Security Factory skal først være et repository med det, der kan genbruges på tværs af apps og agenter. Det enkelte app-repo får en lille, versioneret pakke. Appens kode bliver, hvor den er. Et bestemt abonnement, Pi/Daytona, en egen server eller vores dashboard er ikke produktkrav.
+**Gældende retning, 24. september 2026:** En færdigsamlet factory på Machinist med samme installation/dashboard til software, security og valgfrie Defense-forløb. Den portable metodepakke kan fortsat bruges alene i et eksisterende app-repo. Appens kode, CI og hosting bliver, hvor de er; agent og model vælges pr. installation.
 
-**Videre produktforslag:** En [selvhostbar platform](platform.md) kan gøre tilslutning og agentdrift lettere. [Anbefalingen](product-experience.md) er først at kvalificere ét nemt setup og genbruge en egnet eksisterende motor/UI, før vi bygger en ny platform. Den bygger oven på den portable metode; appens hosting og deployment forbliver selvstændige valg. Den eksisterende pakke kan fortsat bruges uden platformen.
+**Byggeretning:** Genbrug [Machinists motor og GUI](machinist-review.md); kvalificér én VPS-/lokalprofil i [gennemgående slices](platform.md). Den færdige Arcitai-pakke er endnu ikke udgivet. Dokumentationen nedenfor beskriver især den eksisterende metodepakke.
 
 ## Produktnavn og grænsen til Defense Factory
 
 Det fulde navn er **Arcitai Software and Security Factory**. “Factoryen” og “factory-pakken” er korte henvisninger til samme produkt. Security er indbygget i udviklingen og et særskilt arbejdsspor, når en opgave kræver specialistarbejde.
 
-| Produkt | Ansvar |
+| Arbejdsområde | Ansvar |
 | --- | --- |
 | **Software and Security Factory** — dette repo | Afklare, designe, bygge og rette software i vertical slices; teste, reviewe og verificere security før levering og ved senere ændringer |
-| **Defense Factory** — separat løsning | Løbende overvågning, logs, incidents, dependencies/advisories og opfølgning på systemer i drift; også software, der er bygget uden vores factory |
+| **Defense** — valgfrit forløb på samme platform | Løbende sikkerhedsundersøgelse og opfølgning; en driftsprofil kan behandle logs, incidents og dependencies/advisories. Også software bygget uden vores factory |
 
 **Samarbejde:** Defense registrerer et fund → afleverer en afgrænset issue med berørt system/revision, konsekvens, bevis og acceptkriterier → denne factory leverer en verificeret rettelse/PR → release følger appens politik → Defense efterprøver effekten i drift. Følsomme beviser bliver i den aftalte private kanal. Et fund giver ikke i sig selv ret til produktionsændringer.
 
-Dette er en ansvarsdeling, ikke en tidsgrænse for security: denne factory kan også rette fejl og sårbarheder efter release. Appens releasechecks, smoke tests og kvalitetsmålinger bliver her; en løbende overvågningstjeneste hører til Defense. Ingen af produkterne kræver installation af det andet. Overdragelsen kan begynde som en almindelig issue; der er ingen ny automatisk integration implementeret med navneændringen.
+Dette er en ansvarsdeling, ikke en tidsgrænse for security eller et krav om to installationer. Softwareforløbet kan også rette fejl efter release. Defense får egne datakilder, følsomme beviser og handlingsrettigheder. En alarm kan blive en almindelig issue; en fælles flade giver ikke automatisk produktionsadgang. Ingen ny sensor-/incidentintegration er implementeret med denne retning.
 
 ## Hvad kan vi definere?
 

@@ -77,69 +77,61 @@
 <main>
   <header>
     <div class="meta"><span class="brand">ARCITAI / SOFTWARE AND SECURITY FACTORY</span><span>Til Gustav · 3 minutters review · 24. september 2026</span></div>
-    <h1>En factory til dine eksisterende apps.</h1>
-    <p class="note"><strong>Ny research:</strong> <a href="defence-review.html">Defence Factory og ansvarsdelingen</a> — et selvstændigt sikkerhedsforløb med tilsluttet drift.</p>
-    <p class="intro">En fælles metodepakke, som kan lægges ind i appens repo. Du vælger agent, model og driftsmiljø. Appens arkitektur og deployment bevares.</p>
+    <h1>Én factory. Ét dashboard.</h1>
+    <p class="intro">En færdigsamlet pakke på Machinist til software, security og Defense. Kør den på en VPS eller egen maskine, og behold dit repo, din agent, model og apphosting.</p>
   </header>
 
-  <aside class="recommendation" aria-label="Produktets retning">
-    <strong>GitHub kan være hele kontrolpanelet.</strong>
-    Opret issues, følg checks og læs PR’er. Skills beskriver arbejdet; den valgte integration starter agenten. Egen runner, cloud-sandbox og vores dashboard er tilvalg.
+  <aside class="recommendation" aria-label="Den valgte retning">
+    <strong>Genbrug Machinist. Saml Arcitai-arbejdsgangene ovenpå.</strong>
+    Start pakken → forbind repo og model → afprøv miljøet → send første issue. Standardvalg følger med; tilpasning er mulig. Den samlede pakke skal stadig bygges.
   </aside>
 
-  <section aria-labelledby="boundary-title">
-    <h2 id="boundary-title">To tydelige ansvarsområder</h2>
-    <div class="scope">
-      <article><h3>Software and Security Factory</h3><p>Dette repo: byg og ret software i vertical slices med tests, review og security indbygget. Også rettelser efter release.</p></article>
-      <article><h3>Defense Factory</h3><p>Separat løsning: overvågning, logs, incidents og dependencies i drift. Kan også bruges til software bygget andre steder.</p></article>
+  <section aria-labelledby="workflows-title">
+    <h2 id="workflows-title">Tre arbejdsforløb på samme platform</h2>
+    <div class="status">
+      <article class="card"><h3>Software</h3><p>Issue → vertical slices → tests og review → verificeret PR. Én lille adfærd fra ende til ende, før næste udvidelse.</p></article>
+      <article class="card"><h3>Security</h3><p>Undersøgelse → valideret fund → rettelse og bevis. Specialist og kontroller vælges efter ændringens risiko.</p></article>
+      <article class="card"><h3>Defense og drift</h3><p>Alarm → diagnose → forslag eller ny softwareopgave → opfølgning. Kan også dække software bygget andetsteds.</p></article>
     </div>
-    <p class="note">Fund fra Defense → afgrænset issue → verificeret rettelse/PR her → release efter appens politik → opfølgning i drift. <a href="adoption.md#produktnavn-og-grænsen-til-defense-factory">Ansvar og overdragelse</a>.</p>
+    <p class="note">Fælles jobstyring, historik og målinger. Egne rettigheder og private beviser pr. forløb. Første incidentprofil undersøger og foreslår; en 500-fejl er ikke automatisk et sikkerhedsproblem.</p>
   </section>
 
   <section aria-labelledby="stack-title">
-    <h2 id="stack-title">Hvad definerer vi — og hvad vælger appen?</h2>
+    <h2 id="stack-title">Hvad bruger vi til hvad?</h2>
     <table>
-      <caption>Samme krav til kvalitet og beviser på tværs af installationer</caption>
-      <thead><tr><th scope="col">Fælles i pakken</th><th scope="col">Udfyldes pr. app</th></tr></thead>
+      <caption>Valgt byggeretning — ikke en allerede færdig installation</caption>
+      <thead><tr><th scope="col">Del</th><th scope="col">Valg og ansvar</th></tr></thead>
       <tbody>
-        <tr><th scope="row">Skills og instruktion</th><td>Codex, Cursor, Pi eller anden agent. Kontrollér, at instruktioner og nødvendige værktøjer faktisk virker.</td></tr>
-        <tr><th scope="row">Vertical slices</th><td>Appens arkitektur og checks. Byg én lille adfærd fra ende til ende, afprøv og udvid.</td></tr>
-        <tr><th scope="row">CI/CD-principper</th><td>Eksisterende tests, build, hosting og releasepolitik. Ingen fast cloududbyder.</td></tr>
-        <tr><th scope="row">Security og review</th><td>Kontroller efter risiko; Codex Security eller anden egnet specialist. Ingen obligatorisk fuld scan på hver lille ændring.</td></tr>
-        <tr><th scope="row">Job og beviser</th><td>Manuel start, managed automation eller egen runner. Én ejer af jobstart; kendt revision, stop og recovery.</td></tr>
-        <tr><th scope="row">Værdi og måling</th><td>Kvalitet, samlet pris, al mennesketid, gennemløbstid og fejl efter accept. Ukendt er ikke nul.</td></tr>
+        <tr><th scope="row">Motor og dashboard</th><td>Machinist: kø, workflows, worker, godkendelser og historik. Genbrug GUI’en først.</td></tr>
+        <tr><th scope="row">Arbejdsgange</th><td>Arcitais seks skills, projektkontekst, reviewregler og beviser. Risiko vurderes i den konkrete app.</td></tr>
+        <tr><th scope="row">Agent og model</th><td>Codex først, Pi som næste portabilitetsprøve. Andre harnesses via kvalificerede executors; inference vælges separat.</td></tr>
+        <tr><th scope="row">Agentens computer</th><td>Isolerede jobs på dedikeret Linux-VPS eller lokalt Linux-miljø. Browser ved behov; ingen GPU nødvendig med ekstern inference.</td></tr>
+        <tr><th scope="row">GitHub og Actions</th><td>Issues, PR’er og almindelig CI/CD. Langvarigt agentarbejde kører på worker; appens eksisterende deployment bevares.</td></tr>
+        <tr><th scope="row">Dokumenteret værdi</th><td>Kvalitet, samlet pris, mennesketid, gennemløbstid og fejl efter accept. Vis manglende data; tokens er ikke det samme som pris.</td></tr>
       </tbody>
     </table>
+    <p class="note">VPS’en fortsætter, når laptoppen lukkes. Lokal drift kræver en vågen maskine. Cloudflare Sandbox er et muligt senere tilvalg med betaling; ingen obligatorisk platformsubscription eller Archon.</p>
   </section>
 
-  <section aria-labelledby="actions-title">
-    <h2 id="actions-title">Actions gør det velkendte</h2>
-    <div class="status">
-      <article class="card"><h3>Tests og CI</h3><p>TDD i udviklingen; CI genkører rigtige tests, build og relevante hurtige sikkerhedschecks før integration.</p></article>
-      <article class="card"><h3>Deployment</h3><p>Brug appens eksisterende CD eller hostingintegration, med dens rettigheder, miljøer og rollback.</p></article>
-      <article class="card"><h3>Agentarbejde</h3><p>Kører i det valgte agentmiljø. Lange jobs behøver ikke optage en GitHub-hosted runner, mens vi venter.</p></article>
-    </div>
-    <p class="note"><strong>Lavprisvalg:</strong> egne Actions-runners bruger ikke hosted-minutpuljen efter de aktuelle regler. En egnet lokal model kan også fjerne API-regningen. Maskinen skal være tændt; strøm, drift, lager og apphosting tæller stadig. <a href="low-cost.md">Runnerregler og Codex Security i CI</a>.</p>
-  </section>
-
-  <section aria-labelledby="profiles-title">
-    <h2 id="profiles-title">Samme pakke, forskellige installationer</h2>
-    <div class="roadmap">
-      <p><b>Mac + cloudabonnement</b>Brug udbyderens agentmiljø og integration. GitHub er arbejdsfladen. Ingen egen controller, hvis tjenesten dækker behovet.</p>
-      <p><b>Z13 + lokal model</b>Agent og eventuelt CI kører på din egen tændte maskine. Afprøv model, værktøjer og afgrænset arbejdsmiljø.</p>
-      <p><b>Egen sky</b>Valgt agent på egen VM eller sandbox. Cloudroom er inspiration til drift; ingen bestemt runtime er produktkrav.</p>
-    </div>
+  <section aria-labelledby="risk-title">
+    <h2 id="risk-title">Risiko er relativ — og skal kunne forklares</h2>
+    <p>Hvad kan gå galt, hvem rammes, og kan vi opdage og gendanne det? Det afgør tests, specialistreview og releasekrav. En lille ændring i adgangskontrol kan kræve mere end en stor tekstrettelse. Ukendt risiko bliver ikke automatisk lav.</p>
+    <p class="note">En score eller lavrisikolabel giver ikke i sig selv lov til merge, deploy eller rollback. <a href="relative-risk.md">Videoens tidskoder, originalartiklen og vores regel</a>.</p>
   </section>
 
   <section aria-labelledby="build-title">
-    <h2 id="build-title">Hvad ligger klar nu?</h2>
-    <p><strong>Eksportérbar pakke:</strong> seks skills, fælles regler, installationsark, aflevering/målinger, issue-form og inaktivt CI-eksempel. Eksporten overskriver ikke appens filer. Den lokale runner og dashboardet er bevaret som tilvalg.</p>
-    <p class="note"><strong>Næste prøve:</strong> tilslut én eksisterende app med dens valgte agent og CI → gennemfør én lille vertical slice → review faktiske beviser. Automatisér derefter et konkret gentaget trin. Ingen provider er forhåndsvalgt.</p>
+    <h2 id="build-title">Byg og bevis i vertical slices</h2>
+    <div class="roadmap">
+      <p><b>1. Repo → fungerende miljø</b>Vis et rigtigt appcheck i Machinist. Afprøv isolation, relevant testfejl, stop og genstart.</p>
+      <p><b>2. Issue → verificeret PR</b>Kør én reel ændring med separat review, korrekt revision og målte resultater.</p>
+      <p><b>3. Drift uden åben laptop</b>Forbind issue-polling til workflowet. Afprøv dubletter, mistet worker og vedvarende budget.</p>
+    </div>
+    <p class="note"><strong>Derefter:</strong> ét driftsignal → read-only incidentundersøgelse → privat sag → forslag eller softwareissue. Samme motor og dashboard.</p>
   </section>
 
   <footer>
-    <p><strong>Status:</strong> pakken er bygget og eksporten afprøvet. Rigtig kunde-/modelpilot, runnerregistrering og cloudautomation er endnu ikke udført.</p>
-    <p><a href="adoption.md">Produkt og opsætning</a> · <a href="../kit/README.md">Den konkrete pakke</a> · <a href="../kit/policy.md">CI/CD og security-regler</a> · <a href="low-cost.md">Lavprisprofil</a> · <a href="proof.md">Afprøvninger</a>. Siden virker offline uden JavaScript.</p>
+    <p><strong>Status:</strong> metodekit og prototype findes. Machinist er bygget og testet lokalt med syntetiske processer. Arcitai-installation, rigtig model-/apppilot og incidentconnector er endnu ikke færdige. Owains Google Cloud-demo er separat kode, ikke en indbygget Machinist-connector.</p>
+    <p><a href="platform.md">Byggeretning</a> · <a href="machinist-review.md">Machinist og integrationshuller</a> · <a href="relative-risk.md">Video og risiko</a> · <a href="foundation-review.md">Kilder og drift</a> · <a href="proof.md">Afprøvninger</a>. Siden virker offline uden JavaScript.</p>
   </footer>
 </main>
 </body>
