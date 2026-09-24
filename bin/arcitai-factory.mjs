@@ -54,7 +54,8 @@ async function install() {
     writeFileSync(archivePath,archive,{mode:0o600});mkdirSync(source,{recursive:true});mkdirSync(join(state,'bin'),{recursive:true});
     run('tar',['-xzf',archivePath,'--strip-components=1','-C',source]);
     console.log(`Building pinned Machinist ${PINS.machinist.slice(0,12)}…`);
-    await stream('docker',['run','--rm','--mount',`type=bind,source=${source},target=/src,readonly`,'--mount',`type=bind,source=${join(state,'bin')},target=/out`,'-w','/src','-e',`GOOS=${process.platform}`,'-e',`GOARCH=${process.arch==='x64'?'amd64':'arm64'}`,'-e','CGO_ENABLED=0',PINS.goImage,'go','build','-trimpath','-o','/out/machinist','./cmd/machinist']);
+    // Preserve operator ownership on Linux bind mounts; compiler caches stay disposable.
+    await stream('docker',['run','--rm','--user',`${process.getuid()}:${process.getgid()}`,'--mount',`type=bind,source=${source},target=/src,readonly`,'--mount',`type=bind,source=${join(state,'bin')},target=/out`,'-w','/src','-e','HOME=/tmp','-e','GOCACHE=/tmp/go-cache','-e','GOMODCACHE=/tmp/go-modules','-e',`GOOS=${process.platform}`,'-e',`GOARCH=${process.arch==='x64'?'amd64':'arm64'}`,'-e','CGO_ENABLED=0',PINS.goImage,'go','build','-trimpath','-o','/out/machinist','./cmd/machinist']);
     chmodSync(binary,0o755);save(receipt,{pin:PINS.machinist,archiveSha256:PINS.archiveSha256,sha256:digest(readFileSync(binary)),platform:process.platform,arch:process.arch});
   }
   await stream('docker',['build','-t',PINS.jobImage,join(ROOT,'factory/image')]);

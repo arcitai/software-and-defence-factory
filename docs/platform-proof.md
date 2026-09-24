@@ -7,6 +7,9 @@
 | Bevis | Resultat |
 | --- | --- |
 | Ren privat demo-state, uden global Machinist/Go | CLI hentede checksum-verificeret source, byggede Machinist og jobimage, startede server/worker og indsendte opgave |
+| Frisk klon fra GitHub | Den publicerede pakke installerede selv og gennemførte softwareforløbet til godkendt handoff; ingen filer fra den oprindelige arbejdsmappe var nødvendige |
+| Builderens filrettigheder | Go-builder kørt som operatørens UID/GID med midlertidige caches; en ny installation byggede en operatørejet binær og gennemførte demoen. Undgår root-ejede bind-mount-filer på Linux |
+| GitHub CI | Den publicerede pakke bestod npm-installation og alle 38 checks/tests på Ubuntu; CI kører ingen agent/modeljobs |
 | `npm run check` | 38 tests samt JavaScript-/JSON-kontrol bestået |
 | `npm run probe:platform` | Docker/Machinist-integration: normal aflevering, ændret kandidat, ændret checkpolitik, fejlet test + retry, cancel, deadline, incident-dedup og stop/restart |
 | Softwarebevis | En rigtig Git-ændring fra broken til fixed; checks/review og godkendelse knyttes til samme commit og politik. Appens originalcheckout bevares |
