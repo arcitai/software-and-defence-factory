@@ -40,3 +40,14 @@ cleanup after both success and failed checks. Existing candidate/policy guards,
 retry, cancellation, timeout and incident/restart checks passed. The 20 package/
 runtime tests and 39 dashboard tests passed. No application development agent
 was launched by this fixture qualification.
+
+## 0.3.3 — read-only cache cleanup
+
+A real application build exposed read-only cache directories left after an
+unsuccessful copy. Verification now removes owned scratch directories after
+container stop without following symlinks, and preserves the check exit code
+if cleanup itself still requires recovery. Linux Docker qualification passed
+all 11 paths, including success and exit-17 checks that create mode-000 cache
+directories with symlinks to the read-only candidate. Both leave no scratch and
+preserve the candidate; the failed check remains failed with its original exit.
+The 20 package/runtime tests and 39 dashboard tests also passed.
