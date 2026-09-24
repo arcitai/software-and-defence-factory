@@ -1,6 +1,6 @@
 # Viderebygning af den valgfrie runtime
 
-**Produktets hovedvej er nu [den portable adoptionspakke](adoption.md).** Brug eksisterende GitHub, CI/CD og valgt agentmiljø først. Denne plan gælder, når en installation faktisk har behov for egen runner eller dashboard. Den er ikke en obligatorisk installatør- eller cloudplan.
+**Aktuelt:** [Den portable pakke](adoption.md) kan tages i brug med en valgt agent. **Mulig videreudvikling:** en [selvhostbar platform med guided opsætning](platform.md), som styrer issue → agent → verificeret PR, mens appens eksisterende pipeline ejer deployment. Afsnittene herunder er tekniske muligheder; de vælger ikke en bestemt cloududbyder. Metoden kan fortsat bruges uden egen runtime. [Den aktuelle anbefaling](product-experience.md) er først én afprøvet standardopsætning, med Fabro som kandidat til genbrug af motor/UI. Archon er fravalgt af ejeren.
 
 Beslutningsforslag efter [videogennemgangen](video-audit.md), [Pi-research](pi-research.md), [BuilderIO-gennemgangen](builderio-review.md) og [Dex’ designmetode og den supplerende playbook](dex-review.md). Dette er **næste versions kontrakt og prioritering**, ikke funktioner, som v0.1 allerede har. [Arkitekturen](architecture.md) beskriver den kørende kode.
 

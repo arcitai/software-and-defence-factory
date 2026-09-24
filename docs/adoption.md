@@ -2,6 +2,8 @@
 
 **Gældende retning, 24. september 2026:** Arcitai Software and Security Factory skal først være et repository med det, der kan genbruges på tværs af apps og agenter. Det enkelte app-repo får en lille, versioneret pakke. Appens kode bliver, hvor den er. Et bestemt abonnement, Pi/Daytona, en egen server eller vores dashboard er ikke produktkrav.
 
+**Videre produktforslag:** En [selvhostbar platform](platform.md) kan gøre tilslutning og agentdrift lettere. [Anbefalingen](product-experience.md) er først at kvalificere ét nemt setup og genbruge en egnet eksisterende motor/UI, før vi bygger en ny platform. Den bygger oven på den portable metode; appens hosting og deployment forbliver selvstændige valg. Den eksisterende pakke kan fortsat bruges uden platformen.
+
 ## Produktnavn og grænsen til Defense Factory
 
 Det fulde navn er **Arcitai Software and Security Factory**. “Factoryen” og “factory-pakken” er korte henvisninger til samme produkt. Security er indbygget i udviklingen og et særskilt arbejdsspor, når en opgave kræver specialistarbejde.
