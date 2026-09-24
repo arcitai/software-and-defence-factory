@@ -1,0 +1,105 @@
+{
+  "synthetic": true,
+  "asOf": "2026-09-24T12:00:00.000Z",
+  "service": {
+    "tenant": "demo",
+    "service": "booking",
+    "environment": "production",
+    "repository": "example/booking",
+    "owner": "service-owner",
+    "deployedRelease": "release-a",
+    "coverage": [
+      {
+        "id": "uptime",
+        "capability": "availability",
+        "lastSuccessAt": "2026-09-24T12:00:00.000Z",
+        "maxAgeMinutes": 5
+      }
+    ],
+    "requiredVerificationChecks": [
+      "booking-journey"
+    ],
+    "minimumObservationMinutes": 10,
+    "verificationMaxAgeMinutes": 15
+  },
+  "signals": [
+    {
+      "id": "event-1",
+      "source": "fixture-monitor",
+      "tenant": "demo",
+      "service": "booking",
+      "environment": "production",
+      "episode": "outage-1",
+      "condition": "booking-fails",
+      "kind": "availability",
+      "severity": "critical",
+      "observedAt": "2026-09-24T11:00:00.000Z",
+      "deployedRelease": "release-a",
+      "summary": "Synthetic: the booking journey fails",
+      "evidenceRefs": [
+        "evidence:synthetic-failure"
+      ]
+    },
+    {
+      "id": "event-1",
+      "source": "fixture-monitor",
+      "tenant": "demo",
+      "service": "booking",
+      "environment": "production",
+      "episode": "outage-1",
+      "condition": "booking-fails",
+      "kind": "availability",
+      "severity": "critical",
+      "observedAt": "2026-09-24T11:00:00.000Z",
+      "deployedRelease": "release-a",
+      "summary": "Synthetic: the booking journey fails",
+      "evidenceRefs": [
+        "evidence:synthetic-failure"
+      ]
+    },
+    {
+      "id": "event-2",
+      "source": "fixture-monitor",
+      "tenant": "demo",
+      "service": "booking",
+      "environment": "production",
+      "episode": "outage-1",
+      "condition": "booking-fails",
+      "kind": "availability",
+      "severity": "critical",
+      "observedAt": "2026-09-24T11:01:00.000Z",
+      "deployedRelease": "release-a",
+      "summary": "Synthetic: the booking journey fails",
+      "evidenceRefs": [
+        "evidence:synthetic-failure"
+      ]
+    }
+  ],
+  "verification": {
+    "caseId": "filled-from-generated-case",
+    "tenant": "demo",
+    "service": "booking",
+    "environment": "production",
+    "targetRelease": "release-b",
+    "observedRelease": "release-b",
+    "changeRef": "change:fixture-fix",
+    "deployedAt": "2026-09-24T11:40:00.000Z",
+    "windowStartedAt": "2026-09-24T11:45:00.000Z",
+    "windowEndedAt": "2026-09-24T12:00:00.000Z",
+    "recordedBy": "fixture-verifier",
+    "checks": [
+      {
+        "id": "booking-journey",
+        "result": "passed",
+        "observedAt": "2026-09-24T12:00:00.000Z",
+        "release": "release-b",
+        "evidenceRefs": [
+          "evidence:synthetic-journey-pass"
+        ]
+      }
+    ],
+    "evidenceRefs": [
+      "evidence:synthetic-release"
+    ]
+  }
+}

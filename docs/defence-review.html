@@ -1,0 +1,131 @@
+<!doctype html>
+<html lang="da">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light">
+  <title>Arcitai Defence Factory · Research og retning</title>
+  <style>
+    :root { color-scheme: light; --ink:#192820; --muted:#506158; --paper:#f5f5ef; --line:#d5dcd3; --green:#225641; }
+    * { box-sizing:border-box; }
+    body { margin:0; color:var(--ink); background:var(--paper); font:16px/1.5 system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif; }
+    main { max-width:1080px; margin:auto; padding:32px 36px 28px; }
+    h1,h2,h3,p { margin:0; }
+    h1 { font-size:clamp(30px,4.5vw,46px); line-height:1.13; letter-spacing:-.035em; margin:12px 0; }
+    h2 { font-size:20px; letter-spacing:-.015em; margin-bottom:12px; }
+    h3 { font-size:17px; margin-bottom:6px; }
+    p { text-wrap:pretty; }
+    a { color:#1c6048; text-underline-offset:3px; }
+    a:focus-visible { outline:3px solid #875200; outline-offset:4px; border-radius:2px; }
+    .meta { display:flex; justify-content:space-between; gap:8px 20px; flex-wrap:wrap; color:var(--muted); font-size:13px; }
+    .brand { font-weight:750; letter-spacing:.08em; }
+    .intro { max-width:760px; color:var(--muted); font-size:18px; }
+    .recommendation { margin:22px 0; padding:17px 20px; border-radius:12px; background:var(--green); color:white; }
+    .recommendation strong { display:block; font-size:18px; margin-bottom:3px; }
+    section { margin-top:24px; }
+    .status { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:12px; }
+    .card { padding:16px; border:1px solid var(--line); background:#fff; border-radius:10px; }
+    .tag { display:inline-block; font-size:12px; font-weight:750; letter-spacing:.025em; padding:3px 8px; border-radius:5px; margin-bottom:9px; }
+    .built { background:#e1efe5; color:#244c36; }
+    .tested { background:#f8edcf; color:#67470b; }
+    .next { background:#e8edf4; color:#34495e; }
+    .card p { font-size:15px; }
+    .flow { list-style:none; display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:20px; padding:0; margin:14px 0 0; }
+    .flow li { position:relative; background:#e9eee7; padding:10px 12px; border-radius:6px; font-size:14px; }
+    .flow li:not(:last-child)::after { content:'→'; position:absolute; right:-17px; top:11px; color:var(--muted); }
+    .flow b { display:block; font-size:15px; }
+    table { width:100%; border-collapse:collapse; font-size:15px; background:white; }
+    caption { text-align:left; color:var(--muted); font-size:14px; padding-bottom:10px; }
+    th,td { padding:10px 12px; text-align:left; vertical-align:top; border-bottom:1px solid var(--line); overflow-wrap:anywhere; }
+    thead { background:#e9eee7; }
+    tbody th { width:23%; font-weight:650; }
+    .note { margin-top:12px; font-size:14px; color:var(--muted); }
+    .scope { display:grid; grid-template-columns:1.1fr 1fr; gap:28px; }
+    .scope ul { margin:0; padding-left:20px; }
+    .scope li { margin-bottom:8px; padding-left:3px; }
+    .finish { border-left:3px solid #9bb6a1; padding-left:18px; }
+    .finish p + p { margin-top:10px; }
+    .small { font-size:14px; color:var(--muted); }
+    .roadmap { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:20px; border-top:1px solid var(--line); padding-top:16px; }
+    .roadmap p { font-size:14px; }
+    .roadmap b { display:block; margin-bottom:3px; font-size:15px; }
+    footer { border-top:1px solid var(--line); margin-top:24px; padding-top:13px; color:var(--muted); font-size:12px; }
+    footer p + p { margin-top:6px; }
+    @media (max-width:680px) {
+      main { padding:22px 18px; }
+      .status,.scope,.roadmap { grid-template-columns:1fr; gap:12px; }
+      .flow { grid-template-columns:1fr; gap:15px; }
+      .flow li:not(:last-child)::after { content:'↓'; left:15px; right:auto; top:auto; bottom:-18px; }
+      .intro { font-size:17px; }
+      table { font-size:14px; }
+      th,td { padding:9px 7px; }
+      tbody th { width:30%; }
+      .finish { margin-top:6px; }
+      .recommendation { padding:16px; }
+    }
+    @media print {
+      body { background:white; font-size:11pt; }
+      main { max-width:none; padding:0; }
+      h1 { font-size:26pt; }
+      section { margin-top:16px; break-inside:avoid; }
+      .recommendation { color:var(--ink); background:white; border:2px solid var(--green); }
+      a { color:inherit; }
+    }
+  </style>
+</head>
+<body>
+<main>
+  <header>
+    <div class="meta"><span class="brand">ARCITAI / DEFENCE FACTORY</span><span>Research → forslag · 3 minutters review · 24. september 2026</span></div>
+    <h1>Løbende sikkerhed.<br>Fra fund til verificeret løsning.</h1>
+    <p class="intro">OpenAIs definition flytter vores fokus mod proaktiv sikkerhedsundersøgelse. Din idé om overvågning og incidents passer ind som en tilsluttet driftsdel.</p>
+  </header>
+  <aside class="recommendation" aria-label="Revideret anbefaling">
+    <strong>To ansvar. En fælles vej til rettelsen.</strong>
+    Software Factory ejer udvikling og levering. Defence Factory følger sikkerhedsrisiko på tværs af livscyklussen. Begge kan arbejde før og efter en release.
+  </aside>
+  <section aria-labelledby="boundary-title">
+    <h2 id="boundary-title">Sådan foreslår jeg, vi deler arbejdet</h2>
+    <table>
+      <caption>Vores produktforslag — ingen bestemt agent, cloud eller model er påkrævet</caption>
+      <thead><tr><th scope="col">Del</th><th scope="col">Ansvar og eksempel</th></tr></thead>
+      <tbody>
+        <tr><th scope="row">Software Factory</th><td>Byg og lever ændringer med security, tests og review. Fx en ny bookingfunktion eller en sikkerhedsrettelse.</td></tr>
+        <tr><th scope="row">Defence Factory</th><td>Undersøg systemet, validér fund, prioritér og følg løsningen. Fx kontrollér adgang mellem kunder, selv om ingen alarm er udløst.</td></tr>
+        <tr><th scope="row">Tilsluttet drift</th><td>Brug eksisterende uptime, logs, alarmer og beredskab. Driftsproblemer og dependency-signaler kan starte en sag.</td></tr>
+      </tbody>
+    </table>
+    <p class="note">Defence kan også tilsluttes gammel software og leverandørløsninger. Modtageren af en rettelse kan være vores Software Factory, det eksisterende team eller leverandøren.</p>
+  </section>
+  <section aria-labelledby="evidence-title">
+    <h2 id="evidence-title">Hvad researchen ændrer</h2>
+    <div class="status">
+      <article class="card"><h3>OpenAI: aktiv sikkerhed</h3><p>Find og validér sårbarheder; følg udbedringen. En overvågningskø dækker kun en del. <a href="https://openai.com/the-defense-factory/">Definitionen</a>.</p></article>
+      <article class="card"><h3>Cloudflare: begynd småt</h3><p>Start med en brugbar skill. Udbyg orkestreringen, når en konkret flaskehals kræver det. <a href="https://blog.cloudflare.com/build-your-own-vulnerability-harness/">Deres erfaring</a>.</p></article>
+      <article class="card"><h3>Ramp: afprøv rettelsen</h3><p>Integrationstest og menneskeligt PR-review indgår i deres forløb. <a href="https://engineering.ramp.com/post/100-vulnerabilities-patched-with-0-humans">Deres eksempel</a>.</p></article>
+    </div>
+  </section>
+  <section aria-labelledby="slice-title">
+    <h2 id="slice-title">Første vertical slice</h2>
+    <ol class="flow">
+      <li><b>1 · Ét konkret fund</b>Kendt app, revision, ejer og afgrænset scope.</li>
+      <li><b>2 · Reproducér</b>Afprøv i et isoleret miljø. Bevar uafklarede resultater.</li>
+      <li><b>3 · Ret og review</b>Minimal ændring; almindelige tests og appens CI/CD.</li>
+      <li><b>4 · Kontrollér effekten</b>Faktisk release, relevante checks og dokumenteret resultat.</li>
+    </ol>
+    <p class="note">Start gerne med et importeret fund. Kvalificér hele kæden, før vi tilføjer bred scanning, flere agenter og løbende automation.</p>
+  </section>
+  <section aria-labelledby="decision-title">
+    <h2 id="decision-title">Det betyder for vores setup</h2>
+    <div class="scope">
+      <p><strong>Selvstændige løsninger.</strong> Del security-kontekst, sager og beviser; repo-/runtimeopdeling afklares senere. Codex Security er en mulig specialist; andre agenter og lokale modeller skal kunne kvalificeres til samme opgave.</p>
+      <p><strong>Dokumenteret værdi.</strong> Mål relevante validerede fund, støj, tid til faktisk udbedring, regressioner, direkte udgifter og mennesketid. Bevar ukendt dækning synligt.</p>
+    </div>
+  </section>
+  <footer>
+    <p><strong>Status:</strong> research og revideret forslag. Det lokale alarm-replay er kun en operations-prototype; discovery, sikkerhedsvalidering og live drift er endnu ikke tilsluttet.</p>
+    <p><a href="defence-research.md">Research inkl. Google og X</a> · <a href="review.html">Software Factory-overblik</a> · <a href="../experiments/defence-operations/README.md">Prototype og grænser</a> · <a href="proof.md">Afprøvninger</a>. Virker offline uden JavaScript.</p>
+  </footer>
+</main>
+</body>
+</html>
