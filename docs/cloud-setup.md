@@ -1,12 +1,16 @@
 # Factory i skyen: hvad bruger vi til hvad?
 
-**Anbefaling, 24. september 2026:** brug Codex Cloud til den hurtigste manuelle pilot, hvis kontoen har adgang. Byg vores åbne produktprofil med **den eksisterende Arcitai-kerne på en lille server og Pi i en sandbox, der startes ved behov**. Daytona er første sandbox-kandidat. Det er to startmuligheder for samme metode; vi bygger kun én ny workerintegration først: Pi/Daytona.
+**Præcisering, 24. september 2026:** dette er en sammenligning af mulige driftsprofiler. [Den portable adoptionspakke](adoption.md) er produktets kerne. Ingen bestemt provider, egen server, Pi/Daytona-adapter eller dashboard er et krav eller et forhåndsvalgt næste byggetrin.
 
-Et stort lokalt setup er ikke nødvendigt. Skyens worker kan arbejde, mens du bruger Codex lokalt eller lukker computeren. **Cloudprofilen nedenfor er et byggeforslag, ikke allerede tilsluttet drift.** Den lokale starter og dens syntetiske adapterprøver er [dokumenteret særskilt](proof.md).
+Det tidligere konkrete cloudforslag nedenfor er nyttigt **som eksempel, hvis installationen vælger egen styring**. Et managed setup kan i stedet bruge sin providers eksisterende agentmiljø og automation med GitHub som hele arbejdsfladen. Cloudroom er inspiration til egen drift. En lokal installation er også gyldig.
 
-## Komponentoversigten
+En cloudworker kan arbejde uden en tændt laptop; lokale jobs kræver deres maskine. Model-, miljø- og triggeradgang skal afprøves for den valgte profil. Ingen komplet cloudintegration er kvalificeret med dette repo.
 
-| Del | Vores åbne cloudprofil | Hvad den gør |
+Vil du minimere faste udgifter, så se [egen compute og almindelig CI/CD](low-cost.md). Egen runner kan udføre Actions-jobs uden at bruge hosted-minutter; det er en separat beslutning fra valg af agent og model.
+
+## Eksempel: hvis man vælger egen styring i skyen
+
+| Del | Eksempel med egen styring | Hvad den gør |
 | --- | --- | --- |
 | Opgaver og kode | GitHub issues, branches og PR’er | Bevarer krav, kodehistorik og menneskelig review. Én afgrænset vertical slice ad gangen |
 | Styring og dashboard | Eksisterende Node/SQLite-app på en lille Linux-VM, fx hos Hetzner | Holder kø, scope, status, stop og beviser, også når din computer er slukket |
@@ -22,7 +26,7 @@ Et stort lokalt setup er ikke nødvendigt. Skyens worker kan arbejde, mens du br
 
 Den lille VM kan begynde med 2 vCPU/4 GiB som kapacitetsantagelse, ikke et målt minimum. Brug lokal persistent SQLite og backup. v0.1 åbnes privat via [SSH-portforward](setup.md); den har ikke login til offentlig deling. En lukket laptop afbryder visningen, ikke serveren. En delt offentlig arbejdsflade kræver senere adgangskontrol. Hetzner dokumenterer EU-lokationer; konkret serverpris og region vælges ved opsætning. EU-inference kræver også kontrol af sandbox, logs og backups. [Hetzner Cloud](https://www.hetzner.com/cloud/).
 
-## Den nemmeste start før cloudadapteren findes
+## Mulig managed start uden egen controller
 
 **Codex Cloud:** forbind pilotrepoet, vælg et miljø, angiv setup og nødvendige checks, og start én lille opgave manuelt. Opgaven kører i et separat cloudmiljø og kan afleveres til review/PR. Brug samme krav, skills og målekort; importér kun beviser, der faktisk er indsamlet. Det kræver ikke vores egen server for at gennemføre denne pilot. Kontoens adgang er ikke afprøvet her. [Cloud](https://learn.chatgpt.com/docs/cloud), [miljøer](https://learn.chatgpt.com/docs/environments/cloud-environment).
 
@@ -67,7 +71,7 @@ GitHub Free har aktuelt 2.000 inkluderede hosted Actions-minutter pr. måned til
 
 Sammenlign først økonomi, når de samme små opgaver er kørt med samme acceptkrav. Medregn mislykkede forsøg, reviews og mennesketid efter [målemetoden](value.md).
 
-## Næste byggetrin: tre vertical slices
+## Hvis Pi/Daytona vælges: tre mulige vertical slices
 
 1. **Én forberedt opgave → Pi i skyen → synlig reviewpakke.** Pak det nødvendige worker-image og tilføj en fjernadapter til den eksisterende kerne. Vis ægte jobstatus og præcis revision; bevar resultatet før teardown. Minimum omfatter scope, én writer, afgrænset adgang, timeout og verificerbart stop. Afprøv syntetisk først; en reel betalt pilot dokumenteres særskilt.
 2. **Afbryd og kom tilbage.** Luk visningen, afbryd forbindelsen og genstart controlleren. Genfind jobbet uden dobbelt writer; mistet kontakt står som ukendt. Budget-/stopgrænser, beviser og oprydning skal holde, før ubemandet betalt brug åbnes.
@@ -75,4 +79,4 @@ Sammenlign først økonomi, når de samme små opgaver er kørt med samme accept
 
 Den nuværende runner deler filsystem/journal med controlleren. En cloud-sandbox er derfor **ikke** blot et nyt endpoint i konfigurationen: jobtransport, statusafstemning og artifact-import mangler. SQLite bliver hos controlleren; den deles ikke som netværksdisk med worker. Lokal Codex og cloudworker bruger separate branches/workspaces og samles gennem review.
 
-Det detaljerede arbejde følger [runtimeplanen](next-runtime.md) og den eksisterende [Pi-profil](../profiles/pi/README.md). Daytona dokumenterer [sandboxmiljøer](https://www.daytona.io/docs/sandboxes) og [computer-use](https://www.daytona.io/docs/en/computer-use/); kompatibilitet, region, værktøjer og stop er endnu ikke prøvet i vores setup. Ingen konto, server, betalt kørsel eller deployment er oprettet med denne research.
+En sådan valgfri udbygning følger [runtimeplanen](next-runtime.md) og den eksisterende [Pi-profil](../profiles/pi/README.md). Daytona dokumenterer [sandboxmiljøer](https://www.daytona.io/docs/sandboxes) og [computer-use](https://www.daytona.io/docs/en/computer-use/); kompatibilitet, region, værktøjer og stop er endnu ikke prøvet i vores setup. Ingen konto, server, betalt kørsel eller deployment er oprettet med denne research.

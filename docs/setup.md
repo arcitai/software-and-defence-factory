@@ -1,4 +1,6 @@
-# Opsætning og en fuld opgave
+# Opsætning af den valgfrie lokale runtime og en fuld opgave
+
+For at tilslutte en eksisterende app uden egen controller: start med [den portable pakke](adoption.md). Denne side gælder kun den medfølgende Node/SQLite-runner og UI.
 
 Vil du starte uden stor lokal maskine, så læs først [cloudoversigten med komponentvalg](cloud-setup.md). Den skelner mellem en manuel Codex Cloud-pilot og vores endnu ikke tilsluttede Pi/sandbox-profil. Opskriften nedenfor beskriver den eksisterende lokale kerne.
 

@@ -1,12 +1,37 @@
-# Arcitai Factory
+# Arcitai Software & Defence Factory
 
 **Business first. Security and quality built in.**
 
-En åben, self-hostable starter til en software- og security-factory. GitHub ejer issues, kode og PR’er. Factoryen samler opgaver, jobforsøg, review og dokumenteret værdi. Harness og inference vælges hver for sig.
+En åben factory-pakke til **eksisterende app-repositories**: fælles skills, vertical slices, CI-/security-principper, review og dokumenteret værdi. Agent/harness, model, arbejdsmiljø og deployment vælges pr. installation. GitHub kan være hele kontrolpanelet. Vores lokale runner og dashboard er et valgfrit supplement.
 
-**Start her til review:** [Kort visuelt overblik — status og næste byggetrin](docs/review.html). Åbn filen i en browser; den virker offline.
+**Start her:** [Kort visuelt review](docs/review.html) · [Hvad er fast, og hvad vælger installationen?](docs/adoption.md)
 
-## Prøv dashboardet
+## Tilslut en app
+
+Klon eller hent dette repository som kilde til pakken. Appens kode bliver i sit nuværende repo. Med Node 22.13+ kan du eksportere en lille pakke til en ny mappe:
+
+```sh
+node scripts/export-kit.mjs ../my-app-factory-kit
+```
+
+Eksporten overskriver ikke en eksisterende mappe. Den indeholder seks skills, en issue-form, metode, installationsark, afleveringsskabelon og et **inaktivt** CI-eksempel. Ingen database, server, model eller providerkonto kræves for at bruge instruktionerne. Læs den eksporterede `.factory-kit/README.md`, og lad din valgte agent tilpasse pakken på en branch i appens eget repo.
+
+[Adoptionsvejledning](kit/README.md) · [Fælles regler](kit/policy.md) · [Installationsark](kit/installation.md) · [Aflevering og målinger](kit/delivery.md)
+
+| Vi definerer | Installationen udfylder |
+| --- | --- |
+| Afgræns → byg i vertical slices → bevis → separat review | Appens arkitektur, tests og konkrete acceptkriterier |
+| Portable skills og krav til nødvendige capabilities | Codex, Cursor, Pi eller anden agent; valgte modeller og værktøjer |
+| CI verificerer kode; CD leverer efter projektets politik | Eksisterende Actions/anden CI, host, miljøer og rollback |
+| Security efter ændringens risiko, fund og release | Relevante scannere/specialister og privat fundkanal |
+| Én jobejer, kendt status, stop og beviser | Manuel start, providerens automation eller egen runner |
+| Fem målepunkter med ærlige ukendte værdier | Målekilder, forbrugsgrænser og observationsperiode |
+
+**Ingen provider er standard for produktet.** En installation må gerne vælge ét konkret abonnement eller runtime. Det valg ændrer ikke den fælles metode. En kopieret skill starter ikke et cloudjob: den valgte integration skal konfigureres og afprøves. [Driftsvalg og grænser](docs/adoption.md).
+
+Eksport og beskyttelse mod overskrivning er afprøvet med isolerede fixtures. Pakken er endnu ikke kvalificeret gennem en rigtig kundes cloud-/modelopgave. Der er ingen aktiveret automation, CD eller ekstern publicering.
+
+## Valgfrit: prøv den lokale runner og dashboardet
 
 Kræver Node.js **22.13+** med `node:sqlite` (afprøvet på 22.21.1 og 22.22.3). Dashboardets kerne kræver ingen eksterne npm-pakker, ingen build, ingen GitHub Actions og intet modelkald ved start. Security-workerens SDK installeres separat efter behov.
 
@@ -21,7 +46,7 @@ npm run check
 npm run doctor
 ```
 
-## Hvad er med?
+### Hvad er med i den valgfrie runtime?
 
 | Del | Implementeret i v0.1 |
 | --- | --- |
@@ -36,31 +61,17 @@ npm run doctor
 
 **Det er en kørbar starter med en bevidst manuel overdragelse til eksterne tjenester.** UI’et starter ikke betalte agenter, opretter ikke PR’er og udfører ikke merge/deploy. Automatisk provider-polling, fuld GitHub-reconciliation, udgiftsstop i kroner, autentificering og flere samtidige workers er viderebygning. Se [arkitektur og grænser](docs/architecture.md).
 
-## Vælg første setup
+Security kan bruge en valgt specialist, inklusive Codex Security hvor tilgængelig. Det valg kræver ikke, at resten af installationen bruger Codex. Starterens valgfrie Security SDK har et åbent dependencyfund, beskrevet i [pilotforbeholdene](docs/security-dependency-review.md).
 
-1. **Hurtigste cloudpilot: Codex Cloud**, hvis dit eksisterende abonnement giver adgang. Start én afgrænset opgave manuelt; arbejd videre lokalt imens. Cloud og lokal brug deler forbrugsgrænser. Vores dashboard er endnu ikke koblet til tjenesten.
-2. **Vores åbne cloudprofil: Pi i Daytona-sandbox + lille server til den eksisterende kerne.** Ingen kraftig lokal hardware eller egen GPU kræves med ekstern model-API. Fjernadapter, worker-image og recovery skal bygges; første nye integration er Pi/Daytona. [Komponenttabel, alternativer, priser og Cloudroom-vurdering](docs/cloud-setup.md).
-3. **Eget arbejdsmiljø:** de eksisterende CLI-adaptere kan bruges efter konkret kvalifikation. [Pi-blueprint](profiles/pi/README.md) · [Codex lokalt](profiles/codex-local.md) · [Kastanje/Ollama](profiles/open-models.md). Cursor er et managed alternativ, især ved behov for færdig browser/desktop. [Cursor-opskrift](profiles/cursor-cloud.md).
+## Valgfrie profiler og baggrund
 
-Security bruger samme kerne og et særskilt specialistspor. Den officielle Codex Security SDK er nu et valgfrit worker-modul med en bestået syntetisk rapportprøve. Reel modeladgang og scanning skal kvalificeres separat. Browser og især desktopstyring kræver deres egne prøver. Ingen Warp-abonnement kræves, og ingen prisbesparelse er målt på en komplet pilot endnu.
+- [Lavpris: almindelig CI/CD, egne Actions-runners og modelomkostninger](docs/low-cost.md)
 
-Security SDK har et åbent dependencyfund i ZIP-håndteringen. Adapteren bruger den medfølgende pluginmappe og afviser custom plugins; dependencyen er ikke rettet. [Afgrænsning og pilotforbehold](docs/security-dependency-review.md).
+- [Cloudmuligheder og Cloudroom: sammenligning, ikke obligatorisk stack](docs/cloud-setup.md)
+- [Pi-blueprint](profiles/pi/README.md) · [Codex lokalt](profiles/codex-local.md) · [Åbne modeller](profiles/open-models.md) · [Cursor cloud](profiles/cursor-cloud.md)
+- [Ras Mic og fem øvrige videoer](docs/video-audit.md) · [BuilderIO](docs/builderio-review.md) · [Dex og vertical slices](docs/dex-review.md)
+- [Metode for dokumenteret værdi](docs/value.md) · [Warp-måling](docs/warp-measurement.md)
+- [Valgfri runtime: arkitektur](docs/architecture.md), [setup](docs/setup.md), [viderebygning](docs/next-runtime.md) og [workerprøver](docs/worker-integrations.md)
+- [Udførte kontroller](docs/proof.md) · [Security](SECURITY.md) · [Recovery](docs/recovery.md)
 
-## Læs videre
-
-- [Cloudsetup: hvad bruger vi til hvad, Cloudroom og forbrugsmodellen](docs/cloud-setup.md)
-- [Dex og playbooken: design før kode, små leverancer og en prøve med senere krav](docs/dex-review.md)
-- [BuilderIO: tre trin, få capabilities og en manuel pilot først](docs/builderio-review.md) · [Kræver din beslutning](templates/human-review.md)
-- [Pi: dyb research, minimumscapabilities og vurdering af HarnessTax](docs/pi-research.md) · [Pi-profiler](profiles/pi/README.md)
-- [Pi- og Security-jobadaptere: opsætning og prøver](docs/worker-integrations.md)
-- [Genbrug Codex Security og pak et lean Pi-setup](docs/codex-reuse.md)
-- [Seks videoer: kildegennemgang og dækningskontrol](docs/video-audit.md)
-- [Næste runtime: samlet pipeline og prioriterede opgaver](docs/next-runtime.md) · [Reviewpakke med før/efter](templates/review-packet.md)
-- [Opsætning og en hel opgave fra start til accept](docs/setup.md)
-- [Research: Warp/Oz, alternativer og anbefalet system](docs/research.md)
-- [Start målingen: fem målepunkter, én scorer og bachelorprotokol](docs/value.md) · [Warp-kilder og tilpasning](docs/warp-measurement.md)
-- [Skills](.agents/skills/README.md) · [Profiler](config/profiles.json) · [Evalueringer](evals/suite.json)
-- [Security og tillidsgrænser](SECURITY.md) · [Recovery](docs/recovery.md)
-- [Udførte kontroller og kendte begrænsninger](docs/proof.md)
-
-MIT-licens. Uafhængigt repository uden AIOS som runtime-afhængighed. [Ejerskab og kildeproveniens](docs/ownership.md).
+MIT. Uafhængigt af AIOS og bestemte agentprodukter. [Ejerskab og kildeproveniens](docs/ownership.md).

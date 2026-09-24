@@ -1,6 +1,12 @@
 # Arcitai Factory
 
-This repository owns a local, single-operator factory starter. Read README.md and only the relevant docs. It runs independently of AIOS, Codex Desktop or any particular model vendor. `CLAUDE.md` imports this file; maintain instructions here.
+This repository owns a portable adoption kit for existing app repositories and an optional local, single-operator factory starter. Read README.md and only the relevant docs. It runs independently of AIOS, Codex Desktop or any particular model vendor. `CLAUDE.md` imports this file; maintain instructions here.
+
+## Product contract
+
+- Keep the adoption kit independent of any harness, model, hosting provider or runtime service. GitHub may be the entire control surface. An installation makes concrete choices; the core defines method and evidence.
+- Preserve an adopting app's instructions, architecture, CI and deployment. Export into a new staging directory; never silently install or overwrite app files.
+- Skills provide instructions, not installed capabilities or a scheduler. Keep examples inactive until adapted and explicitly selected.
 
 ## Local contract
 

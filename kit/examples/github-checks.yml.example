@@ -1,0 +1,32 @@
+# Optional hosted-runner starting point; consumes private hosted minutes if enabled.
+# For a qualified dedicated self-hosted environment, choose its labels instead.
+# Never direct untrusted PR code to a personal or privileged persistent runner.
+# Not installed or activated by the kit.
+# Adapt the app's existing CI first. The app owns scripts/factory-ci, including
+# dependency setup and its REAL checks. Missing setup must fail, never pass.
+name: Factory checks
+on:
+  pull_request:
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: factory-checks-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+jobs:
+  checks:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      # actions/checkout v6 tag resolved on 2026-09-24; review before upgrades.
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803
+        with:
+          persist-credentials: false
+      - name: Run this app's configured checks
+        shell: bash
+        run: |
+          if [ ! -x ./scripts/factory-ci ]; then
+            echo 'Configure executable scripts/factory-ci with the real app checks before enabling this workflow.' >&2
+            exit 1
+          fi
+          ./scripts/factory-ci

@@ -1,6 +1,6 @@
 # Fra Warp-inspiration til en åben Arcitai Factory
 
-Research samlet **24. september 2026**. Warp-gennemgangen nedenfor suppleres af [Pi-research](pi-research.md), [BuilderIO-metoden](builderio-review.md) og [Warp Scorers og måling](warp-measurement.md). **Pi er første kandidat til den åbne factory**. Pi, Codex og valgfri Codex Security er nu workeradaptere; Cursor er et managed alternativ. De nye adapteres [afprøvning er syntetisk](worker-integrations.md). Starteren er ikke et færdigt produktionssystem eller dokumentation for modelbesparelser.
+Research samlet **24. september 2026**. Warp-gennemgangen nedenfor suppleres af [Pi-research](pi-research.md), [BuilderIO-metoden](builderio-review.md) og [Warp Scorers og måling](warp-measurement.md). **Den portable metodepakke er kernen; ingen provider er forhåndsvalgt.** Pi, Codex og valgfri Codex Security findes som adaptere i den valgfrie lokale runtime; managed løsninger er alternative installationer. De nye adapteres [afprøvning er syntetisk](worker-integrations.md). Starteren er ikke et færdigt produktionssystem eller dokumentation for modelbesparelser.
 
 **Suppleret med brugerens seks videoer:** [transskriptionsbaseret kildegennemgang](video-audit.md) og [næste runtime](next-runtime.md). Start med en manuel pilot på eksisterende runner. Machinist undersøges kun ved et dokumenteret controllerbehov. Før/efter-bevis, miljølivscyklus og feedback fra drift er eksplicit med i planen.
 
@@ -8,9 +8,11 @@ Research samlet **24. september 2026**. Warp-gennemgangen nedenfor suppleres af 
 
 **Cloudsetup, 24. september:** [Komponenttabel og Cloudroom-gennemgang](cloud-setup.md) tager udgangspunkt i en bruger uden stort lokalt setup. Codex Cloud er den hurtigste manuelle pilotmulighed; Pi/Daytona med eksisterende kerne på en lille server er den åbne målprofil. Agents API og Cursor er alternativer. Cloudroom bidrager med principper, ikke en ny obligatorisk runtime. Ingen komplet cloudprofil er tilsluttet eller økonomisk benchmarket.
 
+**Gældende produktretning, 24. september:** [En portabel metodepakke til eksisterende apps](adoption.md) er kernen. GitHub kan være hele arbejdsfladen. De tidligere konkrete Pi/Daytona- og controllerforslag er valgfrie driftsprofiler, ikke universelle krav. Skills, checks, security-udløsere og beviser defineres fælles; installationen vælger leverandører og integration.
+
 ## Den anbefalede form
 
-Ét produkt: **Arcitai Software & Defence Factory**. Én metode og arbejdsflade, to arbejdsspor, flere udskiftelige harness-/modelprofiler. Start med en operatør og et pilotrepo. GitHub er den første forge-adapter; kernen ejer ikke GitHub-specifikke agentantagelser. Kastanje bliver både en pilotcase og en valgfri inference-rute.
+Ét produkt: **Arcitai Software & Defence Factory**. Én metode, to arbejdsspor og udskiftelige harness-/modelprofiler; GitHub eller et valgfrit dashboard er arbejdsfladen. Start med en operatør og et pilotrepo. GitHub er den første forge-adapter; kernen ejer ikke GitHub-specifikke agentantagelser. Kastanje bliver både en pilotcase og en valgfri inference-rute.
 
 | Lag | Mindste nyttige indhold |
 | --- | --- |

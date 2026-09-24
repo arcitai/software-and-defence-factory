@@ -1,16 +1,18 @@
-# Fra starter til en factory, der kan arbejde uden opsyn
+# Viderebygning af den valgfrie runtime
+
+**Produktets hovedvej er nu [den portable adoptionspakke](adoption.md).** Brug eksisterende GitHub, CI/CD og valgt agentmiljø først. Denne plan gælder, når en installation faktisk har behov for egen runner eller dashboard. Den er ikke en obligatorisk installatør- eller cloudplan.
 
 Beslutningsforslag efter [videogennemgangen](video-audit.md), [Pi-research](pi-research.md), [BuilderIO-gennemgangen](builderio-review.md) og [Dex’ designmetode og den supplerende playbook](dex-review.md). Dette er **næste versions kontrakt og prioritering**, ikke funktioner, som v0.1 allerede har. [Arkitekturen](architecture.md) beskriver den kørende kode.
 
 **Implementeret 22. september:** Pi RPC og Security SDK er nu tilsluttet den eksisterende CLI-runner og syntetisk afprøvet. [Aktuel worker-status](worker-integrations.md). Det implementerer ikke i sig selv den ubemandede pipeline nedenfor.
 
-Den mindste fornuftige løsning er **én controller, én worker og ét pilotrepo**. GitHub er indgangen til arbejdet og hjem for kode/PR. Runtime ejer kørsler, låse og stop. Dashboardet viser denne tilstand. Skills beskriver faglig metode; de skal ikke være eneste håndhævelse af budgetter, checks eller adgang.
+Når egen runtime er nødvendig, er den mindste fornuftige løsning **én controller, én worker og ét pilotrepo**. GitHub er indgangen til arbejdet og hjem for kode/PR. Runtime ejer kørsler, låse og stop. Dashboardet viser denne tilstand. Skills beskriver faglig metode; de skal ikke være eneste håndhævelse af budgetter, checks eller adgang.
 
 **Forenkling 23. september:** behold den nuværende runner til en manuel pilot. Den synlige arbejdsgang er **find og afgræns → ret og bevis → review og aflever**. Et samlet overblik viser beslutninger, beviser og forbrug. Automatisér ét gentaget trin ad gangen efter faktisk brug; et nyt framework, endnu en controller og mange planlagte agentjobs er ikke forudsætninger.
 
 **Måling 24. september:** følg [den lille måleprotokol](value.md#start-her-fem-målepunkter-og-en-scorer): kvalitet, samlet pris, al mennesketid, gennemløbstid og fejl efter accept. Én valgfri scorer supplerer reviewet med en evidensvurdering. Brug baseline → undersøg fejl → afprøv én ændring → review → mål igen. Det bygger videre på [Warp Scorers](warp-measurement.md) uden en ny runtime eller obligatorisk evaluatormodel.
 
-**Cloudretning 24. september:** udgangspunktet er nu en bruger uden stort lokalt setup. [Komponentoversigten](cloud-setup.md) anbefaler Codex Cloud til en hurtig, manuel metodepilot og **Pi/Daytona som første nye fjernadapter** til vores eksisterende kerne på en lille server. Ingen Actions er nødvendig som runtime. Cloudroom er gennemgået, men Rust/PostgreSQL indføres ikke uden et dokumenteret behov. Dette præciserer den tidligere lokale pilotretning; den lokale runner bevares som udviklings- og testvej.
+**Præcisering efter ejerens korrektion, 24. september:** ingen bestemt cloudadapter er forhåndsvalgt som produktets næste trin. Pi/Daytona, Codex Cloud, Cursor, lokal Z13 og egen sky er eksempler på installationer. Kvalificér den valgte apps faktiske behov først; genbrug en managed integrations runtime, hvor den allerede løser opgaven. GitHub kan være hele kontrolpanelet.
 
 ## Den samlede arbejdsgang
 
@@ -43,7 +45,7 @@ Implementering kan bruge Codex, Cursor eller en anden egnet harness. Security ka
 
 ## Hvis piloten viser behov for en anden motor
 
-**Machinist er en mulig senere controller-kandidat**, med Sandcastle som alternativ byggesten, hvis hovedbehovet er agent-/sandboxadaptere. Det tidligere forslag om at afprøve Machinist før piloten er nedprioriteret: dokumentér først en konkret begrænsning i nuværende runner og forventet mindre vedligehold. **Pi er første harness-kandidat**; controller og harness løser forskellige opgaver. Pi’s syntetiske RPC-prøve er gennemført, men erstatter ikke controller-/recovery-prøven nedenfor. Ved et muligt skifte begrænses prøven til ét syntetisk repo, ingen providerbetaling og ingen produktionsadgang i første fase.
+**Machinist er en mulig senere controller-kandidat**, med Sandcastle som alternativ byggesten, hvis hovedbehovet er agent-/sandboxadaptere. Det tidligere forslag om at afprøve Machinist før piloten er nedprioriteret: dokumentér først en konkret begrænsning i nuværende runner og forventet mindre vedligehold. **Pi er en mulig harness-kandidat**; controller og harness løser forskellige opgaver. Pi’s syntetiske RPC-prøve er gennemført, men erstatter ikke controller-/recovery-prøven nedenfor. Ved et muligt skifte begrænses prøven til ét syntetisk repo, ingen providerbetaling og ingen produktionsadgang i første fase.
 
 | Afprøvning | Bestået når |
 | --- | --- |
@@ -56,13 +58,13 @@ Implementering kan bruge Codex, Cursor eller en anden egnet harness. Security ka
 
 Kilden til kandidatens muligheder og begrænsninger står i [Machinist-afsnittet](video-audit.md#machinist-undersøg-før-vi-genopfinder-runtime). Vi har kun læst koden; denne afprøvning er **ikke udført**. Hvis kandidaten vælges, bliver dens runtime-status autoritativ. Arcitais UI kan vise den via en adapter; den eksisterende lokale forsøgsjournal må ikke konkurrere om jobclaim. Gem en eksport og definér migreringen, før en kø flyttes.
 
-## Deploymentprofiler og førstevalg
+## Eksempler på deploymentprofiler
 
 | Profil | Controller og worker | Inference | Første brug / grænse |
 | --- | --- | --- | --- |
 | Hurtig managed pilot | Codex Cloud styrer sin egen opgave; manuel forbindelse til vores review/metode | Tjenestens tilgængelige modeller | Hurtig start uden egen server. Konto/adgang skal prøves; ikke vores automatiske issue-pipeline |
-| **Åben cloudprofil — første nye adapter** | Eksisterende Node/SQLite-controller på lille VM; Pi i Daytona-sandbox pr. job | Valgt ekstern API; Kastanje/EU efter kvalifikation | Pi-image, fjernprotokol, artifact-import og recovery skal bygges. UI via privat SSH-portforward |
-| Andre managed alternativer | Cursor Cloud Agent eller Agents API med hosted sandbox | Den valgte tjenestes muligheder | Cursor ved færdig computer-use; Agents API ved eget dashboard med OpenAI-harness. Særskilt adgang/afregning; bygges ikke parallelt med Pi-ruten |
+| Egen styring med åben worker | Eksisterende Node/SQLite-controller på lille VM; Pi i Daytona-sandbox pr. job | Valgt ekstern API; Kastanje/EU efter kvalifikation | Pi-image, fjernprotokol, artifact-import og recovery skal bygges. UI via privat SSH-portforward |
+| Andre managed alternativer | Cursor Cloud Agent eller Agents API med hosted sandbox | Den valgte tjenestes muligheder | Cursor ved færdig computer-use; Agents API ved eget dashboard med OpenAI-harness. Særskilt adgang/afregning; vælg én relevant integration |
 | Lokal | Loopback-UI; dedikeret VM/arbejdsmiljø til worker | Lokal Ollama eller valgt ekstern rute | Z13-pilot senere. Mål RAM, GPU, kontekst og stabilitet først |
 
 De konkrete primærkilder og prisgrænser står i [cloudguiden](cloud-setup.md). Ingen profil er endnu afprøvet som en komplet cloudleverance. Cloud betyder ikke én samlet tjeneste: controller, arbejdsmiljø og model har hver sin livscyklus og afregning.
@@ -71,7 +73,7 @@ Ingen profil kræver GitHub Actions. Repository-checks kan køre i workerens tes
 
 Egen cloud kræver ikke en GPU, når inference er ekstern. Lokal runtime betyder ikke lokal inference. En lokal model gør heller ikke browseropslag, GitHub, logs og backups lokale. EU-løftet kræver kontrol af hele den valgte datavej; se [value.md](value.md).
 
-### Fjernprofilen bygges i gennemgående dele
+### Hvis en egen fjernprofil behøves: gennemgående dele
 
 1. **Forberedt job → rigtig fjernstatus → reviewpakke:** den mindste Pi/Daytona-adapter, nødvendigt image, kendt base/revision, afgrænset adgang, én writer, timeout, stop og bevarede artifacts. Prøv med syntetisk provider først. En rigtig modelkørsel er særskilt evidens.
 2. **Afbryd og genoptag samme job:** gem provider-id, genfind faktisk tilstand, håndter crash og dobbelte events uden en ekstra writer. Efterprøv budgetgrænser og oprydning før betalt ubemandet drift; mistet kontakt er ukendt, ikke stoppet.
@@ -115,7 +117,7 @@ Disse er lokale opgaveudkast; de er ikke oprettet på GitHub.
 
 | Prioritet / opgave | Leverance og konkret accept |
 | --- | --- |
-| **P0 — Én manuel metodepilot og første fjernslice** | Hurtig metodepilot kan ske i Codex Cloud med manuel reviewpakke. Produktarbejdet bygger én Pi/Daytona-jobvej gennem eksisterende kerne som ovenfor. Fastlæg baseline og udfyld [målekort](../templates/measurement-card.md) med præcis revision, beviser, alle forsøg og samlet mennesketid. Skeln mellem manuelle overdragelser, syntetiske prøver og reel cloudintegration |
+| **Før egen runtime-udbygning — Kvalificér den valgte installation** | Tilslut pakken til én eksisterende app med dens valgte agent og CI. Afprøv en lille opgave og review. Beskriv et konkret hul, før en ny adapter bygges. Brug [målekort](../templates/measurement-card.md); skeln mellem manuelle overdragelser, syntetiske prøver og reel integration |
 | **P0 før reel workerafvikling — Et reproducerbart, afgrænset miljø** | Én workerprofil med rigtige checks, testdata og de nødvendige capabilities. Bevis at controllerdata/administrationsnøgler ikke kan nås, og at stop virker |
 | **P0 før automatisk aflevering — Luk kvalitetssløjfen** | Implementering → konfigurerede checks → separat review → højst to reparationer → reviewpakke eller præcis blocker. Stale head, manglende check og ændret policy afvises. Manuel review bruges indtil da |
 | **P0 før betalt ubemandet brug — Forbrug og recovery** | Providerens stop efterprøves; jobs kan genstartes uden dublet, tabte artifacts eller nulstillet budget. Ukendt forbrug forbliver ukendt |

@@ -76,63 +76,60 @@
 <body>
 <main>
   <header>
-    <div class="meta"><span class="brand">ARCITAI / FACTORY</span><span>Til Gustav · 3–4 minutters review · 24. september 2026</span></div>
-    <h1>Factoryen arbejder i skyen.</h1>
-    <p class="intro">Du behøver ingen kraftig lokal computer. Udviklingen følger stadig vertical slices: én lille funktion fra ende til ende, afprøvning og derefter næste del.</p>
+    <div class="meta"><span class="brand">ARCITAI / SOFTWARE FACTORY</span><span>Til Gustav · 3 minutters review · 24. september 2026</span></div>
+    <h1>En factory til dine eksisterende apps.</h1>
+    <p class="intro">En fælles metodepakke, som kan lægges ind i appens repo. Du vælger agent, model og driftsmiljø. Appens arkitektur og deployment bevares.</p>
   </header>
 
-  <aside class="recommendation" aria-label="Anbefalet beslutning">
-    <strong>Hurtig pilot: Codex Cloud. Åben produktprofil: Pi i en cloud-sandbox.</strong>
-    Start manuelt med dit eksisterende abonnement, hvis cloudadgangen er tilgængelig. Byg derefter én Pi/Daytona-forbindelse til vores dashboard. Samme metode, krav og målinger; model og hosting kan skiftes.
+  <aside class="recommendation" aria-label="Produktets retning">
+    <strong>GitHub kan være hele kontrolpanelet.</strong>
+    Opret issues, følg checks og læs PR’er. Skills beskriver arbejdet; den valgte integration starter agenten. Egen runner, cloud-sandbox og vores dashboard er tilvalg.
   </aside>
 
   <section aria-labelledby="stack-title">
-    <h2 id="stack-title">Hvad bruger vi til hvad?</h2>
+    <h2 id="stack-title">Hvad definerer vi — og hvad vælger appen?</h2>
     <table>
-      <caption>Forslag til vores åbne cloudprofil · integrationen skal bygges</caption>
-      <thead><tr><th scope="col">Del</th><th scope="col">Valg og opgave</th></tr></thead>
+      <caption>Samme krav til kvalitet og beviser på tværs af installationer</caption>
+      <thead><tr><th scope="col">Fælles i pakken</th><th scope="col">Udfyldes pr. app</th></tr></thead>
       <tbody>
-        <tr><th scope="row">Opgaver og kode</th><td><strong>GitHub.</strong> Issues, branches og PR’er er arbejdsgrundlaget.</td></tr>
-        <tr><th scope="row">Styring og UI</th><td><strong>Vores Node/SQLite-app på en lille EU-server.</strong> Holder kø, status og beviser. Privat adgang via SSH i første version.</td></tr>
-        <tr><th scope="row">Agentens computer</th><td><strong>Daytona-sandbox ved behov.</strong> Eget checkout, terminal, tests og browser. Arbejder videre, når din laptop lukkes.</td></tr>
-        <tr><th scope="row">Agent og model</th><td><strong>Pi + valgt model-API.</strong> Repoets skills følger med. Kastanje/EU er en mulig modelrute, som skal kvalificeres.</td></tr>
-        <tr><th scope="row">Browser / desktop</th><td><strong>Browser-CLI først.</strong> Computer-use tilføjes ved behov; Pi får ikke værktøjerne automatisk fra sandboxen.</td></tr>
-        <tr><th scope="row">Kvalitet og security</th><td><strong>Faste checks + separat review.</strong> Codex Security som valgfri specialist. Beviser skal passe til kodeversionen.</td></tr>
-        <tr><th scope="row">Triggere og CI</th><td><strong>GitHub API fra controlleren.</strong> GitHub Actions er valgfrit til korte PR-checks. Agenten og ventetiden ligger udenfor.</td></tr>
-        <tr><th scope="row">Dokumenteret værdi</th><td><strong>Journal + målekort.</strong> Kvalitet, samlet pris, al mennesketid, gennemløbstid og fejl efter accept.</td></tr>
+        <tr><th scope="row">Skills og instruktion</th><td>Codex, Cursor, Pi eller anden agent. Kontrollér, at instruktioner og nødvendige værktøjer faktisk virker.</td></tr>
+        <tr><th scope="row">Vertical slices</th><td>Appens arkitektur og checks. Byg én lille adfærd fra ende til ende, afprøv og udvid.</td></tr>
+        <tr><th scope="row">CI/CD-principper</th><td>Eksisterende tests, build, hosting og releasepolitik. Ingen fast cloududbyder.</td></tr>
+        <tr><th scope="row">Security og review</th><td>Kontroller efter risiko; Codex Security eller anden egnet specialist. Ingen obligatorisk fuld scan på hver lille ændring.</td></tr>
+        <tr><th scope="row">Job og beviser</th><td>Manuel start, managed automation eller egen runner. Én ejer af jobstart; kendt revision, stop og recovery.</td></tr>
+        <tr><th scope="row">Værdi og måling</th><td>Kvalitet, samlet pris, al mennesketid, gennemløbstid og fejl efter accept. Ukendt er ikke nul.</td></tr>
       </tbody>
     </table>
-    <p class="note"><strong>Det er kun styringen, der skal være tændt hele tiden.</strong> Agentcomputeren starter ved opgaver. Ingen egen GPU er nødvendig, når modellen leveres via en API.</p>
   </section>
 
-  <section aria-labelledby="choice-title">
-    <h2 id="choice-title">Tre vigtige afklaringer</h2>
+  <section aria-labelledby="actions-title">
+    <h2 id="actions-title">Actions gør det velkendte</h2>
     <div class="status">
-      <article class="card"><h3>Codex Cloud er genvejen</h3><p>En manuel pilot kræver ingen egen server. Cloud og lokal Codex deler dog abonnementsgrænser. Eget dashboard via Agents API er en særskilt, API-afregnet integration.</p></article>
-      <article class="card"><h3>Cloudroom er inspiration</h3><p>God model for jobs, der overlever en afkoblet klient. Men selvhosting tilføjer Linux-drift, Rust og PostgreSQL. Vi overtager principperne og beholder vores lille kerne.</p></article>
-      <article class="card"><h3>Compute er kun én udgift</h3><p>Daytona-eksempel: 2 vCPU + 4 GiB i 20 timer ≈ $3,31. Model, disk, controller og øvrig drift kommer oveni. Ingen samlet prisbesparelse er målt.</p></article>
+      <article class="card"><h3>Tests og CI</h3><p>TDD i udviklingen; CI genkører rigtige tests, build og relevante hurtige sikkerhedschecks før integration.</p></article>
+      <article class="card"><h3>Deployment</h3><p>Brug appens eksisterende CD eller hostingintegration, med dens rettigheder, miljøer og rollback.</p></article>
+      <article class="card"><h3>Agentarbejde</h3><p>Kører i det valgte agentmiljø. Lange jobs behøver ikke optage en GitHub-hosted runner, mens vi venter.</p></article>
     </div>
-    <p class="note">Cursor er et alternativ, hvis færdig browser/desktop sparer opsætning. Vi bygger én cloudadapter først. <a href="cloud-setup.md">Se alternativer, prisgrundlag og Cloudroom-gennemgang</a>.</p>
+    <p class="note"><strong>Lavprisvalg:</strong> egne Actions-runners bruger ikke hosted-minutpuljen efter de aktuelle regler. En egnet lokal model kan også fjerne API-regningen. Maskinen skal være tændt; strøm, drift, lager og apphosting tæller stadig. <a href="low-cost.md">Runnerregler og Codex Security i CI</a>.</p>
   </section>
 
-  <section aria-labelledby="status-title">
-    <h2 id="status-title">Hvad findes allerede?</h2>
-    <p><strong>Bygget:</strong> lokalt dashboard, opgaver, GitHub-læsning, journal, stop og evidensimport. <strong>Syntetisk afprøvet:</strong> Pi og Security. <strong>Mangler:</strong> fjernworker, automatisk jobforløb og rigtige pilotmålinger. Cloudprofilen er endnu en plan.</p>
+  <section aria-labelledby="profiles-title">
+    <h2 id="profiles-title">Samme pakke, forskellige installationer</h2>
+    <div class="roadmap">
+      <p><b>Mac + cloudabonnement</b>Brug udbyderens agentmiljø og integration. GitHub er arbejdsfladen. Ingen egen controller, hvis tjenesten dækker behovet.</p>
+      <p><b>Z13 + lokal model</b>Agent og eventuelt CI kører på din egen tændte maskine. Afprøv model, værktøjer og afgrænset arbejdsmiljø.</p>
+      <p><b>Egen sky</b>Valgt agent på egen VM eller sandbox. Cloudroom er inspiration til drift; ingen bestemt runtime er produktkrav.</p>
+    </div>
   </section>
 
   <section aria-labelledby="build-title">
-    <h2 id="build-title">Næste byggetrin · tre vertical slices</h2>
-    <div class="roadmap">
-      <p><b>1 / Én opgave gennem skyen</b>Forberedt opgave → Pi-sandbox → synlig reviewpakke. Med fast revision, adgangsgrænser, timeout og stop fra første slice.</p>
-      <p><b>2 / Afbryd og kom tilbage</b>Genfind jobbet efter mistet forbindelse eller genstart. Ingen dobbelt worker, tabte beviser eller nulstillet budget.</p>
-      <p><b>3 / Tilslut GitHub-flowet</b>En godkendt issue følger samme vej til PR og review. Derefter tre Kastanje-opgaver, inklusive videreudvikling af tidligere kode.</p>
-    </div>
-    <p class="note">Behov → arkitektur → kodevalg → små fungerende dele. Afprøv hver del, gem beviser og fortsæt inden for aftalt scope. Ukendt status eller pris skal være synlig.</p>
+    <h2 id="build-title">Hvad ligger klar nu?</h2>
+    <p><strong>Eksportérbar pakke:</strong> seks skills, fælles regler, installationsark, aflevering/målinger, issue-form og inaktivt CI-eksempel. Eksporten overskriver ikke appens filer. Den lokale runner og dashboardet er bevaret som tilvalg.</p>
+    <p class="note"><strong>Næste prøve:</strong> tilslut én eksisterende app med dens valgte agent og CI → gennemfør én lille vertical slice → review faktiske beviser. Automatisér derefter et konkret gentaget trin. Ingen provider er forhåndsvalgt.</p>
   </section>
 
   <footer>
-    <p><strong>Til dit review:</strong> cloudretning, komponentvalg og byggeorden. Kontoopsætning, deployment og betalte forsøg er ikke udført.</p>
-    <p><a href="cloud-setup.md">Cloudguide og primære kilder</a> · <a href="next-runtime.md">Byggeplan</a> · <a href="value.md">Målemetode</a> · <a href="dex-review.md">Dex og playbook</a> · <a href="proof.md">Afprøvninger</a>. Siden virker offline uden JavaScript.</p>
+    <p><strong>Status:</strong> pakken er bygget og eksporten afprøvet. Rigtig kunde-/modelpilot, runnerregistrering og cloudautomation er endnu ikke udført.</p>
+    <p><a href="adoption.md">Produkt og opsætning</a> · <a href="../kit/README.md">Den konkrete pakke</a> · <a href="../kit/policy.md">CI/CD og security-regler</a> · <a href="low-cost.md">Lavprisprofil</a> · <a href="proof.md">Afprøvninger</a>. Siden virker offline uden JavaScript.</p>
   </footer>
 </main>
 </body>
