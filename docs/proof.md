@@ -26,3 +26,17 @@ The restored dashboard displays the native queue, task stages, history and actua
 ## Limits
 
 Real Codex/Pi inference inside the factory, local-model network access, application-specific browser/toolchain capability, cost, token reporting, production connectors and autonomous deployment have not been qualified by these synthetic tests. A separately successful host-local model request is not proof that an isolated factory job can use it. Application installations require a real bounded pilot after scope, credentials, toolchain and checks are selected.
+
+## 0.3.2 — application build workspace
+
+Verification now uses an isolated disk-backed checkout so native builds can exceed
+1 GiB without exhausting the temporary RAM filesystem. CPU/process limits are
+configurable and validated; defaults preserve the earlier limits. The source
+candidate remains read-only and scratch is removed only after container stop.
+
+Linux Docker qualification passed all nine paths, including a real 1,100 MiB
+write, read-only candidate mounts, configured CPU/process limits and scratch
+cleanup after both success and failed checks. Existing candidate/policy guards,
+retry, cancellation, timeout and incident/restart checks passed. The 20 package/
+runtime tests and 39 dashboard tests passed. No application development agent
+was launched by this fixture qualification.

@@ -33,6 +33,8 @@ export function configAt(state) {
   if (!Number.isInteger(config.port) || config.port < 1024 || config.port > 65535) throw new Error('Invalid port');
   if (!Number.isInteger(config.timeoutSeconds) || config.timeoutSeconds < 1 || config.timeoutSeconds > 7200) throw new Error('timeoutSeconds must be 1–7200');
   if (!Number.isInteger(config.memoryMiB) || config.memoryMiB < 256) throw new Error('Invalid memory limit');
+  if (config.cpus !== undefined && (!Number.isInteger(config.cpus) || config.cpus < 1 || config.cpus > 32)) throw new Error('cpus must be 1–32');
+  if (config.pidsLimit !== undefined && (!Number.isInteger(config.pidsLimit) || config.pidsLimit < 64 || config.pidsLimit > 16384)) throw new Error('pidsLimit must be 64–16384');
   if (!['none','bridge'].includes(config.network)) throw new Error('network must be none or bridge; host networking is not supported');
   if (typeof config.image !== 'string' || !/^[a-zA-Z0-9][a-zA-Z0-9_./:@-]*$/.test(config.image)) throw new Error('Invalid container image');
   if (typeof config.repo !== 'string' || !isAbsolute(config.repo) || [config.repo,state,ROOT].some(p=>/[,\n\r]/.test(p))) throw new Error('Expected absolute paths without commas or line breaks');

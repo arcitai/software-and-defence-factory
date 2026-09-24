@@ -54,3 +54,14 @@ ssh -N -L 127.0.0.1:7331:127.0.0.1:7331 your-host
 Open http://127.0.0.1:7331 on the client. Use the same local/remote port because the HTTP service validates its Host header. The SSH connection must remain open. Access also works across different networks when your configured private network connects the hosts.
 
 Use `status`, `cancel JOB_ID`, `retry JOB_ID` and `stop`, always with the selected `--state`. `service` prints a systemd user-service definition; review and install it through the host's normal service management. It is not enabled by printing it. See [recovery](recovery.md).
+
+## Native application builds
+
+Pin an application-specific image with the required toolchains. In `factory.json`,
+`cpus` (1–32, default 2), `pidsLimit` (64–16384, default 256), `memoryMiB` and
+`timeoutSeconds` bound the job's resources. Verification uses a separate
+disk-backed checkout, keeping the candidate read-only. Its private scratch
+directory is removed after container termination is confirmed. Interrupted
+executors may retain scratch under their attempt for recovery; stop/reconcile
+the job before removing it. Ensure the state filesystem has sufficient space.
+No Docker socket, operator credentials or unrelated project caches are mounted.

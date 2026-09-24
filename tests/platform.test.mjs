@@ -43,9 +43,11 @@ test('incident report is a typed draft; model claims cannot verify cause, recove
 });
 test('configuration rejects unsafe network and command shapes before process launch',t=>{
   const state=instance(t),base=configAt(state);
-  for(const change of [{network:'host'},{command:'sh -c anything'},{repo:'/tmp/a,target=/'},{scope:{}}]) {
+  for(const change of [{network:'host'},{command:'sh -c anything'},{repo:'/tmp/a,target=/'},{scope:{}},{cpus:0},{cpus:33},{cpus:'8'},{pidsLimit:1},{pidsLimit:16385},{pidsLimit:'1024'}]) {
     save(join(state,'factory.json'),{...base,...change});assert.throws(()=>configAt(state));
   }
+  save(join(state,'factory.json'),{...base,cpus:8,pidsLimit:2048});
+  assert.equal(configAt(state).cpus,8);
 });
 test('init preserves app and refuses to overwrite an existing installation',t=>{
   const parent=instance(t),repo=join(parent,'app'),state=join(parent,'new-state');mkdirSync(repo);

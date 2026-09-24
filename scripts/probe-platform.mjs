@@ -32,6 +32,19 @@ try {
   await cli('approve',pass.id);await waitState(pass.id,'succeeded');
   assert.equal(json(join(folder,'accepted.json')).head,candidate.head);record('software: exact revision, isolated checkout, checks, review, approval, handoff');
 
+  setConfig({cpus:4,pidsLimit:1024,check:"test \"$(cat value.txt)\" = fixed && dd if=/dev/zero of=large-build-fixture bs=1M count=1100 status=none && sleep 2"});
+  const native=await work('Synthetic disk-backed build verification');
+  const checking=await until(()=>containers(state).find(c=>c.Config.Labels['sdf.job']===native.id&&c.State.Running&&c.Config.Env.includes('FACTORY_PHASE=verify')));
+  assert.equal(checking.HostConfig.NanoCpus,4000000000);assert.equal(checking.HostConfig.PidsLimit,1024);
+  assert(checking.Mounts.some(m=>m.Destination==='/scratch'&&m.RW));
+  assert(checking.Mounts.some(m=>m.Destination==='/workspace'&&!m.RW));
+  await waitState(native.id,'awaiting_approval');
+  const verification=(await snapshot(native.id)).runs.find(r=>r.command==='verify');
+  assert(!existsSync(join(state,'jobs',native.id,verification.id,'check-workspace')));
+  assert(!existsSync(join(state,'jobs',native.id,'checkout/large-build-fixture')));
+  await cli('approve',native.id);await waitState(native.id,'succeeded');setConfig({});
+  record('native build scratch exceeds 1 GiB without changing the candidate; limits and cleanup verified');
+
   const changed=await work('Synthetic changed revision guard');await waitState(changed.id,'awaiting_approval');
   writeFileSync(join(state,'jobs',changed.id,'checkout/value.txt'),'changed after review\n');
   await cli('approve',changed.id);await waitState(changed.id,'failed');
@@ -44,6 +57,7 @@ try {
   setConfig({check:'exit 17'});
   const fail=await work('Synthetic failing check');await waitState(fail.id,'failed');
   assert.equal((await snapshot(fail.id)).runs.at(-1).command,'verify');
+  assert(!existsSync(join(state,'jobs',fail.id,(await snapshot(fail.id)).runs.at(-1).id,'check-workspace')));
   setConfig({});await cli('retry',fail.id);await waitState(fail.id,'awaiting_approval');
   await cli('approve',fail.id);await waitState(fail.id,'succeeded');record('failed app check blocks delivery; controlled retry rechecks same candidate');
 
