@@ -241,3 +241,31 @@ image without changing the working state, reject selection with active or
 unreconciled work, then verify `doctor` and `up` against the selected image.
 No model or toolchain qualification is claimed by image installation or by
 these source tests.
+
+### Operator proof and real self-development delivery
+
+The real Factory development job `job_622021808e2f7e09d4a9b0b2` used the released
+0.4.3 runtime and Codex `gpt-6-luna` with `max` reasoning. Its source was held at
+`0ea5a204f6454e0e6264060529a1f788c1874a5f`; the recorded base matched. Factory
+produced candidate `567c3665cdb42f353877f8a7f4f83196a2f2d576`, ran the configured
+full checks, obtained a separate passing review, and completed explicitly
+approved handoff for that same candidate/policy. This was a real repository
+change, not the arithmetic demo. The local-model profile remains unqualified.
+
+The operator separately exercised 11 real-Docker cases on that candidate:
+custom selection/doctor, repeat selection, shared-tag movement across two
+installations, missing-image preservation, live-controller refusal, unresolved
+attempt refusal, retained-container refusal, mismatched metadata/failed startup,
+custom-to-custom selection, ordinary standard installation, and preservation of
+the real profile and application source. All passed. Those fixtures made no
+model calls. Failed metadata-write rollback is covered by deterministic fault
+injection; power-loss recovery is not claimed.
+
+The 0.4.4 delivery adds the generic repository-readiness guide, staged issue form,
+capability inventory and accepted future dashboard design to the Factory-owned
+implementation. The integrated package passed 44 runtime/package tests and
+44 dashboard tests. The existing UI source is unchanged. Publication and
+installed-artifact readback are recorded with the delivery PR for #30/#40; the
+operator still owns that external step. This proves supervised self-development,
+not autonomous issue intake, source snapshots (#28), PR publication (#29), full
+interface parity (#37), security qualification or the future dashboard redesign.

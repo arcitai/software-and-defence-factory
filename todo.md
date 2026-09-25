@@ -16,6 +16,8 @@ interaction and optional project identity. No global project hub is planned.
 - [x] [#33 — retain terminal diagnostics](https://github.com/arcitai/software-and-defence-factory/issues/33): bounded beginning/tail logs, honest terminal exits and regression proof.
 - [x] [#34 — per-attempt executor/model provenance](https://github.com/arcitai/software-and-defence-factory/issues/34): immutable effective profiles, honest legacy unknowns and restart proof.
 
+- [x] [#30 — supported local custom job images](https://github.com/arcitai/software-and-defence-factory/issues/30): produced through a real Factory job, checked/reviewed against its exact candidate, and exercised with disposable Docker states. GUI setup controls remain #37.
+
 ## Ready for supervised self-development
 
 The readiness threshold is one explicitly admitted issue completed by the released
@@ -24,14 +26,13 @@ independent review, operator/platform proof and a normal protected PR. The
 operator retains acceptance and delivery. A complete dashboard redesign or an
 autonomous publisher is not a prerequisite for this scoped development path.
 
-- [#40 — repeatable repository readiness](https://github.com/arcitai/software-and-defence-factory/issues/40): issue forms/labels, honest admission guide, queue and a real self-development delivery.
+- [x] [#40 — repeatable repository readiness](https://github.com/arcitai/software-and-defence-factory/issues/40): issue forms/labels, honest admission guide, queue and a real self-development delivery.
 - [#1 — project-focused dashboard](https://github.com/arcitai/software-and-defence-factory/issues/1): follow [DESIGN.md](DESIGN.md), inspired by Build by Warp. The owner has selected this direction; it supersedes preserving the inherited layout. Preserve working actions and evidence.
 
 ## Remove remaining operator work
 
-1. [#30 — supported custom job-image selection](https://github.com/arcitai/software-and-defence-factory/issues/30): remove the manual installation-metadata step.
-2. [#28 — immutable source admission](https://github.com/arcitai/software-and-defence-factory/issues/28): eliminate the controlled-checkout workaround.
-3. [#29 — optional trusted PR handoff](https://github.com/arcitai/software-and-defence-factory/issues/29), after #28. [#12](https://github.com/arcitai/software-and-defence-factory/issues/12) retains the overall source/delivery contract.
+1. [#28 — immutable source admission](https://github.com/arcitai/software-and-defence-factory/issues/28): eliminate the controlled-checkout workaround.
+2. [#29 — optional trusted PR handoff](https://github.com/arcitai/software-and-defence-factory/issues/29), after #28. [#12](https://github.com/arcitai/software-and-defence-factory/issues/12) retains the overall source/delivery contract.
 
 ## One Factory, two interfaces
 
