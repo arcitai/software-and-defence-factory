@@ -13,6 +13,7 @@ import { PageHeading } from "@/components/ui/page-heading";
 import { cn } from "@/lib/utils";
 import { routeFromHash } from "@/routes";
 import { boardColumns, currentRun, filterJobs, groupJobsByBoardColumn, jobCounts, jobDisplayTitle } from "@/runs-board";
+import { projectIdentity, repositoryLabel } from "@/project-identity";
 import { createStatusLoader } from "@/status-loader";
 import { TriggersPage } from "@/triggers";
 import "./styles.css";
@@ -93,6 +94,7 @@ function App() {
   const choices = useMemo(() => selectionChoices(status), [status.commands, status.workflows]);
 
   const repositories = status.repositories;
+  const identity = projectIdentity(status.repo);
 
   const counts = useMemo(() => jobCounts(status.jobs), [status.jobs]);
   const visibleJobs = useMemo(() => filterJobs(status.jobs, filter), [filter, status.jobs]);
@@ -187,6 +189,7 @@ function App() {
       </aside>
 
       <main className="workshop min-w-0 flex-1">
+        <ProjectContext identity={identity} loaded={statusLoaded} error={statusError} />
         {view === "task" ? <TaskDetail csrfToken={status.csrf_token} job={selectedJob} loaded={statusLoaded} error={statusError || taskActionError} deleting={deletingJob === route.jobID} onDelete={deleteJob} onWorkflowAction={workflowAction} /> : view === "analytics" ? <Analytics jobs={status.jobs} loaded={statusLoaded} error={statusError} /> : view === "workers" ? <WorkersPage workers={status.workers} loaded={statusLoaded} error={statusError} /> : view === "triggers" ? <TriggersPage triggers={status.triggers || []} loaded={statusLoaded} error={statusError} /> : ["commands", "workflows"].includes(view) ? <CommandsPage /> : <div className="mx-auto max-w-[1500px] space-y-6 p-4 sm:p-6 lg:p-8">
           <PageHeading title="Tasks" description={status.agent === "mock" ? "Synthetic installation demo — no model calls." : "Describe the work. Review the result."}>
             <div className="flex items-center gap-2">
@@ -194,7 +197,7 @@ function App() {
             </div>
           </PageHeading>
 
-          {composerOpen && <RunComposer title={title} setTitle={setTitle} sourceURL={sourceURL} setSourceURL={setSourceURL} choices={choices} repositories={repositories} selection={selection} setSelection={setSelection} repository={repository} setRepository={setRepository} prompt={prompt} setPrompt={setPrompt} model={model} setModel={setModel} submitting={submitting} submit={submit} close={() => setComposerOpen(false)} />}
+          {composerOpen && <RunComposer title={title} setTitle={setTitle} sourceURL={sourceURL} setSourceURL={setSourceURL} choices={choices} repositories={repositories} identity={identity} selection={selection} setSelection={setSelection} repository={repository} setRepository={setRepository} prompt={prompt} setPrompt={setPrompt} model={model} setModel={setModel} submitting={submitting} submit={submit} close={() => setComposerOpen(false)} />}
           {(statusError || submitError) && <div role="alert" className="rounded-md border border-danger/35 bg-danger/10 px-3 py-2 text-sm text-danger">{submitError || statusError}</div>}
 
           <section>
@@ -224,7 +227,25 @@ function App() {
   );
 }
 
-function RunComposer({ title,setTitle,sourceURL,setSourceURL,choices,repositories,selection,setSelection,repository,setRepository,prompt,setPrompt,model,setModel,submitting,submit,close }) {
+function ProjectContext({ identity, loaded, error }) {
+  const title = identity?.name || (!loaded && !error ? "Loading configured project…" : "Project identity unavailable");
+  const freshness = error ? loaded ? "Status stale" : "Status unavailable" : loaded ? "Status current" : "Loading status";
+  return <header aria-label="Configured project" className="sticky top-14 z-30 border-b border-border bg-background/95 px-4 py-2 backdrop-blur md:top-0 sm:px-6 lg:px-8">
+    <div className="mx-auto grid min-w-0 max-w-[1500px] grid-cols-[minmax(0,1fr)_auto] items-center gap-x-3 gap-y-1">
+      <div className="flex min-w-0 items-center gap-2">
+        <span className="shrink-0 text-xs text-muted-foreground">Project</span>
+        <strong className="min-w-0 truncate text-sm font-semibold" title={identity?.name}>{title}</strong>
+      </div>
+      {identity && <details className="col-span-2 row-start-2 min-w-0 text-xs text-muted-foreground">
+        <summary className="w-fit cursor-pointer rounded-sm focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring">Configured path</summary>
+        <div className="break-all pt-1">{identity.path}</div>
+      </details>}
+      <span className={cn("row-start-1 col-start-2 shrink-0 text-right text-xs", error ? "text-warning" : "text-muted-foreground")} title={error || undefined} aria-label={error ? `${freshness}: ${error}` : freshness} aria-live="polite">{freshness}</span>
+    </div>
+  </header>;
+}
+
+function RunComposer({ title,setTitle,sourceURL,setSourceURL,choices,repositories,identity,selection,setSelection,repository,setRepository,prompt,setPrompt,model,setModel,submitting,submit,close }) {
   const specHintID=React.useId();
   const isTask=selection.startsWith("workflow:");
   return <Card className="overflow-hidden border-primary/25">
@@ -235,7 +256,7 @@ function RunComposer({ title,setTitle,sourceURL,setSourceURL,choices,repositorie
       <section className="text-sm">
         <div className="grid gap-4 sm:grid-cols-2">
           <label><span className="field-label">{isTask ? "Workflow" : "Command"}</span><select className="field-control" value={selection} onChange={e=>setSelection(e.target.value)} required>{choices.map(c=><option key={c.value} value={c.value}>{c.label}</option>)}</select></label>
-          <label><span className="field-label">Repository</span><select className="field-control" value={repository} onChange={e=>setRepository(e.target.value)} required>{!repositories.length && <option value="">No repositories available</option>}{repositories.map(r=><option key={r} value={r}>{r}</option>)}</select></label>
+          <label><span className="field-label">Repository</span><select className="field-control" value={repository} onChange={e=>setRepository(e.target.value)} required>{!repositories.length && <option value="">No repositories available</option>}{repositories.map(r=><option key={r} value={r}>{repositoryLabel(r,identity)}</option>)}</select></label>
           {isTask && <><label><span className="field-label">Title · optional</span><input className="field-control" value={title} onChange={e=>setTitle(e.target.value)} maxLength={512} placeholder="From your instructions by default" /><span className="mt-1 block text-xs text-muted-foreground">Shown in the task board</span></label><label><span className="field-label">Source link · optional</span><input type="url" className="field-control" value={sourceURL} onChange={e=>setSourceURL(e.target.value)} placeholder="https://github.com/…" /><span className="mt-1 block text-xs text-muted-foreground">Preserved with the task requirements</span></label></>}
           <label><span className="field-label">Model · optional</span><input className="field-control" value={model} onChange={e=>setModel(e.target.value)} maxLength={128} placeholder="Workflow default" /></label>
         </div>
