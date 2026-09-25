@@ -10,17 +10,18 @@ interaction and optional project identity. No global project hub is planned.
 - [x] [#26 — contributor and worker development foundation](https://github.com/arcitai/software-and-defence-factory/issues/26).
 - [x] [#25 — visible project identity and task composer label](https://github.com/arcitai/software-and-defence-factory/issues/25). Real worker pilot with separate browser acceptance and reviewed PR delivery; local-model attempts failed and remain qualification evidence, not a qualified profile.
 
-## Next: reliable execution
+## Completed reliability slice
 
-Start with the review recovery gap exposed by the first real task, then remove
-the remaining manual setup and handoff steps.
+- [x] [#35 — revise a stopped software review](https://github.com/arcitai/software-and-defence-factory/issues/35): explicit feedback starts fresh implementation/checks/review/approval and preserves failed attempts.
+- [x] [#33 — retain terminal diagnostics](https://github.com/arcitai/software-and-defence-factory/issues/33): bounded beginning/tail logs, honest terminal exits and regression proof.
+- [x] [#34 — per-attempt executor/model provenance](https://github.com/arcitai/software-and-defence-factory/issues/34): immutable effective profiles, honest legacy unknowns and restart proof.
 
-1. [#35 — revise a stopped software review](https://github.com/arcitai/software-and-defence-factory/issues/35): preserve the old candidate and restart implementation with explicit feedback.
-2. [#33 — retain terminal diagnostics](https://github.com/arcitai/software-and-defence-factory/issues/33), and [#34 — per-attempt executor/model provenance](https://github.com/arcitai/software-and-defence-factory/issues/34): make failures diagnosable and history truthful.
+## Next: setup and handoff
 
-3. [#30 — supported custom job-image selection](https://github.com/arcitai/software-and-defence-factory/issues/30): remove the manual installation-metadata step.
-4. [#28 — immutable source admission](https://github.com/arcitai/software-and-defence-factory/issues/28): eliminate the controlled-checkout workaround.
-5. [#29 — optional trusted PR handoff](https://github.com/arcitai/software-and-defence-factory/issues/29), after #28. [#12](https://github.com/arcitai/software-and-defence-factory/issues/12) retains the overall source/delivery contract.
+1. [#30 — supported custom job-image selection](https://github.com/arcitai/software-and-defence-factory/issues/30): remove the manual installation-metadata step.
+2. [#28 — immutable source admission](https://github.com/arcitai/software-and-defence-factory/issues/28): eliminate the controlled-checkout workaround.
+3. [#29 — optional trusted PR handoff](https://github.com/arcitai/software-and-defence-factory/issues/29), after #28. [#12](https://github.com/arcitai/software-and-defence-factory/issues/12) retains the overall source/delivery contract.
+
 ## Dashboard track
 
 These scoped design changes can progress independently of automatic PR handoff.

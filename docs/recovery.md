@@ -21,3 +21,72 @@ confirmed. If a filesystem error still prevents cleanup, the attempt fails and
 retains the original check exit and private log path alongside the cleanup error.
 Inspect that retained attempt before manual removal; never substitute the source
 candidate path for the scratch path.
+
+## Review feedback or phase retry
+
+Use **Request changes** on a failed software review only when its validated
+verdict is `changes` or `blocked`, or at the normal approval gate. The CLI
+provides the same action:
+
+```sh
+software-defence-factory revise JOB_ID --file /private/revision.md --state /private/state/project
+```
+
+Feedback must be nonempty and at most 4,000 characters. It is accumulated in the
+bounded job prompt. The controller checks the latest attempt and reconciles its
+processes before starting a new build from the configured source with that
+feedback. The old checkout moves to `previous-checkout-*`; the old failed review
+and reports remain intact. Verification, review and operator approval are all
+required again. A stale or duplicate request cannot approve or restart a newer
+attempt. **Retry** only repeats the stopped phase and is suitable for a repaired
+execution environment; retrying review cannot change the candidate.
+
+A crashed review without a validated verdict cannot request implementation
+changes. Inspect the private log and restore the missing runtime capability
+before retrying. For pre-0.4.3 jobs, the controller can recognize a failed review
+only from that attempt's retained `review.json`, matching the candidate and
+successful check policy. Missing or mismatched evidence grants no revision action.
+Do not edit SQLite, rewrite verdicts or create acceptance records to bypass this.
+
+## Bounded diagnostics
+
+Each attempt's private `<phase>.log` retains the first 128 KiB and last 768 KiB
+of observed Docker stdout/stderr. A truncation marker identifies omitted bytes;
+the footer records process exit code, signal and stream byte counts. UTF-8 is
+decoded separately per pipe; interleaving reflects observed arrival order, not a
+guarantee of ordering between pipes. Inspect `artifacts/<run>/executor.log` and
+`result.json` for controller/adapter failures as well. Raw model logs remain
+private: do not paste them into public issues without sanitizing them.
+
+A terminal log line is diagnostic evidence, not a replacement for required
+agent reports, passing checks or review. Nonzero exits and missing/malformed
+reports still fail closed. Process termination during a host crash can leave
+incomplete logs and an interrupted attempt; apply process reconciliation above.
+
+## Recorded execution profiles
+
+Before each attempt executes, the controller freezes its effective configuration
+and resolves the Docker image tag to an immutable image ID. The private
+`<run>/execution-config.json` is mode 0600 and is not a dashboard artifact. Its
+command can contain private operator configuration; preserve it only in private
+backups. The inference environment remains private and is never exported.
+
+The allowlisted `artifacts/<run>/execution.json`, measurement and dashboard
+agree on executor, requested model, controller version, immutable image and
+policy hash. This hash fingerprints the effective runtime configuration JSON; it
+is not the SHA-256 of the mounted `policy.md` file. Verification and handoff are deterministic and have no model;
+handoff has no job container. Mock executions also have no model; arbitrary
+custom commands have unknown model selection rather than a fabricated provider
+default. Only supported Codex/Pi profiles record a configured model request.
+A requested model is configuration, not independent
+proof of the model/provider that served inference. Changing the installation's
+profile affects subsequent attempts, never the recorded history. A changed
+check/review policy still invalidates acceptance of earlier proof.
+
+Attempts made before this metadata existed display **Not recorded
+(legacy/unknown)**. Do not copy today's profile onto them. For an investigation,
+compare the retained per-attempt measurement, logs, candidate/check/review hashes
+and any contemporaneous private configuration backup. Record only corroborated
+facts in a separate private incident note with evidence paths and unknowns; leave
+the original queue/evidence unchanged. Without that evidence, model/image facts
+cannot be reconstructed reliably.

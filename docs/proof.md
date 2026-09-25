@@ -171,3 +171,52 @@ Node 22/24 PR checks now protect main. This exercise does not qualify the local
 model, long-term headless auth refresh, broader security profile (#6), live
 Defence (#7) or fully unattended delivery. Private logs and host paths remain
 outside the public package.
+
+## 0.4.3 — revision recovery, bounded logs and attempt provenance
+
+The final package passed 35 runtime/package and 44 dashboard tests. All twelve
+existing Docker qualification paths also passed, including cancellation, timeout,
+immutable candidate/policy guards, recovery and retained image installation.
+
+An isolated synthetic Docker installation exercised both `changes` and `blocked`
+review outcomes through CLI revision, fresh build/check/review and a new approval.
+It retained the original failed review, unchanged report and previous candidate;
+stale approval and duplicate feedback were rejected. A separate browser journey
+exercised the same feedback and approval controls at desktop 1440×1000 and narrow
+390×844 in both themes. Previous failed reviews and execution facts remained in
+History. An initial browser assertion expected the wrong completion heading;
+readback confirmed the actual **Task complete** state and retained evidence.
+
+A deterministic Docker process emitted more than 3 MiB and then a terminal error
+on stderr, exiting 17 without an agent report. The retained log was below 1 MiB,
+contained startup and terminal diagnostics plus exit/truncation metadata, and the
+attempt failed without acceptance. Retrying with a different profile and
+restarting the real controller preserved both attempts' original profiles and
+exported measurements. UTF-8 boundaries, stream interleaving, legacy unknowns,
+private-field exclusion and stale/rejected actions also have regressions.
+
+Only after that deterministic proof, a bounded real Codex GPT-6 Luna/max profile
+changed one line in an isolated fixture. Its build, configured check and separate
+review passed. Each agent phase had a 300-second limit. Logs recorded terminal
+exits and the exact requested model/image/configuration profile; inference
+credentials were not exported. The review incorrectly compared the configuration
+policy hash to the mounted Markdown file hash; operator inspection reconciled
+the effective-configuration digest before approval. This is a tiny real-model
+control-flow qualification, not proof of local-model adequacy, application
+quality, persistent credential refresh or the broader security profile (#6).
+
+To repeat the additional synthetic probes, use a dedicated mock installation
+with a committed `value.txt` containing `broken` and a check requiring `fixed`,
+as in the platform probe. Finish active fixture jobs first; the probes modify
+only that fixture's private configuration and restore it afterwards:
+
+```sh
+node scripts/probe-review.mjs /private/state/synthetic-fixture
+node scripts/probe-diagnostics.mjs /private/state/synthetic-fixture
+```
+
+Both probes require a running controller, installed Node-capable Docker image
+and the `mock` profile; they make no model calls. Never use an application state
+for qualification. When exercising a source candidate, set `SDF_BOOTSTRAPPED=1`
+so its child CLI commands use that same candidate rather than a managed release.
+See [recovery](recovery.md) for diagnostic limits, safe revision and legacy facts.

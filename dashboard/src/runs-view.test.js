@@ -24,7 +24,7 @@ test("runs default to board view and share filters when switching views", async 
     created_at: "2026-01-01T00:00:00Z", updated_at: "2026-01-01T00:01:00Z",
     runs: [
       { id: "plan", command: "plan", state: "succeeded", outcome: "complete", summary: "Planned" },
-      { id: "build", command: "build", state: "succeeded", outcome: "complete", summary: "Built", executor: "test-executor", model: "test-model", worker_name: "test-worker", duration_millis: 1000, exit_code: 0 },
+      { id: "build", command: "build", state: "succeeded", outcome: "complete", summary: "Built", execution: {executor: "codex", requestedModel: "test-model", runtimeVersion: "test-runtime", image: "sha256:fixture", policyHash: "fixture"}, executor: "codex", model: "test-model", worker_name: "test-worker", duration_millis: 1000, exit_code: 0 },
     ],
   };
   const interruptedJob = { ...detailJob, id: "job_interrupted", state: "interrupted", workflow: { name: "build", steps: ["build"], current_step: 0 }, runs: [{ id: "interrupted", command: "build", state: "interrupted" }] };
@@ -91,7 +91,7 @@ test("runs default to board view and share filters when switching views", async 
   tab("Details").click();
   await eventually(() => assert.equal(tab("Details").getAttribute("aria-selected"), "true"));
   const details = document.querySelector('[role="tabpanel"]:not([hidden])');
-  for (const text of ["test-executor", "test-model", "test-worker", "Not reported", "Delete task", "Exit code"]) {
+  for (const text of ["codex", "test-model", "test-worker", "Not reported", "Delete task", "Exit code"]) {
     assert.ok(details.textContent.includes(text), `details include ${text}`);
   }
   tab("History").click();
