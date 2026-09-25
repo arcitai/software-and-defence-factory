@@ -202,6 +202,7 @@ test('an unfinished or failed later turn cannot claim complete attempt coverage'
   const done=completed({input_tokens:20,output_tokens:3,cached_input_tokens:12});
   assert.equal(parseCodexJsonl([start,done]).coverage,'complete');
   assert.equal(parseCodexJsonl([start,done,start]).coverage,'partial');
+  assert.equal(parseCodexJsonl([start,start,done]).coverage,'partial','a second start cannot erase an unfinished turn');
   assert.equal(parseCodexJsonl([start,done,Buffer.from('{"type":"turn.failed","error":{"message":"private fixture"}}\n')]).coverage,'partial');
   assert.equal(parseCodexJsonl([start]),null,'no count is invented for the unfinished first turn');
   assert.equal(parseCodexJsonl([done,Buffer.from('{"type":"item.completed","item":{"type":"turn.started"}}\n')]).coverage,'complete','nested events are not turn boundaries');

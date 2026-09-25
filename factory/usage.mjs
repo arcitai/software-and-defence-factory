@@ -104,7 +104,7 @@ export class CodexUsageParser {
     try { event = JSON.parse(text); }
     catch { if (topLevelTurnPrefix(text)) this.incomplete = true; return; }
     if (!record(event)) return;
-    if (event.type === 'turn.started') { this.pendingTurn = true; return; }
+    if (event.type === 'turn.started') { if (this.pendingTurn) this.incomplete = true; this.pendingTurn = true; return; }
     if (event.type === 'turn.failed') { this.pendingTurn = false; this.incomplete = true; return; }
     if (event.type !== 'turn.completed') return;
     this.pendingTurn = false;
