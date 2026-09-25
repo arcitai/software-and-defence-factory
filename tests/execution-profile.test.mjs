@@ -16,6 +16,11 @@ test('model overrides and public phase facts are isolated from credentials and m
   const profile=executionProfile(effective,'build');
   assert.equal(profile.requestedModel,'requested');assert.equal(profile.image,image);assert(!JSON.stringify(profile).includes('PRIVATE_SENTINEL'));
   assert.equal(executionProfile(effective,'verify').requestedModel,null);
+  for(const [agent,selection] of [['mock','not_applicable'],['custom','unknown']]) {
+    const profile=executionProfile({...effective,agent},'build');assert.equal(profile.requestedModel,null);assert.equal(profile.modelSelection,selection);
+  }
+  assert.equal(profile.modelSelection,'explicit');
+  assert.equal(executionProfile({...effective,model:null},'build').modelSelection,'provider_default');
   assert.equal(executionProfile(effective,'handoff').executor,'deterministic');
   assert.equal(executionProfile(effective,'handoff').image,null);
   assert.throws(()=>withRequestedModel({...config,agent:'custom'},'other'),/overrides/);

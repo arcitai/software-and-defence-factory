@@ -17,9 +17,13 @@ export function withRequestedModel(configuration, requestedModel) {
 // Public facts only. The complete admitted configuration stays in private state.
 export function executionProfile(config, phase) {
   const deterministic = ['verify', 'handoff'].includes(phase);
+  const applicable = !deterministic && config.agent !== 'mock';
+  const provider = applicable && ['codex', 'pi'].includes(config.agent);
+  const requestedModel = provider ? config.model || null : null;
   return {
     version: 1, phase, executor: deterministic ? 'deterministic' : config.agent,
-    requestedModel: deterministic ? null : config.model || null,
+    requestedModel,
+    modelSelection: !applicable ? 'not_applicable' : !provider ? 'unknown' : requestedModel ? 'explicit' : 'provider_default',
     runtimeVersion: VERSION, image: phase === 'handoff' ? null : config.image,
     policyHash: digest(JSON.stringify(config)), workerName: hostname(),
   };

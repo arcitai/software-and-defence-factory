@@ -33,6 +33,12 @@ test('failed review offers explicit revision, preserves denied/stale feedback, a
   assert.match(document.body.textContent,/requested-model/);assert.match(document.body.textContent,/test-version/);assert.match(document.body.textContent,/policy-fixture/);
   await act(()=>document.querySelector('[role="tab"][id$="history"]').click());
   assert.match(document.body.textContent,/Not recorded \(legacy\/unknown\)/);
+  for(const [executor,label] of [['mock','Not applicable'],['custom','Not recorded by custom executor']]) {
+    Object.assign(runs[1],{executor,model:null});await render();
+    await act(()=>document.querySelector('[role="tab"][id$="details"]').click());
+    const text=document.querySelector('[role="tabpanel"]:not([hidden])').textContent;
+    assert.match(text,new RegExp(label));assert(!text.includes('Provider default requested'));
+  }
   job.can_request_changes=false;await render();
   await act(()=>document.querySelector('[role="tab"][id$="result"]').click());assert(!button('Request changes'));
 });

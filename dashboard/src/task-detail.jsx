@@ -293,6 +293,10 @@ export function TaskDetail({
 }
 
 function ExecutionDetails({ run }) {
+  const modelLabel = !run.execution ? "Not recorded"
+    : run.execution.modelSelection === "not_applicable" || ["deterministic", "mock"].includes(run.executor) ? "Not applicable"
+    : !["codex", "pi"].includes(run.executor) ? "Not recorded by custom executor"
+    : run.model || "Provider default requested";
   return (
     <section
       aria-label="execution details"
@@ -321,7 +325,7 @@ function ExecutionDetails({ run }) {
               : "Not available"
           }
         />
-        <RunMetric label="Requested model" value={!run.execution ? "Not recorded" : run.executor === "deterministic" ? "Not applicable" : run.model || "Provider default requested"} />
+        <RunMetric label="Requested model" value={modelLabel} />
         <RunMetric label="Runtime version" value={run.execution?.runtimeVersion || "Not recorded"} />
         <RunMetric label="Job image" value={run.execution ? run.execution.image || "Not applicable" : "Not recorded"} mono />
         <RunMetric label="Policy hash" value={run.execution?.policyHash || "Not recorded"} mono />

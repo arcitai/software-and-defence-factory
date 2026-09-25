@@ -75,7 +75,10 @@ The allowlisted `artifacts/<run>/execution.json`, measurement and dashboard
 agree on executor, requested model, controller version, immutable image and
 policy hash. This hash fingerprints the effective runtime configuration JSON; it
 is not the SHA-256 of the mounted `policy.md` file. Verification and handoff are deterministic and have no model;
-handoff has no job container. A requested model is configuration, not independent
+handoff has no job container. Mock executions also have no model; arbitrary
+custom commands have unknown model selection rather than a fabricated provider
+default. Only supported Codex/Pi profiles record a configured model request.
+A requested model is configuration, not independent
 proof of the model/provider that served inference. Changing the installation's
 profile affects subsequent attempts, never the recorded history. A changed
 check/review policy still invalidates acceptance of earlier proof.
