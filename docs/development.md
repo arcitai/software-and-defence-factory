@@ -17,7 +17,8 @@ dashboard/controller per project. A synthetic demo remains a separate
 installation; it is not the project dashboard or proof of product work.
 Other applications need not run while Factory itself is being developed.
 
-The dashboard should identify the project (#25). Optional project identity
+The dashboard identifies the configured directory and keeps its full path in a
+secondary disclosure (#25). The readable task-form label still submits `app`. Optional project identity
 from `DESIGN.md` is planned in #27; it is not supported configuration yet.
 Shared navigation, state meanings, evidence and approvals remain Factory-owned.
 
@@ -62,7 +63,7 @@ model endpoint must be reachable from the actual isolated image/network.
 The setup plan covers that separate connectivity/boot obligation.
 
 For an existing custom image, ordinary `install` would replace its selection.
-Version 0.4.1 has no supported custom-image installation command; #30 tracks
+The current CLI has no supported custom-image installation command; #30 tracks
 that gap. A manually prepared profile must verify and retain the exact Docker
 image ID, record matching `factory.json` and `engine.json` metadata in private
 state, and exercise the real checks. `doctor`'s current installation marker
@@ -94,12 +95,23 @@ completes any browser or other external acceptance before approving.
 
 Inspect failures rather than resubmitting blindly. `cancel JOB_ID` stops the
 selected attempt; after reconciliation, `retry JOB_ID` retains prior evidence.
-Use the dashboard's request-changes path for a changed implementation. Follow
-[recovery](recovery.md) before starting a replacement writer.
+The dashboard's request-changes path currently works only at the approval gate.
+A review returning `changes` or `blocked` stops as a failed review; retry repeats
+that review on the same immutable candidate. It does not reopen implementation.
+Until #35 adds that transition, preserve the failed job and use a separate
+continuation task or a delivery branch with fresh checks and independent review.
+Do not edit an accepted candidate, rewrite reports or force a passing verdict.
+Follow [recovery](recovery.md) before starting a replacement writer.
+
+UI tasks need a browser-capable operator to inspect the built assets, including
+any corrections made after automated review. A stopped review may legitimately
+require that external proof. Keep it tied to the final UI hashes and distinguish
+lead acceptance from the controller's acceptance record. A model response or
+JSDOM test does not establish the rendered layout.
 
 ## Handoff, delivery and operation
 
-Version 0.4.1 returns an accepted patch; #29 tracks optional PR publication.
+The current CLI returns an accepted patch; #29 tracks optional PR publication.
 Apply the patch on a unique branch at its recorded base, compare the resulting
 diff/tree, run applicable integration checks and open a PR. Changed content or
 base needs fresh relevant review. The repository's actual required checks still

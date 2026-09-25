@@ -126,3 +126,48 @@ after human unlock/login, not proof of unattended disk unlock or a separate
 physical-network test. A cached sudo success was found insufficient as evidence
 of a permanent administrator policy; setup now requires inspecting the effective
 policy and an uncached/fresh-boot check when that capability is selected.
+
+## 0.4.2 — configured project identity and first real development pilot
+
+Issue #25 uses the status response's configured path to show a persistent
+project name and a keyboard-accessible path disclosure across dashboard routes.
+The task form uses the readable name while preserving the internal `app` key.
+Initial loading/failure, missing identity and stale retained status are explicit.
+The synthetic-installation disclosure remains present. Optional DESIGN.md
+branding is still future scope (#27), not an implemented theme loader.
+
+The final UI build passed 25 runtime/package tests and 43 dashboard tests.
+Vite/JSDOM coverage checks loading, errors/recovery, missing identity, routes,
+label and submission behavior; those responses are fixtures. Separate Chromium
+inspection used the built assets against the released controller in isolated
+synthetic state. Desktop 1440×1000 and narrow 390×844 passed in both themes,
+including long-path layout, keyboard disclosure and Tasks/detail/Workers/Workflows
+identity. A real browser submission sent `repository: "app"`, created/opened a
+task and completed the synthetic checks/review/handoff. Injected status failures
+showed stale retained identity and initial unavailability, then recovered.
+No application job or production integration was used for this UI acceptance.
+
+The first worker candidate hid its desktop path inside closed `details`; the
+lead browser check caught this despite passing DOM tests. The final disclosure
+is available at every width. Inspected UI asset SHA-256 values:
+
+- JavaScript: `d2801623d75004d4d241068f0701ca7bd45a8bc83f2f162f59d805860f51d2d2`
+- CSS: `42b269f62ca91b7cde1a31652d476df5bd322b2f56a3ca6ac6e7bbd3b9cc3e4f`
+
+The real development pilot held source `6dd9c43816090092281ca23cb2e5cf4bba30a18f`.
+Two Pi/Qwen 35B A3B attempts failed without the required report; neither was
+accepted. A fresh Codex GPT-6 Luna/max attempt produced candidate
+`c0c019cba6155c5b5901d96c2c33264abd639356`, passed configured checks, and received
+an independent `blocked` review for outstanding external browser proof.
+This is observed fail-closed behavior, not a completed Factory acceptance.
+The source patch was carried onto main's documentation update, corrected by the
+lead and given final browser acceptance and a fresh independent delivery review.
+No failed report was rewritten and no controller acceptance record was fabricated.
+
+The pilot exposed missing terminal diagnostics (#33), incorrect historical
+executor/model display (#34) and the missing failed-review-to-revision action
+(#35). The contributor recipe documents the current manual boundary. Required
+Node 22/24 PR checks now protect main. This exercise does not qualify the local
+model, long-term headless auth refresh, broader security profile (#6), live
+Defence (#7) or fully unattended delivery. Private logs and host paths remain
+outside the public package.
