@@ -5,6 +5,7 @@ import { spawnSync } from 'node:child_process';
 import { createServer } from 'node:net';
 import { ROOT, STATE_HOME, DATA_HOME, SOURCE_CHECKOUT } from './paths.mjs';
 import { configAt, json, save, run, api, sleep, digest } from './lib.mjs';
+import { assertInstalledJobImage } from './image-install.mjs';
 import { VERSION, newer, latestVersion, installRelease, busyInstallations } from './updates.mjs';
 import { serviceId, systemdUnit, launchAgent, tunnelArguments, groupArguments, runtimeLauncher } from './service-files.mjs';
 
@@ -127,9 +128,8 @@ async function install(kind, state, flags) {
     console.log(JSON.stringify(await serviceStatus(previous), null, 2)); return;
   }
   if (kind === 'controller') {
-    if (!existsSync(join(state, 'engine.json'))) throw new Error('Run install for this state before installing its service');
+    assertInstalledJobImage(state, configAt(state));
     if (existsSync(join(state, 'supervisor.json')) && alive(json(join(state, 'supervisor.json')).pid)) throw new Error('Stop the manually started controller before adopting it as a service');
-    run('docker', ['image', 'inspect', configAt(state).image]);
   }
   let argv = kind === 'controller' ? [process.execPath, launcher(), 'serve', '--state', state] : tunnelArguments(flags.host, port);
   if (flags.group) {

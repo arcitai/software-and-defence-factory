@@ -5,6 +5,7 @@ import { randomBytes } from 'node:crypto';
 import { spawn } from 'node:child_process';
 import { createServer } from 'node:net';
 import { ROOT, PINS, DEFAULT_STATE, configAt, save, json, run, stream, digest, api, sleep, stopContainers } from '../factory/lib.mjs';
+import { assertInstalledJobImage, installCustomJobImage, installStandardJobImage, inspectImageInstallation } from '../factory/image-install.mjs';
 import { admitIncident } from '../factory/incident.mjs';
 import { DEFAULT_DEMO_STATE } from '../factory/paths.mjs';
 import { bootstrap, registerInstallation, VERSION } from '../factory/updates.mjs';
@@ -47,27 +48,16 @@ function init(repo, agent='codex', check='', port=7331) {
   console.log(`Configured ${state}\nApp files were not changed. Only committed code is cloned into jobs.`);
 }
 
-function retainImage(reference) {
-  let image;
-  try { image=run('docker',['image','inspect','--format','{{.Id}}',reference]); }
-  catch(error) { if(/No such image|No such object/.test(error.message))return null;throw error; }
-  if(!/^sha256:[a-f0-9]{64}$/.test(image))throw new Error('Docker returned an unexpected image identity');
-  // Containerd can drop an untagged manifest when the shared build tag moves.
-  // Keep the exact object reachable; existing installations retain their pins.
-  run('docker',['tag',image,`software-defence-factory-retained:${image.slice(7)}`]);
-  return image;
-}
 async function install() {
   const config=configAt(state);
-  if(existsSync(join(state,'supervisor.json'))&&alive(json(join(state,'supervisor.json')).pid))throw new Error('Stop the factory before installing or updating its runtime');
   if (!['darwin','linux'].includes(process.platform)||!['arm64','x64'].includes(process.arch)) throw new Error('Use macOS/Linux arm64/amd64, or WSL2');
-  run('docker',['info','--format','{{.ServerVersion}}']);
-  retainImage(config.image);retainImage(PINS.jobImage);
-  await stream('docker',['build','-t',PINS.jobImage,join(ROOT,'factory/image')]);
-  config.image=retainImage(PINS.jobImage);
-  if(!config.image)throw new Error('Built job image is unavailable');
-  save(join(state,'factory.json'),config);save(join(state,'engine.json'),{runtime:'native-node',version:VERSION,image:config.image});
-  console.log('Installed. Job image is pinned to its local image ID. No model call made.');
+  if(flags.image) {
+    const selected=installCustomJobImage(state,flags.image,{version:VERSION});
+    console.log(`Installed custom job image ${selected.image} from local reference ${selected.reference}. No image was downloaded or built; no model call made.`);
+    return;
+  }
+  const installed=await installStandardJobImage(state,{version:VERSION});
+  console.log(`Installed standard job image ${installed.image}. No model call made.`);
 }
 async function portFree(port) {
   await new Promise((ok,fail)=>{const server=createServer();server.once('error',fail);server.listen(port,'127.0.0.1',()=>server.close(ok));});
@@ -76,9 +66,9 @@ async function up() {
   const config=configAt(state),lock=join(state,'supervisor.json');
   registerInstallation(state);
   if(existsSync(lock)) { if(alive(json(lock).pid))throw new Error('Supervisor already running; use status');rmSync(lock); }
-  if(!existsSync(join(state,'engine.json')))throw new Error('Run install first');
+  assertInstalledJobImage(state,config);
   if(process.getuid()===0)throw new Error('Run the controller as a dedicated unprivileged user with Docker access');
-  run('docker',['image','inspect',config.image]);await portFree(config.port);
+  await portFree(config.port);
   const fd=openSync(join(state,'supervisor.log'),'a',0o600);
   const child=spawn(process.execPath,[join(ROOT,'factory/supervisor.mjs'),state],{detached:true,stdio:['ignore',fd,fd]});
   closeSync(fd);child.unref();
@@ -139,8 +129,7 @@ try {
     const launch=async()=>{
     if(process.getuid()===0)throw new Error('Use a dedicated unprivileged operator account');
     const lock=join(state,'supervisor.json');if(existsSync(lock)){if(alive(json(lock).pid))throw new Error('Supervisor already running');rmSync(lock);}
-    if(!existsSync(join(state,'engine.json')))throw new Error('Run install first');
-    run('docker',['image','inspect',configAt(state).image]);
+    assertInstalledJobImage(state,configAt(state));
     registerInstallation(state);await portFree(configAt(state).port);
     const { supervise } = await import('../factory/supervisor.mjs');await supervise(state);
     };
@@ -153,7 +142,9 @@ try {
   else if(command==='tunnel')await manageService('tunnel',positional[0],state,flags);
   else if(command==='status') { const snapshot=await api(state,'/api/v1/status');delete snapshot.csrf_token;console.log(JSON.stringify(snapshot,null,2)); }
   else if(command==='doctor') {
-    const config=configAt(state);console.log(JSON.stringify({node:process.version,docker:run('docker',['info','--format','{{.ServerVersion}}']),engineInstalled:existsSync(join(state,'engine.json')),repo:config.repo,agent:config.agent,checksConfigured:!!config.check?.trim(),inference:'Not called or verified',dashboard:`http://127.0.0.1:${config.port}`},null,2));
+    const config=configAt(state),dockerVersion=run('docker',['info','--format','{{.ServerVersion}}']),imageStatus=inspectImageInstallation(state,config);
+    console.log(JSON.stringify({node:process.version,docker:dockerVersion,engineInstalled:imageStatus.installed,image:imageStatus.image,repo:config.repo,agent:config.agent,checksConfigured:!!config.check?.trim(),inference:'Not called or verified',qualification:{model:'not assessed',toolchain:'not assessed'},dashboard:`http://127.0.0.1:${config.port}`},null,2));
+    if(!imageStatus.installed)process.exitCode=1;
   } else if(command==='run') {
     let spec;
     if(flags.issue) {
@@ -195,7 +186,7 @@ try {
   demo                                    Install and run a synthetic sample (no model key)
   qualify --state PATH                    Exercise recovery and isolation with a stopped demo job
   init --repo PATH --agent codex|pi|custom --check "npm ci && npm test"
-  install                                 Build the isolated job image; the controller ships with the CLI
+  install [--image LOCAL_REF]             Build the standard image, or select an existing local image
   doctor | up | status | stop              Inspect / operate your private installation
   serve                                   Foreground supervisor
   service [print]                         Print a systemd user-service definition

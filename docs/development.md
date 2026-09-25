@@ -52,23 +52,21 @@ replaced with user-owned locations and an unused port:
 
 ```sh
 software-defence-factory init --repo /absolute/path/to/factory-source --agent pi --check "npm ci --ignore-scripts && npm run build:dashboard && npm run check" --state /private/state/factory-development --port 7343
-software-defence-factory install --state /private/state/factory-development
+software-defence-factory install --image FACTORY_DEV_IMAGE --state /private/state/factory-development
 software-defence-factory doctor --state /private/state/factory-development
 ```
 
-The example uses the standard job image. Configure the chosen model and only
-its inference environment in private state; never copy GitHub/npm credentials,
-personal agent configuration or the host's Docker socket into a job. A local
-model endpoint must be reachable from the actual isolated image/network.
-The setup plan covers that separate connectivity/boot obligation.
-
-For an existing custom image, ordinary `install` would replace its selection.
-The current CLI has no supported custom-image installation command; #30 tracks
-that gap. A manually prepared profile must verify and retain the exact Docker
-image ID, record matching `factory.json` and `engine.json` metadata in private
-state, and exercise the real checks. `doctor`'s current installation marker
-alone is not qualification. Do not overwrite a working custom profile merely
-to make that marker appear.
+Replace `FACTORY_DEV_IMAGE` with an image reference already present in the
+worker's local Docker daemon and compatible with the selected agent and checks.
+The command validates and retains its exact ID, records private runtime/image
+metadata and does not download or build it. Stop and reconcile the installation
+before changing images. Plain `install` remains available when the standard
+image is wanted. Configure the chosen model and only its inference environment
+in private state; never copy GitHub/npm credentials, personal agent
+configuration or the host's Docker socket into a job. A local model endpoint
+must be reachable from the actual isolated image/network. The setup plan covers
+that separate connectivity/boot obligation. `doctor` verifies image readiness;
+model and toolchain qualification remain separate checks.
 
 For the small dashboard pilot, a bounded profile uses four CPUs, 4 GiB of job
 RAM, 512 processes and a 30-minute phase deadline. The local inference server

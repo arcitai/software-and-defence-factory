@@ -220,3 +220,24 @@ and the `mock` profile; they make no model calls. Never use an application state
 for qualification. When exercising a source candidate, set `SDF_BOOTSTRAPPED=1`
 so its child CLI commands use that same candidate rather than a managed release.
 See [recovery](recovery.md) for diagnostic limits, safe revision and legacy facts.
+
+## Issue #30 — supported custom job-image selection — 25 September 2026
+
+The CLI now accepts `install --image LOCAL_IMAGE_REF`. Its deterministic
+regressions use temporary state and a fake Docker executable: they cover exact
+ID pinning/retention, repeat selection, shared-tag movement, custom-to-custom
+selection, invalid selection preservation, failed metadata-write rollback,
+active/unreconciled execution refusal, sibling installation preservation,
+ordinary standard-image installation, and `doctor` image/metadata checks.
+`npm run build:dashboard` and `npm run check` passed; the final check included
+44 runtime/package tests and 44 dashboard tests. These fake-Docker tests do not
+prove a real daemon, image or container lifecycle.
+
+The implementation container had no Docker socket and did not attempt one.
+Disposable real-image checks remain assigned to the operator before acceptance:
+exercise selecting twice, move a tag shared by two states and confirm each
+selected ID remains pinned, change between two custom images, reject a missing
+image without changing the working state, reject selection with active or
+unreconciled work, then verify `doctor` and `up` against the selected image.
+No model or toolchain qualification is claimed by image installation or by
+these source tests.

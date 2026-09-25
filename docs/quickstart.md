@@ -61,8 +61,23 @@ Use `status`, `cancel JOB_ID`, `retry JOB_ID` and `stop`, always with the select
 
 ## Native application builds
 
-Pin an application-specific image with the required toolchains. In `factory.json`,
-`cpus` (1–32, default 2), `pidsLimit` (64–16384, default 256), `memoryMiB` and
+Build a compatible application image on the worker, then select its existing
+local tag through the CLI:
+
+```sh
+software-defence-factory install --image LOCAL_IMAGE_REF --state /private/state/my-app
+software-defence-factory doctor --state /private/state/my-app
+```
+
+Selection resolves and retains the immutable image ID. It does not pull or build
+the reference. An unavailable image, a running controller, an unreconciled job
+or a remaining job container makes selection fail without changing the last
+working configuration. Plain `install` remains the standard-image build path
+and selects the standard image again. `doctor` verifies that the recorded image
+metadata matches the image selected in private state; it reports model and
+toolchain qualification separately, and does not perform either qualification.
+
+In `factory.json`, `cpus` (1–32, default 2), `pidsLimit` (64–16384, default 256), `memoryMiB` and
 `timeoutSeconds` bound the job's resources. Verification uses a separate
 disk-backed checkout, keeping the candidate read-only. Its private scratch
 directory is removed after container termination is confirmed. Interrupted
