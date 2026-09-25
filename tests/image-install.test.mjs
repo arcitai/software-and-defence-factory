@@ -1,12 +1,14 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {
-  mkdtempSync, mkdirSync, readFileSync, writeFileSync, rmSync, renameSync,
+  existsSync, mkdtempSync, mkdirSync, readFileSync, writeFileSync, rmSync, renameSync,
 } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { spawnSync } from 'node:child_process';
+import { acquireInstallationLock } from '../factory/installation-lock.mjs';
+import { serviceId } from '../factory/service-files.mjs';
 import { PINS, save } from '../factory/lib.mjs';
 import {
   assertImageChangeSafe, assertInstalledJobImage, installCustomJobImage,
@@ -280,4 +282,45 @@ test('CLI up refuses a missing image or absent installation metadata before star
   assert.notEqual(missing.status, 0);
   assert.match(missing.stderr, /not present locally/);
   assert.equal(readFileSync(docker.callsFile, 'utf8').includes('build'), false);
+});
+
+
+test('managed startup cannot admit queued work while an image build holds the installation fence', async t => {
+  const state = installation(t), images = new Map([[imageA, imageA]]), runner = fakeRunner(images);
+  const docker = fakeDocker(t, { [imageA]: imageA });
+  const stateHome = join(docker.root, 'operator-state');
+  const id = serviceId('controller', state);
+  save(join(stateHome, 'software-defence-factory', 'services', `${id}.json`), {});
+  mkdirSync(join(state, 'jobs', 'job_queued'), { recursive: true });
+  const env = {
+    PATH: `${docker.bin}:${process.env.PATH}`, XDG_STATE_HOME: stateHome,
+    SDF_BOOTSTRAPPED: '1', SDF_MANAGED_SERVICE: id,
+    SDF_FAKE_IMAGES: docker.imagesFile, SDF_FAKE_CALLS: docker.callsFile,
+  };
+  await installStandardJobImage(state, { runner, build: async () => {
+    const launch = invokeCli(['serve', '--state', state], env);
+    assert.notEqual(launch.status, 0);
+    assert.match(launch.stderr, /Another installation operation/);
+    assert.equal(existsSync(join(state, 'supervisor.json')), false);
+    assert.equal(existsSync(join(state, 'jobs', 'job_queued', 'active.json')), false);
+    assert.equal(JSON.parse(readFileSync(join(state, 'factory.json'))).image, imageA);
+    images.set(PINS.jobImage, imageB); images.set(imageB, imageB);
+  } });
+  assert.equal(JSON.parse(readFileSync(join(state, 'factory.json'))).image, imageB);
+  assert.equal(JSON.parse(readFileSync(join(state, 'engine.json'))).image, imageB);
+  assert.equal(existsSync(join(state, 'installation.lock')), false);
+});
+
+test('startup fence and then its live supervisor refuse image selection without changing metadata', t => {
+  const state = installation(t), runner = fakeRunner(new Map([[imageA, imageA], [imageB, imageB]]));
+  const before = readFileSync(join(state, 'factory.json'));
+  const release = acquireInstallationLock(state, 'start controller');
+  assert.throws(() => installCustomJobImage(state, imageB, { runner }), /Another installation operation/);
+  save(join(state, 'supervisor.json'), { pid: process.pid });
+  release();
+  assert.throws(() => installCustomJobImage(state, imageB, { runner }), /Stop the Factory/);
+  assert.deepEqual(readFileSync(join(state, 'factory.json')), before);
+  assert.equal(existsSync(join(state, 'installation.lock')), false);
+  rmSync(join(state, 'supervisor.json'));
+  assert.equal(installCustomJobImage(state, imageB, { runner }).image, imageB);
 });

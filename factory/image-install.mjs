@@ -4,6 +4,7 @@ import {
 import { randomBytes } from 'node:crypto';
 import { join } from 'node:path';
 import { configAt, instanceLabel, json, PINS, ROOT, run, stream } from './lib.mjs';
+import { acquireInstallationLock } from './installation-lock.mjs';
 import { VERSION } from './updates.mjs';
 
 const imageIdPattern = /^sha256:[a-f0-9]{64}$/;
@@ -107,31 +108,37 @@ function metadataFor(image, source, reference, version) {
 }
 
 export function installCustomJobImage(state, reference, { runner = run, version = VERSION, isAlive = alive, filesystem } = {}) {
-  const config = configAt(state);
-  assertImageChangeSafe(state, { runner, isAlive });
-  const image = inspectLocalImage(reference, runner);
-  if (!image) throw new Error(`Docker image ${reference} is not present locally; build or pull it explicitly before selecting it`);
-  retainImage(image, runner);
-  const nextConfig = { ...config, image };
-  const metadata = metadataFor(image, 'custom', reference, version);
-  persistInstallation(state, nextConfig, metadata, filesystem);
-  return { image, reference, config: nextConfig, metadata };
+  const release = acquireInstallationLock(state, 'select image');
+  try {
+    const config = configAt(state);
+    assertImageChangeSafe(state, { runner, isAlive });
+    const image = inspectLocalImage(reference, runner);
+    if (!image) throw new Error(`Docker image ${reference} is not present locally; build or pull it explicitly before selecting it`);
+    retainImage(image, runner);
+    const nextConfig = { ...config, image };
+    const metadata = metadataFor(image, 'custom', reference, version);
+    persistInstallation(state, nextConfig, metadata, filesystem);
+    return { image, reference, config: nextConfig, metadata };
+  } finally { release(); }
 }
 
 export async function installStandardJobImage(state, { runner = run, build = stream, version = VERSION, isAlive = alive, filesystem } = {}) {
-  const config = configAt(state);
-  assertImageChangeSafe(state, { runner, isAlive });
-  docker(['info', '--format', '{{.ServerVersion}}'], runner);
-  retainIfPresent(config.image, runner);
-  retainIfPresent(PINS.jobImage, runner);
-  await build('docker', ['build', '-t', PINS.jobImage, join(ROOT, 'factory/image')]);
-  const image = inspectLocalImage(PINS.jobImage, runner);
-  if (!image) throw new Error('Built job image is unavailable');
-  retainImage(image, runner);
-  const nextConfig = { ...config, image };
-  const metadata = metadataFor(image, 'standard', PINS.jobImage, version);
-  persistInstallation(state, nextConfig, metadata, filesystem);
-  return { image, config: nextConfig, metadata };
+  const release = acquireInstallationLock(state, 'build image');
+  try {
+    const config = configAt(state);
+    assertImageChangeSafe(state, { runner, isAlive });
+    docker(['info', '--format', '{{.ServerVersion}}'], runner);
+    retainIfPresent(config.image, runner);
+    retainIfPresent(PINS.jobImage, runner);
+    await build('docker', ['build', '-t', PINS.jobImage, join(ROOT, 'factory/image')]);
+    const image = inspectLocalImage(PINS.jobImage, runner);
+    if (!image) throw new Error('Built job image is unavailable');
+    retainImage(image, runner);
+    const nextConfig = { ...config, image };
+    const metadata = metadataFor(image, 'standard', PINS.jobImage, version);
+    persistInstallation(state, nextConfig, metadata, filesystem);
+    return { image, config: nextConfig, metadata };
+  } finally { release(); }
 }
 
 function readMetadata(state) {

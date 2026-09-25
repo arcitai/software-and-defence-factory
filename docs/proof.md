@@ -263,9 +263,12 @@ injection; power-loss recovery is not claimed.
 
 The 0.4.4 delivery adds the generic repository-readiness guide, staged issue form,
 capability inventory and accepted future dashboard design to the Factory-owned
-implementation. The integrated package passed 44 runtime/package tests and
-44 dashboard tests. The existing UI source is unchanged. Publication and
-installed-artifact readback are recorded with the delivery PR for #30/#40; the
-operator still owns that external step. This proves supervised self-development,
+implementation. The integrated package passed 46 runtime/package tests and
+44 dashboard tests. Final review also found and closed a managed-startup/image
+selection race: a shared installation fence now covers selection through metadata
+commit and startup through its supervisor PID claim. Deterministic regressions
+cover both orderings, including managed launch during a pending image build. The existing UI source is unchanged. Publication and
+published/installed-artifact readback remain pending at this source revision;
+the delivery PR for #30/#40 will record that external evidence. This proves supervised self-development,
 not autonomous issue intake, source snapshots (#28), PR publication (#29), full
 interface parity (#37), security qualification or the future dashboard redesign.
