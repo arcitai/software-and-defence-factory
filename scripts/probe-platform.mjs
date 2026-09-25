@@ -68,7 +68,7 @@ try {
   assert(!existsSync(join(state,'jobs',changed.id,'accepted.json')));record('changed candidate cannot inherit earlier approval');
 
   const policy=await work('Synthetic policy change guard');await waitState(policy.id,'awaiting_approval');
-  setConfig({check:'true'});await cli('approve',policy.id);await waitState(policy.id,'failed');
+  setConfig({check:original.check==='true'?':':'true'});await cli('approve',policy.id);await waitState(policy.id,'failed');
   assert(!existsSync(join(state,'jobs',policy.id,'accepted.json')));setConfig({});record('changed check policy cannot inherit earlier approval');
 
   setConfig({check:'exit 17'});

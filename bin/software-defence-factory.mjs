@@ -8,6 +8,7 @@ import { ROOT, PINS, DEFAULT_STATE, configAt, save, json, run, stream, digest, a
 import { admitIncident } from '../factory/incident.mjs';
 import { DEFAULT_DEMO_STATE } from '../factory/paths.mjs';
 import { bootstrap, registerInstallation, VERSION } from '../factory/updates.mjs';
+import { hasService, manageService, serviceDefinition, withServiceOperation, isManagedLaunch } from '../factory/services.mjs';
 
 try {
   const handled = await bootstrap(process.argv.slice(2));
@@ -94,7 +95,8 @@ async function stop() {
     const {pid}=json(lock);
     if(alive(pid)) {
       const identity=run('ps',['-p',String(pid),'-o','command=']);
-      if(!identity.includes(join(ROOT,'factory/supervisor.mjs'))||!identity.includes(state))throw new Error('PID identity changed; refusing to signal an unrelated process');
+      const controllerProcess=identity.includes(join(ROOT,'factory/supervisor.mjs'))||identity.includes(join(ROOT,'bin/software-defence-factory.mjs')+' serve');
+      if(!controllerProcess||!identity.includes(state))throw new Error('PID identity changed; refusing to signal an unrelated process');
       process.kill(pid,'SIGTERM');
       for(let i=0;i<40&&existsSync(lock);i++)await sleep(250);
       if(existsSync(lock))throw new Error('Stop unconfirmed; inspect supervisor and do not start replacement workers');
@@ -134,18 +136,27 @@ async function jobAction(action) {
 
 try {
   if(command==='init') { if(!flags.repo)throw new Error('init requires --repo /path/to/existing/git/repo');init(flags.repo,flags.agent,flags.check,flags.port); }
-  else if(command==='install')await install();
-  else if(command==='up')await up();
-  else if(command==='stop')await stop();
+  else if(command==='install')await withServiceOperation('install',install);
+  else if(command==='up') { if(hasService(state))await manageService('controller','start',state);else await withServiceOperation('up',up); }
+  else if(command==='stop') { if(hasService(state))await manageService('controller','stop',state);else await withServiceOperation('stop',stop); }
   else if(command==='serve') {
+    const managed=isManagedLaunch(state);
+    if(hasService(state)&&!managed)throw new Error('This installation is managed; use service start instead of foreground serve');
+    const launch=async()=>{
     if(process.getuid()===0)throw new Error('Use a dedicated unprivileged operator account');
     const lock=join(state,'supervisor.json');if(existsSync(lock)){if(alive(json(lock).pid))throw new Error('Supervisor already running');rmSync(lock);}
-    registerInstallation(state);await portFree(configAt(state).port);await stream(process.execPath,[join(ROOT,'factory/supervisor.mjs'),state]);
+    if(!existsSync(join(state,'engine.json')))throw new Error('Run install first');
+    run('docker',['image','inspect',configAt(state).image]);
+    registerInstallation(state);await portFree(configAt(state).port);
+    const { supervise } = await import('../factory/supervisor.mjs');await supervise(state);
+    };
+    if(managed)await launch();else await withServiceOperation('serve',launch);
   }
   else if(command==='service') {
-    configAt(state);const q=s=>JSON.stringify(s.replaceAll('%','%%'));
-    console.log(`[Unit]\nDescription=Software & Defence Factory\nAfter=network-online.target\n\n[Service]\nType=simple\nWorkingDirectory=${q(ROOT)}\nExecStart=${q(process.execPath)} ${q(join(ROOT,'bin/software-defence-factory.mjs'))} serve --state ${q(state)}\nRestart=on-failure\nRestartSec=10\nTimeoutStopSec=30\nKillMode=control-group\nUMask=0077\n\n[Install]\nWantedBy=default.target`);
+    if(!positional.length || positional[0]==='print')console.log(serviceDefinition(state));
+    else await manageService('controller',positional[0],state,flags);
   }
+  else if(command==='tunnel')await manageService('tunnel',positional[0],state,flags);
   else if(command==='status') { const snapshot=await api(state,'/api/v1/status');delete snapshot.csrf_token;console.log(JSON.stringify(snapshot,null,2)); }
   else if(command==='doctor') {
     const config=configAt(state);console.log(JSON.stringify({node:process.version,docker:run('docker',['info','--format','{{.ServerVersion}}']),engineInstalled:existsSync(join(state,'engine.json')),repo:config.repo,agent:config.agent,checksConfigured:!!config.check?.trim(),inference:'Not called or verified',dashboard:`http://127.0.0.1:${config.port}`},null,2));
@@ -175,7 +186,7 @@ try {
       run('git',['-C',repo,'-c','user.name=Factory demo','-c','user.email=demo@localhost','commit','-m','Synthetic fixture']);
       init(repo,'mock',"test \"$(cat value.txt)\" = fixed",Number(flags.port || 7332));
     } else if(configAt(state).agent!=='mock')throw new Error('Demo requires a mock configuration');
-    await install();await up();console.log(JSON.stringify(await submit('software','Synthetic installation qualification: fix value.txt. No inference is used.')));
+    await withServiceOperation('demo startup',async()=>{await install();await up();});console.log(JSON.stringify(await submit('software','Synthetic installation qualification: fix value.txt. No inference is used.')));
     console.log('Review the synthetic change in the dashboard and approve its handoff.');
   } else if(['version','--version','-v'].includes(command))console.log(VERSION);
   else if(command==='qualify') {
@@ -183,7 +194,7 @@ try {
   } else if(command==='kit') {
     if(!flags.output)throw new Error('kit requires --output NEW_DIRECTORY');
     await stream(process.execPath,[join(ROOT,'scripts/export-kit.mjs'),resolve(flags.output)]);
-  } else if(command==='help')console.log(`Software & Defence Factory ${VERSION} (test release)
+  } else if(['help','--help','-h'].includes(command))console.log(`Software & Defence Factory ${VERSION} (test release)
 
   kit --output NEW_DIRECTORY               Export the portable method without a runtime
   demo                                    Install and run a synthetic sample (no model key)
@@ -191,8 +202,16 @@ try {
   init --repo PATH --agent codex|pi|custom --check "npm ci && npm test"
   install                                 Build the isolated job image; the controller ships with the CLI
   doctor | up | status | stop              Inspect / operate your private installation
-  serve                                   Foreground supervisor for a VPS service
-  service                                 Print a systemd user-service definition
+  serve                                   Foreground supervisor
+  service [print]                         Print a systemd user-service definition
+  service install|start|stop|restart       Manage a Linux user service (--state PATH)
+                                          install accepts --group EXISTING_GROUP
+  service status|logs|uninstall            Diagnose / remove service, preserve private state
+  service update                          Update idle managed controllers, restore on failure
+  service updates --auto on|off|status     Daily idle updates through a systemd timer
+  service resume                          Release a reconciled maintenance reservation
+  tunnel install|start|stop|status|logs|uninstall --host SSH_ALIAS --port PORT
+                                          Persistent loopback SSH tunnel (macOS/Linux)
   run --file task.md | --issue URL         Submit one software vertical slice
   incident --file incident.json            Submit a private, read-only incident draft
   approve JOB_ID | cancel JOB_ID           Review gate / stop this attempt

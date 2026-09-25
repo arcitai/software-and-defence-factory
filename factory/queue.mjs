@@ -1,6 +1,7 @@
 import { DatabaseSync } from 'node:sqlite';
 import { randomBytes } from 'node:crypto';
 import { join } from 'node:path';
+import { existsSync, writeFileSync, rmSync } from 'node:fs';
 
 const workflows = { software: ['build', 'verify', 'review', 'handoff'], defence: ['defence'] };
 const id = prefix => prefix + '_' + randomBytes(12).toString('hex');
@@ -14,7 +15,8 @@ export class JobQueue {
     this.db = new DatabaseSync(join(state, 'jobs.sqlite'));
     this.db.exec('PRAGMA journal_mode=WAL; PRAGMA busy_timeout=5000; CREATE TABLE IF NOT EXISTS jobs(id TEXT PRIMARY KEY, data TEXT NOT NULL);');
     this.execute = execute; this.stop = stop; this.reconcile = reconcile;
-    this.active = null; this.closing = false; this.pumping = false; this.actions = new Set();
+    this.maintenanceFile = join(state, 'maintenance.json');
+    this.active = null; this.closing = false; this.pumping = false; this.actions = new Set(); this.maintenance = existsSync(this.maintenanceFile);
     for (const job of this.all()) if (['running', 'cancelling'].includes(job.state)) {
       job.state = 'interrupted';
       Object.assign(job.runs.at(-1), { state: 'interrupted', completed_at: now(), error: 'Controller stopped before completion was confirmed.' });
@@ -32,6 +34,7 @@ export class JobQueue {
   save(job) { job.updated_at = now(); this.db.prepare('INSERT INTO jobs VALUES (?,?) ON CONFLICT(id) DO UPDATE SET data=excluded.data').run(job.id, JSON.stringify(job)); return job; }
   submit(input) {
     if (this.closing) throw new QueueError('Controller is stopping');
+    if (this.maintenance) throw new QueueError('Controller is reserved for maintenance');
     if (input?.source_url && (typeof input.source_url !== 'string' || !/^https?:\/\/[^\s]+$/.test(input.source_url) || input.source_url.length > 2048)) throw new QueueError('Expected an HTTP(S) source link', 400);
     if (input?.model && (typeof input.model !== 'string' || !/^[\w.:/+-]{1,128}$/.test(input.model))) throw new QueueError('Invalid model identifier', 400);
     if (input?.source_url && !input.spec?.trim()) input = { ...input, spec: `Investigate the linked requirements within this repository's scope: ${input.source_url}` };
@@ -42,10 +45,19 @@ export class JobQueue {
       state: 'queued', created_at: now(), runs: [] };
     this.save(job); this.schedule(); return { id: job.id };
   }
+  setMaintenance(enabled) {
+    if (typeof enabled !== 'boolean') throw new QueueError('Expected enabled: true or false', 400);
+    if (enabled && (this.closing || this.active || this.actions.size || this.all().some(job => ['queued', 'running', 'cancelling'].includes(job.state)))) throw new QueueError('Controller is busy; update deferred');
+    if (enabled) writeFileSync(this.maintenanceFile, JSON.stringify({ startedAt: now() }), { mode: 0o600 });
+    else rmSync(this.maintenanceFile, { force: true });
+    this.maintenance = enabled;
+    if (!enabled) this.schedule();
+    return { maintenance: enabled };
+  }
   schedule() { if (!this.closing && !this.pumping) { this.pumping = true; queueMicrotask(() => this.pump()); } }
   async pump() {
     try {
-      while (!this.closing) {
+      while (!this.closing && !this.maintenance) {
         let job = this.all().find(item => item.state === 'queued'); if (!job) break;
         const step = job.workflow.current_step, phase = job.workflow.steps[step];
         let attempt = job.runs.at(-1);
@@ -77,7 +89,7 @@ export class JobQueue {
     } finally { this.pumping = false; }
   }
   async exclusive(jobId, perform) {
-    if (this.closing || this.actions.has(jobId)) throw new QueueError('Job is already changing; reload before acting');
+    if (this.closing || this.maintenance || this.actions.has(jobId)) throw new QueueError('Job is already changing or controller is reserved for maintenance; reload before acting');
     this.actions.add(jobId);
     try { return await perform(); } finally { this.actions.delete(jobId); }
   }

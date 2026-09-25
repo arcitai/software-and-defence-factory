@@ -42,7 +42,12 @@ An npm-installed CLI checks npm's `latest` stable release at most once a day
 when invoked. It downloads and activates a newer release when all registered
 installations are stopped and no executor requires reconciliation. It does not
 run a background updater or interrupt a job. Routine `status`, `stop`, `cancel`,
-`serve` and version commands do not initiate automatic downloads.
+`serve`, service/tunnel management, help and version commands do not initiate automatic downloads.
+
+For an always-running Linux installation, opt into the separate managed daily
+timer with `service updates --auto on`. It reserves idle controllers, updates
+and restores their prior running set without interrupting a job. See
+[services](services.md) for installation, maintenance recovery and limitations.
 
 ```sh
 software-defence-factory update --check

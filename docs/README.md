@@ -2,6 +2,7 @@
 
 - [Quickstart](quickstart.md): connect a repository, configure inference, run and inspect a task.
 - [Install and update](npm.md): npm/npx, state paths, automatic updates and CI/CD.
+- [Services and SSH tunnels](services.md): boot/login startup, remote dashboards, idle updates and recovery.
 - [Architecture](architecture.md): components, ownership and evidence flow.
 - [Recovery](recovery.md): stopped, failed and interrupted attempts.
 - [Defence integration](defence-integration.md): private incident intake and limits.

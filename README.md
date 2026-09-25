@@ -23,6 +23,7 @@ Choose the part you need:
 | Try the runtime without inference | `software-defence-factory demo` — Docker required; synthetic sample only |
 | Connect an existing repository | [Runtime quickstart](docs/quickstart.md) |
 | Understand installation and updates | [npm and npx](docs/npm.md) |
+| Restore a dashboard after boot or reconnect remotely | [Services and SSH tunnels](docs/services.md) |
 | Review the evidence and limits | [Qualification](docs/proof.md) |
 
 The runtime supplies policy and six focused skills to its isolated jobs. `init` configures a private installation; it does not modify the application or start work. Model access and the application's real check command must be configured before using it for delivery.
@@ -68,6 +69,7 @@ npm run check
 ```
 
 CI builds the dashboard and checks Node 22/24. A version increase merged to `main` is published to npm through the configured release workflow. Installed CLIs can update on invocation when all installations are stopped. See [release and update behavior](docs/npm.md).
+Managed Linux services can also opt into daily updates that reserve idle controllers, preserve stopped projects and restore the prior release if startup fails. See [service operation](docs/services.md).
 
 This is a test release. Synthetic qualification demonstrates control flow and isolation, not model quality, application correctness or production readiness. Follow [AGENTS.md](AGENTS.md) for contributions and [SECURITY.md](SECURITY.md) for the trust boundaries.
 
