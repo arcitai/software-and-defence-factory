@@ -75,8 +75,8 @@ and the [self-development recipe](docs/development.md) before submitting work.
 ## Dashboard delivery follow-up
 
 - [x] #1: Warp-style frontend delivered in 0.4.5.
-- [ ] #45: finish the reference-matched overview, navigation and task detail; release verification in progress.
-- [ ] #44: retain measured Codex token usage with honest coverage in both interfaces; real Factory job in progress.
+- [x] #45: finish the reference-matched overview, navigation and task detail; implemented and checked; publication readback remains the delivery PR gate.
+- [x] #44: retain measured Codex token usage with honest coverage in both interfaces; native Factory build/check and independent operator Docker/live-provider proof; acceptance/delivery gates remain separate.
 - #42: supported continuation from retained, unreviewed build checkpoints after a bounded timeout.
 - #32: bounded/redacted real worker progress through the shared API/CLI/dashboard.
 - #27: optional reviewed DESIGN.md project colors; monochrome remains the complete default.
