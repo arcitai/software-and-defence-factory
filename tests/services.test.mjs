@@ -1,10 +1,10 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { mkdtempSync, rmSync, writeFileSync } from 'node:fs';
+import { mkdtempSync, rmSync, writeFileSync, mkdirSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { spawnSync } from 'node:child_process';
-import { systemdUnit, launchAgent, tunnelArguments, serviceId, groupArguments } from '../factory/service-files.mjs';
+import { systemdUnit, launchAgent, tunnelArguments, serviceId, groupArguments, runtimeLauncher } from '../factory/service-files.mjs';
 import { JobQueue } from '../factory/queue.mjs';
 import { createController } from '../factory/server.mjs';
 
@@ -77,4 +77,29 @@ test('lifecycle operations and managed updates share one exclusive operation loc
   `;
   const result = spawnSync(process.execPath, ['--input-type=module', '-e', program], { encoding: 'utf8', env: { ...process.env, XDG_STATE_HOME: state } });
   assert.equal(result.status, 0, result.stderr);
+});
+
+test('managed launchers ignore ordinary CLI update selections, including while stopped', t => {
+  const home = temp(t), runtime = join(home, 'retained'), dataHome = join(home, 'data');
+  const fixture = (root, version) => {
+    mkdirSync(join(root, 'bin'), { recursive: true });
+    writeFileSync(join(root, 'package.json'), JSON.stringify({ name: 'software-defence-factory', version }));
+    writeFileSync(join(root, 'bin/software-defence-factory.mjs'), `console.log(${JSON.stringify(version)});`);
+  };
+  fixture(runtime, '0.4.0');
+  for (const version of ['0.4.1', '0.4.2']) fixture(join(dataHome, 'releases', version, 'node_modules/software-defence-factory'), version);
+  const launcher = join(home, 'launch.mjs');
+  writeFileSync(launcher, runtimeLauncher({ runtime, stateHome: home, dataHome }));
+  const selected = () => {
+    const result = spawnSync(process.execPath, [launcher], { encoding: 'utf8' });
+    assert.equal(result.status, 0, result.stderr); return result.stdout.trim();
+  };
+  writeFileSync(join(home, 'updates.json'), '{"version":"0.4.1"}');
+  assert.equal(selected(), '0.4.0');
+  writeFileSync(join(home, 'service-release.json'), '{"version":"0.4.1"}');
+  assert.equal(selected(), '0.4.1');
+  writeFileSync(join(home, 'updates.json'), '{"version":"0.4.2"}');
+  assert.equal(selected(), '0.4.1');
+  writeFileSync(join(home, 'service-release.json'), '{}');
+  assert.equal(selected(), '0.4.0');
 });

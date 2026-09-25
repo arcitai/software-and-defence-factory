@@ -1,4 +1,5 @@
 import { createHash } from 'node:crypto';
+import { join } from 'node:path';
 
 export function serviceId(kind, identity) {
   return `software-defence-factory-${kind}-${createHash('sha256').update(identity).digest('hex').slice(0, 16)}`;
@@ -31,4 +32,9 @@ export function groupArguments(argv, group, executable) {
   if (!['/usr/bin/sg', '/usr/bin/newgrp'].includes(executable)) throw new Error('Unsupported group launcher');
   const quote = value => `'${text(value).replaceAll("'", "'\\''")}'`;
   return [executable, group, '-c', 'exec ' + argv.map(quote).join(' ')];
+}
+
+// Immutable launcher: ordinary CLI preferences never select a service release.
+export function runtimeLauncher({ runtime, stateHome, dataHome }) {
+  return `import { readFileSync, existsSync } from 'node:fs';\nimport { join } from 'node:path';\nimport { pathToFileURL } from 'node:url';\nlet root = ${JSON.stringify(runtime)};\nconst settings = ${JSON.stringify(join(stateHome, 'service-release.json'))};\nif (existsSync(settings)) {\n  const version = JSON.parse(readFileSync(settings, 'utf8')).version;\n  if (/^\\d+\\.\\d+\\.\\d+$/.test(version || '')) {\n    const candidate = join(${JSON.stringify(dataHome)}, 'releases', version, 'node_modules/software-defence-factory');\n    if (existsSync(join(candidate, 'package.json'))) {\n      const pkg = JSON.parse(readFileSync(join(candidate, 'package.json'), 'utf8'));\n      const current = JSON.parse(readFileSync(join(root, 'package.json'), 'utf8')).version;\n      const a = version.split('.').map(Number), b = current.split('.').map(Number);\n      const index = a.findIndex((value, i) => value !== b[i]);\n      if (pkg.name === 'software-defence-factory' && pkg.version === version && index >= 0 && a[index] > b[index]) root = candidate;\n    }\n  }\n}\nprocess.env.SDF_AUTO_UPDATE = '0';\nprocess.env.SDF_BOOTSTRAPPED = '1';\nawait import(pathToFileURL(join(root, 'bin/software-defence-factory.mjs')).href);\n`;
 }

@@ -6,7 +6,7 @@ import { createServer } from 'node:net';
 import { ROOT, STATE_HOME, DATA_HOME, SOURCE_CHECKOUT } from './paths.mjs';
 import { configAt, json, save, run, api, sleep, digest } from './lib.mjs';
 import { VERSION, newer, latestVersion, installRelease, busyInstallations } from './updates.mjs';
-import { serviceId, systemdUnit, launchAgent, tunnelArguments, groupArguments } from './service-files.mjs';
+import { serviceId, systemdUnit, launchAgent, tunnelArguments, groupArguments, runtimeLauncher } from './service-files.mjs';
 
 const records = join(STATE_HOME, 'services');
 const configHome = process.env.XDG_CONFIG_HOME || join(homedir(), '.config');
@@ -99,7 +99,7 @@ function retainRuntime() {
 }
 function launcher() {
   const runtime = retainRuntime(), file = join(DATA_HOME, 'services', `launch-${VERSION}-${digest(STATE_HOME).slice(0, 16)}.mjs`);
-  const content = `import { readFileSync, existsSync } from 'node:fs';\nimport { join } from 'node:path';\nimport { pathToFileURL } from 'node:url';\nlet root = ${JSON.stringify(runtime)};\nconst settings = ${JSON.stringify(join(STATE_HOME, 'updates.json'))};\nif (existsSync(settings)) {\n  const version = JSON.parse(readFileSync(settings, 'utf8')).version;\n  if (/^\\d+\\.\\d+\\.\\d+$/.test(version || '')) {\n    const candidate = join(${JSON.stringify(DATA_HOME)}, 'releases', version, 'node_modules/software-defence-factory');\n    if (existsSync(join(candidate, 'package.json'))) {\n      const pkg = JSON.parse(readFileSync(join(candidate, 'package.json'), 'utf8'));\n      const current = JSON.parse(readFileSync(join(root, 'package.json'), 'utf8')).version;\n      const a = version.split('.').map(Number), b = current.split('.').map(Number);\n      const index = a.findIndex((value, i) => value !== b[i]);\n      if (pkg.name === 'software-defence-factory' && pkg.version === version && index >= 0 && a[index] > b[index]) root = candidate;\n    }\n  }\n}\nprocess.env.SDF_AUTO_UPDATE = '0';\nprocess.env.SDF_BOOTSTRAPPED = '1';\nawait import(pathToFileURL(join(root, 'bin/software-defence-factory.mjs')).href);\n`;
+  const content = runtimeLauncher({ runtime, stateHome: STATE_HOME, dataHome: DATA_HOME });
   if (existsSync(file)) {
     if (readFileSync(file, 'utf8') !== content) throw new Error('Retained launcher content differs; preserve and reconcile it before installation');
   } else writeFileSync(file, content, { flag: 'wx', mode: 0o600 });
@@ -218,8 +218,9 @@ export async function updateServices({ latest = latestVersion, download = instal
 }
 async function performUpdate(latest, download) {
   const held = [], stopped = [];
-  const preferencesPath = join(STATE_HOME, 'updates.json');
-  const previous = existsSync(preferencesPath) ? json(preferencesPath) : { enabled: true, lastCheckedAt: 0 };
+  const preferencesPath = join(STATE_HOME, 'updates.json'), selectionPath = join(STATE_HOME, 'service-release.json');
+  const previousPreferences = existsSync(preferencesPath) ? json(preferencesPath) : { enabled: true, lastCheckedAt: 0 };
+  const previous = existsSync(selectionPath) ? json(selectionPath) : {};
   let activated = false, releaseMaintenance = true;
   const priorVersions = new Map();
   try {
@@ -243,7 +244,11 @@ async function performUpdate(latest, download) {
     download(version);
     for (const record of live) { stop(record); stopped.push(record); }
     if (busyInstallations().length) throw new Error('An installation or executor still blocks activation');
-    save(preferencesPath, { ...previous, version, lastCheckedAt: Date.now() }); activated = true;
+    // Ordinary CLI downloads must never change what an existing service starts.
+    // Only this reserved update transaction may advance the managed selection.
+    activated = true;
+    save(selectionPath, { version });
+    save(preferencesPath, { ...previousPreferences, version, lastCheckedAt: Date.now() });
     for (const record of stopped) { start(record); await waitHealthy(record, version); }
     console.log(`Updated to ${version}; restarted ${stopped.length} previously active services. Jobs and history preserved.`);
   } catch (error) {
@@ -251,7 +256,8 @@ async function performUpdate(latest, download) {
     try {
       if (activated) {
         for (const record of stopped) stop(record);
-        save(preferencesPath, previous);
+        save(selectionPath, previous);
+        save(preferencesPath, previousPreferences);
       }
       for (const record of stopped) { start(record); await waitHealthy(record, priorVersions.get(record.id)); }
       releaseMaintenance = true;

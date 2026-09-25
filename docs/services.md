@@ -28,7 +28,10 @@ reinstall the service using the intended Node executable after stopping it.
 No credentials are copied into the unit or job containers.
 Each service uses an immutable launcher for its installation version. Installing
 another controller or enabling a timer cannot rewrite an existing launcher's
-base. An explicit managed update controls subsequent release selection.
+base. An explicit managed update controls subsequent release selection in
+`service-release.json`. The separate ordinary CLI `updates.json` preference
+cannot move an existing service to another release, even while all services
+are stopped.
 
 If Docker group membership was added after the user service manager started,
 an SSH shell may have access while user services still get permission denied.
