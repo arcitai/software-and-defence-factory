@@ -1,6 +1,6 @@
 # Software & Defence Factory — contributor contract
 
-This is an independent repository. Read README.md and the docs relevant to the change. Personal AIOS context is not a product input or dependency. CLAUDE.md imports this file.
+This is an independent repository. Read README.md and the [documentation map](docs/README.md) relevant to the change. For host/runtime onboarding, follow [the setup plan](docs/setup.md). Personal AIOS context is not a product input or dependency. CLAUDE.md imports this file.
 
 ## Product
 

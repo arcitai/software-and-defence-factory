@@ -1,0 +1,235 @@
+# Setup plan: operator, worker and application
+
+Use this plan for a new installation or when moving an existing Factory to a
+worker machine. Complete the applicable checkpoints in order and record the
+result in a **private** copy of the checklist below. The plan applies to any
+operator/worker names and any suitable private network; it requires no personal
+context system, particular VPN provider or Factory source checkout.
+
+The operator owns access and infrastructure choices. Factory maintainers own
+this plan and the linked command guides and update them with behavior changes.
+Paths beginning `/private/state` or `/absolute/path` below are placeholders;
+replace them with user-owned absolute directories outside the application and
+installed package.
+
+## 1. Choose the scope and hosts
+
+| Choice | Record before installation |
+| --- | --- |
+| Method only or runtime | Method export needs no Docker, background service or model |
+| Operator/client | Local machine, user and how the dashboard will be opened |
+| Worker | Linux/systemd for managed controllers; macOS can use manual `up` |
+| Applications | Canonical repository, branch, preserved WIP and responsible owner |
+| Runtime | Stable Node executable (22.13+), Git, Docker, CPU/RAM/disk budget |
+| State | Private state path and unused loopback port for each installation |
+| Inference | Provider/model, credential reference, job image and network path |
+| Automation | Which controllers may start, update policy and who may submit work |
+| Recovery | Private backup location, retained runtime/image and recovery contact |
+
+One installation owns one repository and port. A synthetic qualification
+installation can provide a running dashboard while product controllers remain
+stopped. There is no multi-project controller or second scheduler hidden in
+this plan. Keep unrelated personal agent configuration on its existing host.
+
+For method-only adoption, run `software-defence-factory kit --output NEW_DIRECTORY`
+and follow [the adoption guide](../kit/README.md). The remaining host/runtime
+steps apply only when using Factory's optional controller.
+
+## 2. Establish host access and boot prerequisites
+
+Use an unprivileged operator account. Check `node --version`, `git --version`
+and `docker info` from the actual login/SSH session. Install dependencies using
+the host's supported method. For a Linux worker, Docker, SSH and any private
+network client must start at boot; inspect their actual unit names instead of
+assuming every distribution uses the same service names.
+
+For remote access:
+
+1. Establish a reachable private address, including across networks if needed.
+2. Enroll the worker's verified SSH host key and configure key authentication.
+3. Create an SSH alias such as `factory-worker`; verify
+   `ssh -o BatchMode=yes factory-worker 'id -un'` from the operator machine.
+4. Verify firewall/interface scope. Keep the dashboard on loopback; do not
+   expose it publicly or disable host-key checking to make the tunnel work.
+
+Administrator access is a separate host choice. Installing/running Factory user
+services does **not** require root or unrestricted passwordless sudo. If the
+owner deliberately chooses passwordless administration, inspect `sudo -n -l`
+for the intended `NOPASSWD` policy and repeat the permitted command after a
+fresh reboot. A successful `sudo -n` command can merely reuse cached
+credentials. A missing rule must be installed by an authenticated administrator;
+record that remaining step without blocking unprivileged Factory operation.
+
+Record disk unlock, login and power behavior explicitly. Linux user lingering
+can start services without desktop login **after the OS and home are available**;
+it cannot unlock an encrypted disk. A sleeping laptop is not an available
+worker. Choose AC/battery/sleep behavior with the owner; do not disable disk
+security or change power policy as a side effect of Factory setup.
+
+Checkpoint: noninteractive SSH (when needed), Docker and the chosen Node binary
+work, and required host dependencies have a documented startup/recovery owner.
+
+## 3. Install the package and qualify the runtime
+
+```sh
+npm install --global software-defence-factory
+software-defence-factory --version
+software-defence-factory help
+```
+
+Use a user-writable npm prefix or the existing Node manager; do not turn the
+controller into a root process to work around installation permissions. For
+example, Linux users choosing `--prefix "$HOME/.local"` must also make
+`$HOME/.local/bin` available in their login PATH. `npx` uses the same package;
+managed services retain a runtime outside its cache. Keep the service's recorded
+Node executable available. See [installation and updates](npm.md).
+
+Use a **separate synthetic state and unused port** to exercise the runtime:
+
+```sh
+software-defence-factory demo --state /private/state/runtime-proof --port 7345
+# Inspect and finish the sample handoff before qualification.
+software-defence-factory qualify --state /private/state/runtime-proof
+```
+
+These commands deliberately create synthetic jobs, including failed/interrupted
+attempts. Never use application state for `demo` or `qualify`. They make no model
+calls and prove neither model quality nor application readiness. Preserve the
+qualification record; stop this controller unless it is the selected dashboard.
+
+## 4. Prepare each application and inference profile
+
+Preserve existing commits, branches, uncommitted work and licenses before moving
+anything. Verify the canonical GitHub origin and main branch's tracking target;
+a fork may still track its upstream product. Move application sources into the
+chosen workspace, not into the npm package or private runtime state.
+
+Before admitting development work, establish:
+
+- Reproducible toolchain/dependency pins and an actual build/check command.
+- A compatible job image for native libraries, browser/mobile tools or custom
+  model adapters; the standard image does not supply every application stack.
+- Meaningful checks in GitHub CI on the selected revision, plus the intended
+  review/branch policy. Record plan/access limits if enforcement is unavailable.
+- Applicable application instructions, design/scope, resource limits, secret
+  references and a clear delivery destination. Keep unfinished WIP separate
+  until intentionally integrated; jobs clone committed source only.
+
+Configure a new installation using [the quickstart](quickstart.md):
+
+```sh
+software-defence-factory init --repo /absolute/path/to/app --agent pi --check "npm ci && npm test" --state /private/state/my-app --port 7331
+software-defence-factory install --state /private/state/my-app
+software-defence-factory doctor --state /private/state/my-app
+```
+
+Replace the agent/check/paths with the accepted application profile. `install`
+builds the standard image: do not use it to overwrite an existing custom image
+selection. Follow the application image's own build/pinning procedure instead.
+`init` does not edit the app, install personal skills or submit a task. Runtime
+jobs receive the bundled method and six skills automatically.
+
+For a local model, verify the existing model service, intended model name and
+its startup. Test the model API from a disposable container using the **selected
+job image and network**. Host `127.0.0.1` inside a container is not the host's
+loopback. Any host bridge/proxy and narrow firewall rule are explicit machine
+infrastructure; they need their own startup and reboot checks. A bridge address may appear
+after the user service manager starts; configure retry/readiness and verify
+recovery rather than assuming startup order from enablement alone. Avoid duplicate
+model servers, public listeners, Docker socket mounts or whole account folders.
+Cloud inference likewise needs a real provider/model connectivity check without
+printing credentials. A model-list/health response is connectivity evidence;
+qualifying model output requires a separately accepted bounded task.
+
+Checkpoint: record the exact source revision, image ID, check command, resource
+limits, inference connectivity and CI result. Keep product controllers stopped
+until their tasks are explicitly ready to run.
+
+## 5. Enable only the intended background services
+
+A newly initialized state has no jobs. Before adopting older state, establish
+that its queue may resume; starting **any** controller executes queued work.
+If queue ownership/state is uncertain, reconcile it before enabling autostart.
+
+On the Linux worker, select the state that should stay available:
+
+```sh
+software-defence-factory stop --state /private/state/runtime-proof
+software-defence-factory service install --state /private/state/runtime-proof
+software-defence-factory service status --state /private/state/runtime-proof
+software-defence-factory service updates --auto on
+software-defence-factory service updates --auto status
+```
+
+Follow [services](services.md) for user lingering, existing Docker group
+membership, logs, stop/start, uninstall and maintenance recovery. A user manager
+started before Docker group membership changed may need `--group docker`; this
+applies an existing group and grants no new membership. Enable lingering only
+for the intended account through the host's administrator.
+
+On the operator machine, stop any old manual tunnel, then:
+
+```sh
+software-defence-factory tunnel install --host factory-worker --port 7345
+software-defence-factory tunnel status --host factory-worker --port 7345
+```
+
+Use the actual selected dashboard port on both sides. macOS tunnels start at
+user login; Linux uses its user service manager. Open `http://127.0.0.1:7345`.
+This is the worker's loopback dashboard forwarded through SSH.
+
+Managed daily updates reserve idle controllers and preserve the prior running
+set; they defer when busy and attempt rollback if the new runtime is unhealthy.
+A deliberate `service stop` leaves boot enablement in place: use `uninstall`
+when a controller must also remain disabled across reboots. Preserve private
+state and previous releases. The timer does not rebuild application images,
+start product tasks, change a model or publish application changes.
+
+## 6. Prove reboot recovery and hand over
+
+Choose a reboot window with disk unlock/recovery available. Save a private
+baseline of the boot ID (`cat /proc/sys/kernel/random/boot_id`), runtime version,
+job IDs/states/attempts, selected enabled services and paused installations.
+After the owner reboots/unlocks the worker, check **before manually starting
+anything**:
+
+- SSH returns and a changed boot ID confirms a new boot.
+- Docker, private network and model/proxy services are healthy, with no relevant
+  failed units or repeated restart loop. Inspect their current-boot logs.
+- `service status --state PATH` reports enabled/running/healthy, the intended
+  runtime version and no unexpected maintenance reservation.
+- The update timer is enabled and has a next execution time.
+- The operator's tunnel reconnects and the dashboard responds at the same URL.
+- Job history is unchanged and intentionally disabled product controllers have
+  no listeners or executor processes. Probe model connectivity from the job
+  container again without starting a product agent.
+- The intended administrator policy still works, if that capability was chosen.
+
+Record actual observations and failures separately. An observed boot after
+manual unlock/login does not prove an unattended cold boot; a worker reboot
+does not prove operator-machine login startup. Process crash recovery and tests
+across two physical networks are also distinct checks. Use [recovery](recovery.md)
+and [service recovery](services.md#recovery-and-proof-limits) for failures; do not
+start a second controller or clear unknown process locks to make status green.
+
+Copy this private completion record into the installation's handoff:
+
+| Checkpoint | Result | Evidence / remaining action |
+| --- | --- | --- |
+| Host roles, owner, source and private state selected | Pending | |
+| SSH, Docker, Node and host startup prerequisites | Pending | |
+| Synthetic runtime qualification | Pending | |
+| Application image, real checks/CI and preserved WIP | Pending | |
+| Inference path and chosen model | Pending | |
+| Controller/tunnel/timer installation and recovery | Pending | |
+| Worker reboot after required unlock/login | Pending | |
+| Operator login recovery / separate networks | Pending | Record separately |
+| History and intentionally stopped products preserved | Pending | |
+| Backups, logs, stop/update/rollback owner and guide | Pending | |
+| First bounded application task | Not started | Separate task authority and proof |
+
+Use Pass, Fail or Not applicable with a reason; never infer success from an
+installed file. Keep host identities, credentials, raw logs and customer details
+out of public issues and package contents. A ready worker is only the foundation:
+follow [the method](../kit/README.md#first-real-task) for the first explicitly
+accepted application task and revision-bound checks/review/handoff.

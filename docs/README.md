@@ -1,5 +1,6 @@
 # Documentation
 
+- [Setup plan](setup.md): host access, application/CI, inference, autostart, reboot proof and handoff.
 - [Quickstart](quickstart.md): connect a repository, configure inference, run and inspect a task.
 - [Install and update](npm.md): npm/npx, state paths, automatic updates and CI/CD.
 - [Services and SSH tunnels](services.md): boot/login startup, remote dashboards, idle updates and recovery.

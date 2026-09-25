@@ -108,3 +108,21 @@ also proved that a foreground server releases its startup lock, allowing an
 independent stop process. All eleven service scenarios and twelve synthetic
 Docker qualification paths passed.
 No application development agent or production connector was started.
+
+## 0.4.1 — repeatable setup and host acceptance
+
+The setup plan now connects host access, application/CI foundations, model
+connectivity, managed services, updates and explicit reboot acceptance. The npm
+consumer test verifies that both setup/service guides ship and that CLI help
+points to the installed setup guide. Runtime behavior is unchanged from 0.4.0.
+
+A subsequent Linux worker reboot with operator unlock/login exercised the 0.4.0
+installation: SSH, Docker, controller, update timer and the client's existing
+SSH tunnel recovered without manually starting Factory. All 18 historical
+synthetic jobs/attempts were preserved; product controllers stayed stopped. The
+local-model bridge retried once while Docker's bridge address appeared and then
+served the model API from the selected job image. This is observed recovery
+after human unlock/login, not proof of unattended disk unlock or a separate
+physical-network test. A cached sudo success was found insufficient as evidence
+of a permanent administrator policy; setup now requires inspecting the effective
+policy and an uncached/fresh-boot check when that capability is selected.
