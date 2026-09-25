@@ -17,7 +17,7 @@ function count(value) {
   return BigInt(value);
 }
 
-function topLevelCompletedPrefix(text) {
+function topLevelTurnPrefix(text) {
   // Used only to recognize a malformed supported event. Track JSON nesting so
   // a forged type inside a message/tool body cannot affect usage provenance.
   let depth = 0;
@@ -38,7 +38,7 @@ function topLevelCompletedPrefix(text) {
         if (text.slice(start, i) === '"type"' && text[next] === ':') {
           next++;
           while (/\s/.test(text[next] || '')) next++;
-          if (text.slice(next, next + 16) === '"turn.completed"') return true;
+          if (['"turn.completed"', '"turn.started"', '"turn.failed"'].some(type => text.startsWith(type, next))) return true;
         }
       }
       continue;
@@ -69,6 +69,7 @@ export class CodexUsageParser {
     this.length = 0;
     this.overflow = false;
     this.incomplete = false;
+    this.pendingTurn = false;
     this.events = 0;
     this.input = 0n;
     this.output = 0n;
@@ -101,8 +102,12 @@ export class CodexUsageParser {
     const text = this.line.toString('utf8', 0, length);
     let event;
     try { event = JSON.parse(text); }
-    catch { if (topLevelCompletedPrefix(text)) this.incomplete = true; return; }
-    if (!record(event) || event.type !== 'turn.completed') return;
+    catch { if (topLevelTurnPrefix(text)) this.incomplete = true; return; }
+    if (!record(event)) return;
+    if (event.type === 'turn.started') { this.pendingTurn = true; return; }
+    if (event.type === 'turn.failed') { this.pendingTurn = false; this.incomplete = true; return; }
+    if (event.type !== 'turn.completed') return;
+    this.pendingTurn = false;
     try {
       const counts = eventCounts(event);
       if (!counts) return;
@@ -122,7 +127,7 @@ export class CodexUsageParser {
       output_tokens: this.output.toString(),
       cached_input_tokens: this.cached.toString(),
       source: 'codex_jsonl',
-      coverage: truncated || this.incomplete ? 'partial' : 'complete',
+      coverage: truncated || this.incomplete || this.pendingTurn ? 'partial' : 'complete',
     };
   }
 }

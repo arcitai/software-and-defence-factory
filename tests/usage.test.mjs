@@ -195,3 +195,17 @@ test('historical polling budgets I/O, never churns a full cache, and keeps store
   const observed = {input_tokens:'20',output_tokens:'3',cached_input_tokens:'12',source:'codex_jsonl',coverage:'complete'};
   assert.equal(adapter.usage({id:'job_stored'},{...late.attempt,state:'failed',usage:observed}).token_usage,'23');
 });
+
+
+test('an unfinished or failed later turn cannot claim complete attempt coverage', t => {
+  const start=Buffer.from('{"type":"turn.started"}\n');
+  const done=completed({input_tokens:20,output_tokens:3,cached_input_tokens:12});
+  assert.equal(parseCodexJsonl([start,done]).coverage,'complete');
+  assert.equal(parseCodexJsonl([start,done,start]).coverage,'partial');
+  assert.equal(parseCodexJsonl([start,done,Buffer.from('{"type":"turn.failed","error":{"message":"private fixture"}}\n')]).coverage,'partial');
+  assert.equal(parseCodexJsonl([start]),null,'no count is invented for the unfinished first turn');
+  assert.equal(parseCodexJsonl([done,Buffer.from('{"type":"item.completed","item":{"type":"turn.started"}}\n')]).coverage,'complete','nested events are not turn boundaries');
+  const log=new BoundedLog();log.write('stdout',Buffer.concat([start,done,start]));
+  const fixture=privateAttempt(t,{log:log.finish({code:137})});
+  assert.equal(retainedCodexUsage(fixture.state,fixture.job,fixture.attempt).coverage,'partial');
+});

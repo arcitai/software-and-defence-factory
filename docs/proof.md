@@ -319,7 +319,7 @@ copy-link feedback and filtered previous/next navigation. Repository links use
 only a validated origin. Software and Defence share Tasks and can be separated
 in Analytics; Defence investigation does not grant production recovery authority.
 
-The integrated candidate passes 59 runtime/package and 50 dashboard tests.
+The integrated candidate passes 60 runtime/package and 50 dashboard tests.
 Browser inspection at normal zoom covers desktop and 320/390px, both themes,
 combined filters/reset/no-results, list/board, close/copy, task metadata,
 Software/Defence selection, Analytics, Workers, Workflows and Triggers. A
@@ -355,3 +355,8 @@ The runtime exposes the same usage through CLI and API. Partial observations,
 missing AI runs and deterministic phases remain distinct; no billing amounts are
 estimated. Public npm, installed assets and idle-only activation are final delivery
 gates recorded in the PR, not claims made by these source checks.
+
+Independent integrated review also closed incomplete-turn coverage and hidden
+compact-header context: a later unfinished/failed Codex turn makes counts
+partial, and task detail retains the project path and explicit status freshness.
+Regression tests cover these paths; the compact header is rechecked visually.

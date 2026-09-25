@@ -31,7 +31,8 @@ negative, malformed, unsafe numeric, and inconsistent counts, and bounds each
 line to 64 KiB, each decimal count to 128 digits, and accepted events to 2,048.
 Input/output and cached-input counts are retained; cache-write and reasoning
 counts are validated as subsets when present but are not included in the total.
-A failed attempt retains a completed event if one was observed.
+A failed attempt retains a completed event if one was observed. A later started
+turn without completion, or a failed turn, makes those observations partial.
 
 For older attempts, status can read back a supported event from the exact
 attempt's bounded private log only when its private execution profile identifies
