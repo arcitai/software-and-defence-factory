@@ -75,3 +75,9 @@ Managed Linux services can also opt into daily updates that reserve idle control
 This is a test release. Synthetic qualification demonstrates control flow and isolation, not model quality, application correctness or production readiness. Follow [AGENTS.md](AGENTS.md) for contributions and [SECURITY.md](SECURITY.md) for the trust boundaries.
 
 MIT for original code and method. Included dashboard components and fonts retain their licenses in [third-party notices](THIRD_PARTY_NOTICES.md).
+
+## Contributing
+
+See [CONTRIBUTING.md](CONTRIBUTING.md) for source setup and checks, the
+[self-development recipe](docs/development.md) for running project work through
+Factory, and [todo.md](todo.md) for the ordered issue backlog.
