@@ -134,9 +134,13 @@ export function TaskDetail({
                   {resultTitle(job, result)}
                 </h2>
                 {result?.summary && (
-                  <p className="line-clamp-3 whitespace-pre-wrap text-sm leading-6 text-muted-foreground">
-                    {result.summary}
-                  </p>
+                  <div className="space-y-1.5">
+                    <p className="text-xs font-medium text-muted-foreground">Run report</p>
+                    <p className="line-clamp-3 whitespace-pre-wrap break-words text-sm leading-6 text-muted-foreground">
+                      {result.summary}
+                    </p>
+                    <p className="text-xs text-muted-foreground">Agent-reported text. The workflow state and its evidence determine acceptance.</p>
+                  </div>
                 )}
                 {result?.error && result.error !== result.summary && (
                   <p
@@ -362,9 +366,6 @@ function TaskActions({ job, result, onAction }) {
   const [feedback, setFeedback] = useState("");
   const [busy, setBusy] = useState(false);
   const latest = job.runs.at(-1);
-  const prURL = (result || latest)?.summary?.match(
-    /https:\/\/github\.com\/[\w.-]+\/[\w.-]+\/pull\/\d+/,
-  )?.[0];
   const action = async (name) => {
     setBusy(true);
     try {
@@ -384,13 +385,6 @@ function TaskActions({ job, result, onAction }) {
   const canRevise = job.can_request_changes ?? (job.state === "awaiting_approval" && job.workflow?.name === "software");
   return (
     <div className="space-y-3">
-      {prURL && (
-        <Button asChild variant="outline">
-          <a href={prURL} target="_blank" rel="noreferrer">
-            Open PR
-          </a>
-        </Button>
-      )}
       {(job.state === "awaiting_approval" || canRevise) && (
         <div className="space-y-3">
           <div className="flex flex-wrap gap-2">

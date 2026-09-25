@@ -6,14 +6,18 @@ const zeroTime = "0001-01-01T00:00:00Z";
 export function State({ value }) {
   const tones = {
     running: "border-warning/25 bg-warning/10 text-warning",
-    queued: "border-warning/25 bg-warning/10 text-warning",
+    cancelling: "border-warning/25 bg-warning/10 text-warning",
+    queued: "border-border bg-muted text-muted-foreground",
+    blocked: "border-warning/25 bg-warning/10 text-warning",
+    interrupted: "border-warning/25 bg-warning/10 text-warning",
+    awaiting_approval: "border-warning/25 bg-warning/10 text-warning",
     succeeded: "border-success/25 bg-success/10 text-success",
     failed: "border-danger/25 bg-danger/10 text-danger",
     timed_out: "border-danger/25 bg-danger/10 text-danger",
-    cancelled: "border-danger/25 bg-danger/10 text-danger",
+    cancelled: "border-border bg-muted text-muted-foreground",
   };
   return (
-    <Badge className={cn("gap-1.5", tones[value] || tones.queued)}>
+    <Badge className={cn("task-state gap-1.5", tones[value] || "border-border bg-muted text-muted-foreground")}>
       <span className="size-1.5 rounded-full bg-current" />
       {stateLabel(value)}
     </Badge>
@@ -28,9 +32,11 @@ export function friendlyName(name) {
 }
 export function relativeTime(value) {
   if (!value || value === zeroTime) return "Not started";
+  const timestamp = Date.parse(value);
+  if (!Number.isFinite(timestamp)) return "Unavailable";
   const seconds = Math.max(
     0,
-    Math.floor((Date.now() - Date.parse(value)) / 1000),
+    Math.floor((Date.now() - timestamp) / 1000),
   );
   if (seconds < 10) return "just now";
   if (seconds < 60) return `${seconds}s ago`;
@@ -46,5 +52,17 @@ export function formatTimestamp(value) {
     : new Date(value).toLocaleString();
 }
 export function stateLabel(value) {
-  return String(value || "unknown").replaceAll("_", " ");
+  const labels = {
+    awaiting_approval: "Awaiting acceptance",
+    cancelling: "Cancelling",
+    failed: "Failed",
+    interrupted: "Interrupted",
+    queued: "Queued",
+    running: "Running",
+    succeeded: "Completed",
+    timed_out: "Timed out",
+    cancelled: "Cancelled",
+    blocked: "Blocked",
+  };
+  return labels[value] || (value ? friendlyName(value) : "Unknown");
 }

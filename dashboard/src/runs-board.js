@@ -1,52 +1,172 @@
 export const boardColumns = [
   { id: "queued", title: "Queued", description: "Waiting to start" },
   { id: "running", title: "In progress", description: "Work underway" },
-  { id: "attention", title: "Needs attention", description: "Approval or input needed" },
+  { id: "attention", title: "Needs attention", description: "Failure, blocker, or approval" },
   { id: "finished", title: "Finished", description: "Completed or stopped" },
+  { id: "other", title: "Other state", description: "Unrecognized runtime state" },
 ];
 
-const activeStates = new Set(["queued", "running"]);
+const activeStates = new Set(["queued", "running", "cancelling"]);
 const failedStates = new Set(["failed", "timed_out"]);
+const attentionStates = new Set(["failed", "timed_out", "blocked", "interrupted"]);
+const knownStates = new Set([
+  "queued", "running", "cancelling", "failed", "timed_out", "blocked",
+  "interrupted", "awaiting_approval", "succeeded", "cancelled",
+]);
 
 export function boardColumnForState(state) {
   if (state === "queued") return "queued";
-  if (state === "running") return "running";
-  if (["blocked", "awaiting_approval", "interrupted"].includes(state)) return "attention";
-  return "finished";
+  if (activeStates.has(state)) return "running";
+  if (attentionStates.has(state) || state === "awaiting_approval") return "attention";
+  if (["succeeded", "cancelled"].includes(state)) return "finished";
+  return "other";
 }
 
 export function needsAttention(state) {
-  return !activeStates.has(state) && state !== "succeeded";
+  return attentionStates.has(state) || state === "awaiting_approval";
 }
 
 export function filterJobs(jobs, filter) {
   return jobs.filter((job) => {
-    if (filter === "active") return activeStates.has(job.state);
-    if (filter === "failed") return failedStates.has(job.state);
-    if (filter === "succeeded") return job.state === "succeeded";
-    return true;
+    switch (filter) {
+      case "active":
+      case "in_progress":
+        return activeStates.has(job.state);
+      case "needs_attention":
+        return attentionStates.has(job.state);
+      case "failed":
+        return failedStates.has(job.state);
+      case "queued":
+        return job.state === "queued";
+      case "running":
+        return job.state === "running";
+      case "cancelling":
+        return job.state === "cancelling";
+      case "blocked":
+        return job.state === "blocked";
+      case "interrupted":
+        return job.state === "interrupted";
+      case "failed_review":
+        return job.state === "failed" && job.runs?.at(-1)?.command === "review";
+      case "review_changes":
+        return job.state === "failed" && job.runs?.at(-1)?.command === "review" && job.can_request_changes === true;
+      case "awaiting_approval":
+        return job.state === "awaiting_approval";
+      case "succeeded":
+        return job.state === "succeeded";
+      case "cancelled":
+        return job.state === "cancelled";
+      case "other":
+        return !knownStates.has(job.state);
+      default:
+        return true;
+    }
+  });
+}
+
+export function searchJobs(jobs, query) {
+  const needle = String(query || "").trim().toLocaleLowerCase();
+  if (!needle) return jobs;
+  return jobs.filter((job) => {
+    const latest = job.runs?.at(-1);
+    const fields = [
+      jobDisplayTitle(job), job.id, job.state, job.repository,
+      job.workflow?.name, job.command, latest?.command,
+      job.task?.spec, job.task?.source_url, job.prompt, job.trigger_subject,
+    ];
+    return fields.some((field) => String(field || "").toLocaleLowerCase().includes(needle));
   });
 }
 
 export function groupJobsByBoardColumn(jobs) {
-  const groups = { queued: [], running: [], attention: [], finished: [] };
+  const groups = { queued: [], running: [], attention: [], finished: [], other: [] };
   for (const job of jobs) groups[boardColumnForState(job.state)].push(job);
   return groups;
 }
 
 export function jobCounts(jobs) {
-  return jobs.reduce((result, job) => {
-    result.all += 1;
+  const result = {
+    all: jobs.length,
+    active: 0,
+    failed: 0,
+    needsAttention: 0,
+    reviewFailed: 0,
+    reviewChanges: 0,
+    queued: 0,
+    running: 0,
+    cancelling: 0,
+    blocked: 0,
+    interrupted: 0,
+    awaitingApproval: 0,
+    succeeded: 0,
+    cancelled: 0,
+    other: 0,
+  };
+  for (const job of jobs) {
     if (activeStates.has(job.state)) result.active += 1;
     if (failedStates.has(job.state)) result.failed += 1;
+    if (attentionStates.has(job.state)) result.needsAttention += 1;
+    if (job.state === "queued") result.queued += 1;
+    if (job.state === "running") result.running += 1;
+    if (job.state === "cancelling") result.cancelling += 1;
+    if (job.state === "blocked") result.blocked += 1;
+    if (job.state === "interrupted") result.interrupted += 1;
+    if (job.state === "failed" && job.runs?.at(-1)?.command === "review") {
+      result.reviewFailed += 1;
+      if (job.can_request_changes === true) result.reviewChanges += 1;
+    }
+    if (job.state === "awaiting_approval") result.awaitingApproval += 1;
     if (job.state === "succeeded") result.succeeded += 1;
-    return result;
-  }, { all: 0, active: 0, failed: 0, succeeded: 0 });
+    if (job.state === "cancelled") result.cancelled += 1;
+    if (!knownStates.has(job.state)) result.other += 1;
+  }
+  return result;
 }
 
 export function currentRun(job) {
-  if (job.workflow) return job.runs.at(-1);
-  return [...job.runs].reverse().find((run) => run.state !== "queued") || job.runs[0];
+  const runs = job.runs || [];
+  if (job.workflow) return runs.at(-1);
+  return [...runs].reverse().find((run) => run.state !== "queued") || runs[0];
+}
+
+export function taskPhase(job) {
+  const runs = job.runs || [];
+  if (job.state === "awaiting_approval") {
+    const handoff = runs.at(-1);
+    const reviewed = runs.find((run) => run.id === handoff?.reviewed_run_id);
+    return reviewed?.command || "review";
+  }
+  const phase = job.workflow?.steps?.[job.workflow.current_step];
+  return phase || currentRun(job)?.command || job.command || "";
+}
+
+export function nextOperatorAction(job) {
+  const latest = job.runs?.at(-1);
+  switch (job.state) {
+    case "queued":
+      return "Waiting for a worker";
+    case "running":
+      return "Work in progress";
+    case "cancelling":
+      return "Stopping task";
+    case "failed":
+      return job.can_request_changes === true && latest?.command === "review"
+        ? "Revise or retry review"
+        : "Retry the failed phase";
+    case "timed_out":
+      return "Retry the timed out phase";
+    case "blocked":
+      return "Resolve the blocker, then retry";
+    case "interrupted":
+    case "cancelled":
+      return "Verify the worker stopped before retry";
+    case "awaiting_approval":
+      return "Approve handoff or request changes";
+    case "succeeded":
+      return "Handoff complete";
+    default:
+      return "Inspect task";
+  }
 }
 
 export function jobDisplayTitle(job) {

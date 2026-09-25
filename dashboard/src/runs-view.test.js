@@ -5,11 +5,11 @@ import { JSDOM } from "jsdom";
 import { createServer } from "vite";
 
 const jobs = [
-  { id: "job_failed", state: "failed", prompt: "Failed fixture", repository: "example/repo", command: "codex", created_at: "2026-01-01T00:00:00Z", runs: [{ id: "run_failed", state: "failed", command: "codex" }] },
-  { id: "job_succeeded", state: "succeeded", prompt: "Succeeded fixture", repository: "example/repo", command: "codex", created_at: "2026-01-01T00:00:00Z", runs: [{ id: "run_succeeded", state: "succeeded", command: "codex" }] },
+  { id: "job_failed", state: "failed", task: { title: "Failed fixture", spec: "This task requests a compact review row." }, repository: "example/repo", command: "codex", created_at: "2026-01-01T00:00:00Z", updated_at: "2026-09-25T10:00:00Z", runs: [{ id: "run_failed", state: "failed", command: "codex" }] },
+  { id: "job_succeeded", state: "succeeded", prompt: "Succeeded fixture", repository: "example/repo", command: "codex", created_at: "2026-01-01T00:00:00Z", updated_at: "2026-09-25T10:01:00Z", runs: [{ id: "run_succeeded", state: "succeeded", command: "codex" }] },
 ];
 
-test("runs default to board view and share filters when switching views", async (context) => {
+test("runs default to the searchable list and share state filters across board and list", async (context) => {
   const dom = new JSDOM('<div id="root"></div>', { url: "http://localhost/#/runs" });
   const priorGlobals = new Map();
   for (const name of ["window", "document", "navigator", "localStorage", "Event", "MouseEvent"]) {
@@ -64,9 +64,27 @@ test("runs default to board view and share filters when switching views", async 
   mountedRoot = (await server.ssrLoadModule("/src/main.jsx")).appRoot;
   await eventually(() => assert.match(document.body.textContent, /Failed fixture/));
 
-  assert.equal(button("Board").getAttribute("aria-pressed"), "true");
-  assert.ok(document.querySelector('a[href="#/runs/job_failed"]'), "board links to task");
-  assert.equal(button("List").getAttribute("aria-pressed"), "false");
+  assert.equal(button("List").getAttribute("aria-pressed"), "true");
+  assert.ok(document.querySelector('a[href="#/runs/job_failed"]'), "list links to task");
+  assert.equal(button("Board").getAttribute("aria-pressed"), "false");
+  assert.match(document.body.textContent, /Last activity/);
+
+  const search = document.querySelector('input[aria-label="Search tasks"]');
+  const setInputValue = Object.getOwnPropertyDescriptor(dom.window.HTMLInputElement.prototype, "value").set;
+  setInputValue.call(search, "compact");
+  search.dispatchEvent(new dom.window.Event("input", { bubbles: true }));
+  await eventually(() => assert.match(document.body.textContent, /Failed fixture/));
+  assert.doesNotMatch(document.body.textContent, /Succeeded fixture/);
+  button("Failed").click();
+  await eventually(() => assert.equal(button("Failed").getAttribute("aria-pressed"), "true"));
+  assert.ok(document.querySelector('a[href="#/runs/job_failed"]'), "search and failed-state filters intersect");
+
+  setInputValue.call(document.querySelector('input[aria-label="Search tasks"]'), "Succeeded fixture");
+  document.querySelector('input[aria-label="Search tasks"]').dispatchEvent(new dom.window.Event("input", { bubbles: true }));
+  await eventually(() => assert.match(document.body.textContent, /No matching tasks/));
+  button("Clear filters").click();
+  await eventually(() => assert.match(document.body.textContent, /Failed fixture/));
+  assert.match(document.body.textContent, /Succeeded fixture/);
 
   button("Board").click();
   await eventually(() => assert.equal(button("Board").getAttribute("aria-pressed"), "true"));
