@@ -10,6 +10,7 @@
 | Control surface | Existing issue/check/PR workflow unless otherwise selected |
 | Harness, version, model/provider and billing | Unselected |
 | Execution environment and necessary tools | Files, Git, shell and tests; browser for UI; other tools as needed |
+| Worker boot and operator login | Disk unlock, SSH/network/Docker/model startup, selected services, timer and observed reboot evidence; not applicable for method-only use |
 | Start, stop, routing owner and recovery | Manual until automation is qualified; one owner per job |
 | Authority and allowed network/credential references | Identify permissions without key values |
 | Time, concurrency, attempts and actual provider stop limits | Unknown until exercised |

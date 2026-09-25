@@ -18,7 +18,7 @@ test('npm artifact installs without a checkout, keeps state outside the package,
   const environment = { ...process.env, XDG_STATE_HOME: join(dir, 'state'), XDG_DATA_HOME: join(dir, 'data'), SDF_AUTO_UPDATE: '0' };
   const packed = JSON.parse(command('npm', ['pack', '--ignore-scripts', '--json', '--pack-destination', dir]))[0];
   const names = packed.files.map(file => file.path);
-  for (const required of ['bin/software-defence-factory.mjs', 'factory/updates.mjs', 'factory/paths.mjs', 'factory/image/Dockerfile', 'kit/policy.md', '.agents/skills/factory-implement/SKILL.md', 'scripts/export-kit.mjs', 'LICENSE']) assert.ok(names.includes(required), required);
+  for (const required of ['bin/software-defence-factory.mjs', 'factory/updates.mjs', 'factory/paths.mjs', 'factory/image/Dockerfile', 'kit/policy.md', 'docs/setup.md', 'docs/services.md', '.agents/skills/factory-implement/SKILL.md', 'scripts/export-kit.mjs', 'LICENSE']) assert.ok(names.includes(required), required);
   assert.ok(names.every(path => !/^(?:\.factory|\.git\/|tests\/|experiments\/|evals\/|node_modules\/)|(?:^|\/)\.env(?:\.|$)/.test(path)));
   command('npm', ['install', '--prefix', prefix, '--ignore-scripts', '--no-audit', '--no-fund', join(dir, packed.filename)], { env: environment });
   const packageRoot = join(prefix, 'node_modules/software-defence-factory');
@@ -29,6 +29,7 @@ test('npm artifact installs without a checkout, keeps state outside the package,
   assert.ok(names.some(path => /^factory\/ui\/assets\/.+\.js$/.test(path)));
   assert.ok(names.includes('THIRD_PARTY_NOTICES.md'));
   assert.match(run(['help']), /state\/software-defence-factory\/platform/);
+  assert.ok(run(['help']).includes(join(packageRoot, 'docs/setup.md')));
   assert.equal(run(['--help']), run(['help']));
   assert.equal(run(['-h']), run(['help']));
   const repo = join(dir, 'app'); mkdirSync(repo);

@@ -1,5 +1,7 @@
 # Runtime quickstart
 
+For a new worker or remote operator, start with the [setup plan](setup.md).
+
 Install Node 22.13+, Git and Docker Engine/Desktop. Use an unprivileged account with Docker access. Install `software-defence-factory` through npm, or invoke the same package with npx. No factory source checkout is required.
 
 ## Qualify a synthetic installation
@@ -55,7 +57,7 @@ ssh -N -L 127.0.0.1:7331:127.0.0.1:7331 your-host
 
 Open http://127.0.0.1:7331 on the client. Use the same local/remote port because the HTTP service validates its Host header. The SSH connection must remain open. Access also works across different networks when your configured private network connects the hosts.
 
-Use `status`, `cancel JOB_ID`, `retry JOB_ID` and `stop`, always with the selected `--state`. `service` prints a systemd user-service definition; review and install it through the host's normal service management. It is not enabled by printing it. See [recovery](recovery.md).
+Use `status`, `cancel JOB_ID`, `retry JOB_ID` and `stop`, always with the selected `--state`. `service install --state PATH` installs and enables the supported Linux user service; `service status`, `service logs` and `service uninstall` operate it. Bare `service` only prints a definition. For managed startup, persistent SSH tunnels and daily idle updates, follow [services](services.md). See [recovery](recovery.md) for interrupted attempts.
 
 ## Native application builds
 

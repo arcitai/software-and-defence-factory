@@ -19,6 +19,7 @@ Choose the part you need:
 
 | Outcome | Command / guide |
 | --- | --- |
+| Set up an operator, worker and application | [Setup plan and acceptance checklist](docs/setup.md) |
 | Use the method with your existing agent | `software-defence-factory kit --output ./factory-kit` — exports a new staging directory |
 | Try the runtime without inference | `software-defence-factory demo` — Docker required; synthetic sample only |
 | Connect an existing repository | [Runtime quickstart](docs/quickstart.md) |

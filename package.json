@@ -1,6 +1,6 @@
 {
   "name": "software-defence-factory",
-  "version": "0.4.0",
+  "version": "0.4.1",
   "description": "Scoped software delivery and defence investigations with isolated jobs, evidence and review",
   "type": "module",
   "license": "MIT",
@@ -29,6 +29,7 @@
     "scripts/export-kit.mjs",
     "scripts/probe-platform.mjs",
     "docs/npm.md",
+    "docs/setup.md",
     "docs/services.md",
     "docs/recovery.md",
     "docs/quickstart.md",

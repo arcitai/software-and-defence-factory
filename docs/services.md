@@ -1,6 +1,7 @@
 # Persistent controllers and remote dashboards
 
-Install the npm CLI first. A Factory controller is a Linux systemd **user**
+For the complete host-to-application sequence and reboot checklist, start with
+[the setup plan](setup.md). Install the npm CLI first. A Factory controller is a Linux systemd **user**
 service; SSH tunnels support Linux systemd and macOS launchd. Neither needs a
 root controller. macOS can still run a local controller with `up`.
 

@@ -224,6 +224,7 @@ Runtime commands accept --state PATH. Default: ${DEFAULT_STATE}
 Demo default: ${DEFAULT_DEMO_STATE}
 The npm CLI keeps state outside the package; updates wait for stopped installations.
 Dashboard binds only to loopback; use SSH for remote access.
-See docs/quickstart.md for inference, hosting, evidence and recovery.`);
+Setup plan: ${join(ROOT, 'docs/setup.md')}
+See docs/quickstart.md for task execution, evidence and recovery.`);
   else throw new Error(`Unknown command: ${command}`);
 } catch(error) {console.error(`Factory: ${error.message}`);process.exitCode=1;}
