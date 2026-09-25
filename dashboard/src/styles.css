@@ -113,7 +113,7 @@ button:disabled { cursor: not-allowed; }
 .view-toggle { display: flex; height: 36px; flex: none; align-items: center; gap: 2px; padding: 3px; border: 1px solid var(--border); border-radius: 8px; }
 .view-toggle button { height: 28px; padding: 0 9px; border-radius: 5px; font-size: 12px; }
 .view-toggle .view-active { background: var(--muted); color: var(--foreground); }
-.run-workspace { display: grid; min-width: 0; grid-template-columns: 212px minmax(0, 1fr); align-items: start; gap: 36px; }
+.run-workspace { display: grid; min-width: 0; grid-template-columns: 212px minmax(0, 1fr); align-items: start; gap: 48px; }
 .task-filter-rail { display: grid; min-width: 0; gap: 8px; }
 .task-filter-rail > h2 { margin: 0 0 2px; color: var(--muted-foreground); font-size: 11px; font-weight: 500; line-height: 16px; letter-spacing: .04em; text-transform: uppercase; }
 .filter-card { min-width: 0; overflow: hidden; border: 1px solid var(--border); border-radius: 8px; background: var(--surface); }
@@ -140,7 +140,7 @@ button:disabled { cursor: not-allowed; }
 .task-row-meta { display: flex; min-width: 0; flex-wrap: wrap; align-items: baseline; gap: 2px 14px; margin-top: 4px; color: var(--muted-foreground); font-size: 11px; line-height: 16px; }
 .task-row-meta > * { overflow-wrap: anywhere; }
 .task-row-next { color: var(--muted-foreground); }
-.task-state { flex: none; border-radius: 999px; padding: 2px 8px; font-size: 11px; font-weight: 500; line-height: 16px; }
+.task-state { flex: none; border-radius: 5px; padding: 2px 8px; font-size: 11px; font-weight: 500; line-height: 16px; }
 .run-column { min-width: 0; overflow: hidden; border: 1px solid var(--border); border-radius: 8px; background: var(--surface); }
 .run-card-link { display: block; min-width: 0; padding: 12px; color: var(--foreground); text-decoration: none; }
 .run-card-link:hover { background: var(--muted); }
@@ -190,9 +190,9 @@ button:disabled { cursor: not-allowed; }
   .mobile-theme { display: grid; flex: none; place-items: center; border: 1px solid transparent; border-radius: 7px; background: transparent; color: var(--muted-foreground); }
   .mobile-theme:hover { border-color: var(--border); color: var(--foreground); }
   .project-header { padding: 25px 20px 17px; }
-  .project-heading { gap: 12px; }
+  .project-heading { gap: 12px; flex-direction: column; align-items: stretch; }
   .project-header h1 { font-size: 30px; line-height: 34px; letter-spacing: -.03em; }
-  .project-new-task { margin-top: 18px; }
+  .project-new-task { margin-top: 0; align-self: flex-start; }
   .runs-page { gap: 18px; padding: 21px 20px 36px; }
   .tasks-toolbar { display: grid; align-items: start; gap: 14px; }
   .tasks-heading h2 { font-size: 20px; line-height: 26px; }

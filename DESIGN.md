@@ -7,8 +7,8 @@ version: 1
 
 The operator should immediately understand which project is selected, what is
 running and what needs a decision. The dashboard is the human interface to the
-same runtime used by the CLI. This is the accepted direction for issue #1; it
-describes intended implementation, not features already shipped.
+same runtime used by the CLI. This is the implemented direction for issue #1. Optional project colors remain
+a separate follow-up in #27.
 
 ## Reference and ownership
 
@@ -53,7 +53,7 @@ Use the self-hosted, pinned Geist variable font with system sans-serif
 fallbacks. Match the reference's readable hierarchy: 36px/40px, weight 600 for
 the project heading; 14px/20px for task titles; 12px/16px muted task metadata;
 and 14px/20px toolbar text. Search and view controls are about 36px tall with
-8px corners. Keep rows compact, with 12–14px vertical padding and fine
+8px corners. List the most recently active tasks first, using recorded timestamps. Keep rows compact, with 12–14px vertical padding and fine
 horizontal separators. Use about 40–56px main margins on desktop, 4/8px spacing
 increments and modest 6–8px corners. Prefer flat surfaces and rare shadows.
 

@@ -70,3 +70,11 @@ These scoped design changes can progress independently of automatic PR handoff.
 AIOS-app and other application development are separate queues. This Factory
 work does not start or resume those jobs. See [CONTRIBUTING.md](CONTRIBUTING.md)
 and the [self-development recipe](docs/development.md) before submitting work.
+
+
+## Dashboard delivery follow-up
+
+- #1: Warp-style frontend is implemented in the 0.4.5 candidate; final review/publication readback remains the delivery PR gate.
+- #42: supported continuation from retained, unreviewed build checkpoints after a bounded timeout.
+- #32: bounded/redacted real worker progress through the shared API/CLI/dashboard.
+- #27: optional reviewed DESIGN.md project colors; monochrome remains the complete default.

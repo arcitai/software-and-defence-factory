@@ -11,7 +11,7 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 import { routeFromHash } from "@/routes";
-import { boardColumns, filterJobs, groupJobsByBoardColumn, jobCounts, jobDisplayTitle, nextOperatorAction, searchJobs, taskPhase } from "@/runs-board";
+import { boardColumns, filterJobs, groupJobsByBoardColumn, jobsByRecentActivity, jobCounts, jobDisplayTitle, nextOperatorAction, searchJobs, taskPhase } from "@/runs-board";
 import { projectIdentity, repositoryLabel } from "@/project-identity";
 import { createStatusLoader } from "@/status-loader";
 import { TriggersPage } from "@/triggers";
@@ -98,7 +98,7 @@ function App() {
 
   const counts = useMemo(() => jobCounts(status.jobs), [status.jobs]);
   const matchingJobs = useMemo(() => searchJobs(status.jobs, search), [search, status.jobs]);
-  const visibleJobs = useMemo(() => filterJobs(matchingJobs, filter), [filter, matchingJobs]);
+  const visibleJobs = useMemo(() => jobsByRecentActivity(filterJobs(matchingJobs, filter)), [filter, matchingJobs]);
 
   const selectedJob = route.jobID ? status.jobs.find((job) => job.id === route.jobID) : undefined;
 
@@ -308,7 +308,7 @@ function RunsOverview({ visibleJobs, counts, loaded, statusError, submitError, s
         <label className="mobile-filter">
           <span>Filter tasks</span>
           <select className="field-control" aria-label="Filter tasks by status" value={filter} onChange={(event) => setFilter(event.target.value)} disabled={!loaded}>
-            {filterOptions.map((option) => <option key={option.id} value={option.id}>{option.label} · {formatCount(counts, option.count)}</option>)}
+            {filterOptions.map((option) => <option key={option.id} value={option.id}>{option.label} · {formatCount(loaded ? counts : {}, option.count)}</option>)}
           </select>
         </label>
         {!loaded && !statusError ? <TaskMessage kind="loading" title="Loading tasks" description="Checking the latest task state." />
@@ -325,8 +325,8 @@ function TaskFilterRail({ counts, loaded, filter, setFilter }) {
   const groups = [
     { id: "in_progress", label: "In progress", count: "active", description: "Work in the queue", children: [["queued", "Queued", "queued"], ["running", "Running", "running"], ["cancelling", "Cancelling", "cancelling"]] },
     { id: "needs_attention", label: "Needs attention", count: "needsAttention", description: "Stopped for a decision or fix", children: [["failed", "Failed", "failed"], ["blocked", "Blocked", "blocked"], ["interrupted", "Interrupted", "interrupted"]], subset: ["review_changes", "Review changes available", "reviewChanges"] },
-    { id: "awaiting_approval", label: "Awaiting acceptance", count: "awaitingApproval", description: "Review complete · approval needed" },
-    { id: "succeeded", label: "Completed", count: "succeeded", description: "Workflow finished successfully" },
+    { id: "awaiting_approval", label: "Awaiting acceptance", count: "awaitingApproval", description: "Operator approval needed" },
+    { id: "succeeded", label: "Completed", count: "succeeded", description: "Completed successfully" },
     { id: "cancelled", label: "Cancelled", count: "cancelled", description: "Stopped by the operator" },
   ];
   if (counts.other) groups.push({ id: "other", label: "Other state", count: "other", description: "Inspect an unrecognized runtime state" });
@@ -371,7 +371,7 @@ function RunComposer({ title,setTitle,sourceURL,setSourceURL,choices,repositorie
         <div className="grid gap-4 sm:grid-cols-2">
           <label><span className="field-label">{isTask ? "Workflow" : "Command"}</span><select className="field-control" value={selection} onChange={e=>setSelection(e.target.value)} required>{choices.map(c=><option key={c.value} value={c.value}>{c.label}</option>)}</select></label>
           <label><span className="field-label">Repository</span><select className="field-control" value={repository} onChange={e=>setRepository(e.target.value)} required>{!repositories.length && <option value="">No repositories available</option>}{repositories.map(r=><option key={r} value={r}>{repositoryLabel(r,identity)}</option>)}</select></label>
-          {isTask && <><label><span className="field-label">Title · optional</span><input className="field-control" value={title} onChange={e=>setTitle(e.target.value)} maxLength={512} placeholder="From your instructions by default" /><span className="mt-1 block text-xs text-muted-foreground">Shown in the task board</span></label><label><span className="field-label">Source link · optional</span><input type="url" className="field-control" value={sourceURL} onChange={e=>setSourceURL(e.target.value)} placeholder="https://github.com/…" /><span className="mt-1 block text-xs text-muted-foreground">Preserved with the task requirements</span></label></>}
+          {isTask && <><label><span className="field-label">Title · optional</span><input className="field-control" value={title} onChange={e=>setTitle(e.target.value)} maxLength={512} placeholder="From your instructions by default" /><span className="mt-1 block text-xs text-muted-foreground">Shown in the task list and board</span></label><label><span className="field-label">Source link · optional</span><input type="url" className="field-control" value={sourceURL} onChange={e=>setSourceURL(e.target.value)} placeholder="https://github.com/…" /><span className="mt-1 block text-xs text-muted-foreground">Preserved with the task requirements</span></label></>}
           <label><span className="field-label">Model · optional</span><input className="field-control" value={model} onChange={e=>setModel(e.target.value)} maxLength={128} placeholder="Workflow default" /></label>
         </div>
       </section>

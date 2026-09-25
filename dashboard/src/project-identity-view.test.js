@@ -94,6 +94,8 @@ test("project identity stays visible, app keeps its submission key, and stale or
   firstStatus.reject(new Error("initial status connection lost"));
   await eventually(() => assert.match(projectName().textContent, /Project identity unavailable/));
   assert.match(projectContext().textContent, /Status unavailable/);
+  assert.equal(document.querySelector('select[aria-label="Filter tasks by status"]').disabled, true);
+  assert.match(document.querySelector('select[aria-label="Filter tasks by status"] option').textContent, /—/, "unavailable mobile counts are not reported as zero");
   await eventually(() => assert.match(document.body.textContent, /initial status connection lost/));
   await runNextPoll();
   await eventually(() => assert.equal(projectName().textContent, "customer-portal"));

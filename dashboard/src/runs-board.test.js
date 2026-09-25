@@ -6,6 +6,7 @@ import {
   githubIssueReference,
   groupJobsByBoardColumn,
   jobCounts,
+  jobsByRecentActivity,
   jobDisplayTitle,
   needsAttention,
   nextOperatorAction,
@@ -97,7 +98,9 @@ test("rows use the current workflow phase and action implied by runtime state", 
   const awaiting = { state: "awaiting_approval", workflow: { steps: ["build", "review", "handoff"], current_step: 2 }, runs: [{ command: "review", state: "succeeded", id: "review" }, { command: "handoff", state: "awaiting_approval", reviewed_run_id: "review" }] };
   assert.equal(taskPhase(awaiting), "review");
   assert.equal(nextOperatorAction(awaiting), "Approve handoff or request changes");
-  assert.equal(nextOperatorAction({ state: "succeeded" }), "Handoff complete");
+  assert.equal(nextOperatorAction({ state: "succeeded" }), "Task complete");
+  assert.equal(nextOperatorAction({ state: "succeeded", workflow: { steps: ["build", "review", "handoff"] } }), "Handoff complete");
+  assert.equal(taskPhase({ state: "awaiting_approval", runs: [{ command: "build" }] }), "build", "initial approval does not invent a completed review");
 });
 
 test("runtime issue titles remain preferred when explicitly supplied", () => {
@@ -105,4 +108,25 @@ test("runtime issue titles remain preferred when explicitly supplied", () => {
   assert.equal(jobDisplayTitle(job), "Make cards readable");
   assert.equal(githubIssueReference(job), "#7");
   assert.equal(jobDisplayTitle({ id: "job_12345678", prompt: "Run an audit" }), "Run an audit");
+});
+
+
+test("legacy CLI issue titles use their recorded task heading without changing data", () => {
+  const title = "Issue: https://github.com/arcitai/software-and-defence-factory/issues/30";
+  const job = { task: { title, spec: `${title}\nAdd supported image selection\n\n## Scope` } };
+  assert.equal(jobDisplayTitle(job), "Add supported image selection");
+  assert.equal(job.task.title, title);
+  assert.equal(jobDisplayTitle({ task: { title } }), title);
+  assert.equal(jobDisplayTitle({ task: { title: "Chosen name", spec: job.task.spec } }), "Chosen name");
+});
+
+test("task overview sorts by recent activity without reordering the runtime snapshot", () => {
+  const jobs = [
+    { id: "old", updated_at: "2026-09-24T12:00:00Z" },
+    { id: "new", updated_at: "2026-09-25T12:00:00Z" },
+    { id: "created", updated_at: "unknown", created_at: "2026-09-25T10:00:00Z" },
+    { id: "unknown" },
+  ];
+  assert.deepEqual(jobsByRecentActivity(jobs).map(j => j.id), ["new", "created", "old", "unknown"]);
+  assert.equal(jobs[0].id, "old");
 });

@@ -134,7 +134,7 @@ export function taskPhase(job) {
   if (job.state === "awaiting_approval") {
     const handoff = runs.at(-1);
     const reviewed = runs.find((run) => run.id === handoff?.reviewed_run_id);
-    return reviewed?.command || "review";
+    return reviewed?.command || handoff?.command || job.command || "";
   }
   const phase = job.workflow?.steps?.[job.workflow.current_step];
   return phase || currentRun(job)?.command || job.command || "";
@@ -163,13 +163,28 @@ export function nextOperatorAction(job) {
     case "awaiting_approval":
       return "Approve handoff or request changes";
     case "succeeded":
-      return "Handoff complete";
+      return job.workflow?.steps?.includes("handoff") ? "Handoff complete" : "Task complete";
     default:
       return "Inspect task";
   }
 }
 
+export function jobsByRecentActivity(jobs) {
+  const activity = (job) => Date.parse(job.updated_at) || Date.parse(job.created_at) || 0;
+  return [...jobs].sort((a, b) => activity(b) - activity(a));
+}
+
 export function jobDisplayTitle(job) {
+  const recorded = job.task?.title;
+  // Earlier CLI issue admission used the URL as the title. Its task text still
+  // carries the actual title on the following line; preserve the stored record.
+  if (typeof recorded === "string" && /^Issue: https:\/\/github\.com\/[^/]+\/[^/]+\/issues\/\d+$/.test(recorded)) {
+    const lines = String(job.task?.spec || "").split("\n");
+    if (lines[0]?.trim() === recorded) {
+      const heading = lines.slice(1).find((line) => line.trim());
+      if (heading) return heading.replace(/^#+\s*/, "").trim();
+    }
+  }
   const title = typeof job.github_issue_title === "string" ? job.github_issue_title.trim() : "";
   return job.task?.title || title || job.task?.spec || job.task?.source_url || job.prompt || job.id;
 }
