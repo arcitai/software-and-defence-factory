@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
 import test from "node:test";
-import { completedRuns, formatDurationMillis, formatReportingCoverage, formatSuccessRate, formatTaskTokenUsage, formatTokenUsage, runDetails, runModelSummary, taskAnalytics, taskDurationMillis, tasksInWindow, tokenUsageSummary } from "./run-metrics.js";
+import { completedRuns, formatDurationMillis, formatReportingCoverage, formatSuccessRate, formatTaskTokenUsage, formatTokenUsage, formatRunTokenUsage, runDetails, runModelSummary, taskAnalytics, taskDurationMillis, tasksInWindow, tokenUsageSummary } from "./run-metrics.js";
 
 function localDate(year, month, day, hour = 0) {
   return new Date(year, month - 1, day, hour).toISOString();
@@ -96,20 +96,20 @@ test("tokenUsageSummary totals only reported completed runs and tracks coverage"
     { completed_at: "2026-08-25T12:03:00Z", token_usage: "01" },
     { completed_at: "0001-01-01T00:00:00Z" },
   ]);
-  assert.deepEqual(summary, { total: "9007199254741010", reported: 2, completed: 4, unavailable: 2 });
-  assert.equal(formatReportingCoverage(summary), "2 of 4 runs");
+  assert.deepEqual(summary, { total: "9007199254741010", reported: 2, completed: 4, unavailable: 2, partial: 0, notApplicable: 0 });
+  assert.equal(formatReportingCoverage(summary), "2 of 4 AI runs");
 });
 
 test("tokenUsageSummary does not present missing usage as zero", () => {
   const missing = tokenUsageSummary([{ completed_at: "2026-08-25T12:00:00Z" }]);
-  assert.deepEqual(missing, { total: undefined, reported: 0, completed: 1, unavailable: 1 });
+  assert.deepEqual(missing, { total: undefined, reported: 0, completed: 1, unavailable: 1, partial: 0, notApplicable: 0 });
   assert.equal(formatTokenUsage(missing.total), "Unavailable");
-  assert.equal(formatReportingCoverage(missing), "0 of 1 run");
+  assert.equal(formatReportingCoverage(missing), "0 of 1 AI run");
 
   const zero = tokenUsageSummary([{ completed_at: "2026-08-25T12:00:00Z", token_usage: "0" }]);
-  assert.deepEqual(zero, { total: "0", reported: 1, completed: 1, unavailable: 0 });
+  assert.deepEqual(zero, { total: "0", reported: 1, completed: 1, unavailable: 0, partial: 0, notApplicable: 0 });
   assert.equal(formatTokenUsage(zero.total), "0");
-  assert.equal(formatReportingCoverage(tokenUsageSummary([])), "No completed runs");
+  assert.equal(formatReportingCoverage(tokenUsageSummary([])), "No completed AI runs");
 });
 
 test("formatTaskTokenUsage marks partial totals as reported", () => {
@@ -145,4 +145,17 @@ test("analytics presents task KPIs while retaining completed run metrics", async
   for (const label of ["Average task time", "Total tasks", "Success rate", "Failed tasks", "Active tasks", "Total reported tokens", "Reporting coverage", "Duration", "Reported token usage"]) {
     assert.match(source, new RegExp(label));
   }
+});
+
+
+test("structured usage preserves partial coverage and excludes deterministic phases", () => {
+  const completed_at="2026-09-25T12:00:00Z";
+  const run={completed_at,command:"build",token_usage:"110",usage:{input_tokens:"100",output_tokens:"10",cached_input_tokens:"90",coverage:"partial",source:"legacy_codex_log"}};
+  const summary=tokenUsageSummary([run,{completed_at,command:"verify"},{completed_at,command:"handoff"},{completed_at,command:"review",usage:{status:"unknown"}}]);
+  assert.equal(summary.total,"110");assert.equal(summary.cached,"90");assert.equal(summary.completed,2);assert.equal(summary.notApplicable,2);
+  assert.equal(formatTaskTokenUsage(summary),"110 tokens reported · partial · 1 run unreported");
+  assert.equal(formatReportingCoverage(summary),"1 of 2 AI runs · 1 partial");
+  assert.equal(formatRunTokenUsage(run),"110 · partial");
+  assert.equal(formatRunTokenUsage({command:"handoff"}),"Not applicable");
+  assert.equal(formatRunTokenUsage({command:"review",usage:{status:"unknown"}}),"Unavailable");
 });

@@ -7,6 +7,7 @@ import { JobQueue, QueueError } from './queue.mjs';
 import { executors } from './processes.mjs';
 import { configAt, ROOT } from './lib.mjs';
 import { VERSION } from './updates.mjs';
+import { readProjectLinks } from './project-links.mjs';
 import { attemptPresentation } from './execution-profile.mjs';
 
 function equal(a, b) { return typeof a === 'string' && Buffer.byteLength(a) === Buffer.byteLength(b) && timingSafeEqual(Buffer.from(a), Buffer.from(b)); }
@@ -28,6 +29,7 @@ export function createController(state, adapter = executors(state)) {
   const config = configAt(state), csrf = randomBytes(32).toString('hex');
   const token = readFileSync(join(state, 'worker.token'), 'utf8').trim();
   const queue = new JobQueue(state, adapter);
+  const projectLinks = readProjectLinks(config.repo);
   const server = http.createServer(async (request, response) => {
     const send = (status, value, type = 'application/json; charset=utf-8') => { response.writeHead(status, { 'Content-Type': type }); response.end(type.startsWith('application/json') ? JSON.stringify(value) : value); };
     response.setHeader('Cache-Control', 'no-store'); response.setHeader('X-Content-Type-Options', 'nosniff'); response.setHeader('Referrer-Policy', 'no-referrer');
@@ -44,7 +46,7 @@ export function createController(state, adapter = executors(state)) {
           outcome: attempt.outcome || (attempt.state === 'succeeded' ? 'complete' : undefined) })) }));
         return send(200, { version: 1, runtime_version: VERSION, maintenance: queue.maintenance, workflows: ['software', 'defence'], commands: [], triggers: [], jobs, csrf_token: csrf,
           workers: [{ name: hostname(), instance_id: 'local-executor', repositories: ['app'], connected: !queue.closing, last_seen_at: new Date().toISOString() }],
-          repositories: ['app'], repo: config.repo, agent: config.agent });
+          repositories: ['app'], repo: config.repo, project_links: projectLinks, agent: config.agent });
       }
       if (request.method === 'GET' && url.pathname === '/api/v1/definitions') {
         const descriptions = {

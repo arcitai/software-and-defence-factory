@@ -20,6 +20,17 @@ test('failed review offers explicit revision, preserves denied/stale feedback, a
   let captured, denied=true;
   const render=async()=>act(()=>root.render(createElement(TaskDetail,{job,loaded:true,csrfToken:'fixture',onWorkflowAction:async(...args)=>{captured=args;/* parent retains job and exposes API error on rejection */if(!denied)job.state='queued';}})));
   await render();
+  const close = document.querySelector('a[aria-label="Close task detail"]');
+  assert.equal(close.getAttribute('href'), '#/runs');
+  let copied;
+  Object.defineProperty(navigator, 'clipboard', { configurable:true, value:{writeText:async value=>{copied=value;}} });
+  await act(()=>document.querySelector('button[aria-label="Copy task link"]').click());
+  assert.equal(copied, 'http://localhost/#/runs/job_fixture');
+  assert.match(document.body.textContent,/Link copied/);
+  navigator.clipboard.writeText=async()=>{throw new Error('denied');};
+  await act(()=>document.querySelector('button[aria-label="Copy task link"]').click());
+  assert.match(document.body.textContent,/Unable to copy link/);
+  assert(document.querySelector('[aria-label="Task metadata"]'));
   const button=name=>[...document.querySelectorAll('button')].find(b=>b.textContent.trim()===name);
   assert.match(document.body.textContent,/Agent-reported text/);
   assert.equal(document.querySelector('a[href="https://github.com/example/app/pull/42"]'),null,'a model summary does not create a verified PR action');

@@ -1,5 +1,5 @@
-import React, { useState } from "react";
-import { ArrowLeft, ArrowRight, Check } from "lucide-react";
+import React, { useEffect, useState } from "react";
+import { ArrowRight, Check, ChevronUp, ChevronDown, Link2, X, FileText, GitBranch, Coins } from "lucide-react";
 import { Tabs } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -7,15 +7,19 @@ import { cn } from "@/lib/utils";
 import { Artifacts, useTaskArtifacts } from "./artifacts.jsx";
 import { taskPresentation } from "./task-presentation.js";
 import { jobDisplayTitle } from "./runs-board.js";
-import { formatDurationMillis, formatTokenUsage } from "./run-metrics.js";
+import { formatDurationMillis, formatTokenUsage, formatRunTokenUsage, tokenUsageSummary, formatTaskTokenUsage, formatReportingCoverage, taskDurationMillis } from "./run-metrics.js";
 import {
   State,
   friendlyName,
   stateLabel,
   formatTimestamp,
+  TaskStateIcon,
 } from "./task-display.jsx";
 
 export function TaskDetail({
+  identity,
+  links,
+  navigation = [],
   csrfToken,
   job,
   loaded,
@@ -25,6 +29,19 @@ export function TaskDetail({
   onWorkflowAction,
 }) {
   const artifacts = useTaskArtifacts(job, csrfToken);
+  const [copyStatus, setCopyStatus] = useState("");
+  useEffect(() => {
+    setCopyStatus("");
+    const escape = event => {
+      if (event.key === "Escape" && !event.target.closest?.("input, textarea, select")) window.location.hash = "#/runs";
+    };
+    window.addEventListener("keydown", escape);
+    return () => window.removeEventListener("keydown", escape);
+  }, [job?.id]);
+  async function copyLink() {
+    try { await navigator.clipboard.writeText(`${window.location.origin}/#/runs/${encodeURIComponent(job.id)}`); setCopyStatus("Link copied"); }
+    catch { setCopyStatus("Unable to copy link"); }
+  }
   if (!job)
     return (
       <div className="p-8">
@@ -35,48 +52,34 @@ export function TaskDetail({
         {error && <p role="alert">{error}</p>}
       </div>
     );
+  const usage = tokenUsageSummary(job.runs || []);
   const terminal = ["succeeded", "failed", "cancelled"].includes(job.state);
   const latest = job.runs.at(-1);
   const lastCompleted = job.runs.findLast((run) => run.outcome === "complete");
   const { result, history, stages } = taskPresentation(job);
   const reviewing = job.state === "awaiting_approval";
   return (
-    <div className="mx-auto max-w-[1000px] space-y-7 p-4 sm:p-6 lg:p-8">
-      <header className="space-y-4">
-        <Button asChild variant="ghost" size="sm" className="-ml-3">
-          <a href="#/runs">
-            <ArrowLeft className="size-4" />
-            Back to tasks
-          </a>
-        </Button>
-        <div className="flex flex-wrap items-start justify-between gap-3">
-          <h1 className="min-w-0 break-words text-2xl font-semibold">
-            {jobDisplayTitle(job)}
-          </h1>
-          <State value={job.state} />
-        </div>
-        <p className="text-sm text-muted-foreground">
-          {job.repository} · {friendlyName(job.workflow?.name || job.command)}
-        </p>
-        {job.task?.source_url && (
-          <a
-            className="block text-sm text-primary underline"
-            href={job.task.source_url}
-            target="_blank"
-            rel="noreferrer"
-          >
-            Source ↗
-          </a>
-        )}
-        {error && (
-          <p role="alert" className="text-sm text-danger">
-            {error}
-          </p>
-        )}
+    <div className="task-detail-layout">
+      <div className="task-detail-main">
+      <div className="detail-toolbar">
+        <div className="detail-position"><span>{navigation.findIndex(item => item.id === job.id) >= 0 ? `${navigation.findIndex(item => item.id === job.id) + 1} / ${navigation.length}` : "Task"}</span><div>
+          {[-1, 1].map((delta) => {
+            const index = navigation.findIndex(item => item.id === job.id);
+            const adjacent = index >= 0 ? navigation[index + delta] : undefined;
+            const Icon = delta < 0 ? ChevronUp : ChevronDown;
+            const label = delta < 0 ? "Previous task" : "Next task";
+            return adjacent ? <a key={delta} href={`#/runs/${encodeURIComponent(adjacent.id)}`} aria-label={label} title={adjacent.title}><Icon size={14} /></a> : <span key={delta} aria-label={`${label} unavailable`}><Icon size={14} /></span>;
+          })}
+        </div></div>
+        <div className="detail-toolbar-actions"><span role="status" className="copy-status">{copyStatus}</span><button type="button" aria-label="Copy task link" title="Copy task link" onClick={copyLink}><Link2 size={16} /></button><a href="#/runs" aria-label="Close task detail" title="Close task detail (Esc)"><X size={18} /></a></div>
+      </div>
+      <header className="task-detail-heading">
+        <TaskStateIcon value={job.state} /><h2>{jobDisplayTitle(job)}</h2>
+        {error && <p role="alert" className="text-sm text-danger">{error}</p>}
       </header>
       {stages.length > 1 && (
         <ol
-          className="flex flex-wrap items-center gap-3 text-sm"
+          className="task-progress flex flex-wrap items-center gap-3 text-sm"
           aria-label="Task progress"
         >
           {stages.map((stage, index) => (
@@ -127,7 +130,7 @@ export function TaskDetail({
             label: "Result",
             content: (
               <Card
-                className="space-y-5 p-5 sm:p-6"
+                className="task-result space-y-5 p-5 sm:p-6"
                 aria-label="Current result"
               >
                 <h2 className="text-lg font-semibold">
@@ -292,6 +295,24 @@ export function TaskDetail({
           },
         ]}
       />
+      </div>
+      <aside className="task-metadata" aria-label="Task metadata">
+        <h3><FileText size={15} />Metadata</h3>
+        <dl>
+          <div><dt>Status</dt><dd><State value={job.state} /></dd></div>
+          <div><dt>Project</dt><dd>{identity?.name || job.repository}</dd></div>
+          <div><dt>Workflow</dt><dd>{friendlyName(job.workflow?.name || job.command)}</dd></div>
+          <div><dt>Created</dt><dd>{formatTimestamp(job.created_at)}</dd></div>
+          <div><dt>Last activity</dt><dd>{formatTimestamp(job.updated_at)}</dd></div>
+          <div><dt>Requested models</dt><dd>{[...new Set((job.runs || []).map(run => run.model || run.execution?.requestedModel).filter(Boolean))].join(", ") || job.model || "Not recorded"}</dd></div>
+          <div><dt>Recorded duration</dt><dd>{formatDurationMillis(taskDurationMillis(job.runs || []))}</dd></div>
+          <div className="task-usage"><dt><Coins size={13} />Reported tokens</dt><dd>{formatTaskTokenUsage(usage)}</dd><dd className="metadata-hint">{formatReportingCoverage(usage)}</dd></div>
+          {usage.input !== undefined && <div><dt>Token breakdown</dt><dd>{formatTokenUsage(usage.input)} input<br />{formatTokenUsage(usage.output)} output<br />{formatTokenUsage(usage.cached)} cached input</dd><dd className="metadata-hint">Cached input is a subset of input.</dd></div>}
+          <div><dt>Monetary cost</dt><dd>Not reported</dd><dd className="metadata-hint">Token counts are usage, not a charge.</dd></div>
+          {links?.repository && <div><dt>Repository</dt><dd><a className="metadata-link" href={links.repository} target="_blank" rel="noreferrer"><GitBranch size={13} />View repo</a></dd></div>}
+          {job.task?.source_url && /^https?:\/\//.test(job.task.source_url) && <div><dt>Source</dt><dd><a className="metadata-link" href={job.task.source_url} target="_blank" rel="noreferrer"><Link2 size={13} />Open source</a></dd></div>}
+        </dl>
+      </aside>
     </div>
   );
 }
@@ -335,11 +356,7 @@ function ExecutionDetails({ run }) {
         <RunMetric label="Policy hash" value={run.execution?.policyHash || "Not recorded"} mono />
         <RunMetric
           label="Tokens"
-          value={
-            formatTokenUsage(run.token_usage) === "Unavailable"
-              ? "Not reported"
-              : formatTokenUsage(run.token_usage)
-          }
+          value={formatRunTokenUsage(run) === "Unavailable" ? "Not reported" : formatRunTokenUsage(run)}
         />
       </dl>
     </section>

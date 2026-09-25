@@ -14,6 +14,7 @@
 - [Architecture](architecture.md): components, ownership and evidence flow.
 - [Recovery](recovery.md): stopped, failed and interrupted attempts.
 - [Defence integration](defence-integration.md): private incident intake and limits.
+- [Usage measurements](usage.md): reported tokens, partial coverage and cost limits.
 - [Qualification](proof.md): what was exercised and what remains unverified.
 - [Ownership](ownership.md): original code, adapted interface and licensing.
 

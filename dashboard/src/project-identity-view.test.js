@@ -6,6 +6,7 @@ import { createServer } from "vite";
 
 test("project identity stays visible, app keeps its submission key, and stale or missing status is labeled", async (context) => {
   const dom = new JSDOM('<div id="root"></div>', { url: "http://localhost/#/runs" });
+  dom.window.scrollTo = () => {};
   const priorGlobals = new Map();
   for (const name of ["window", "document", "navigator", "localStorage", "Event", "MouseEvent"]) {
     priorGlobals.set(name, Object.getOwnPropertyDescriptor(globalThis, name));
