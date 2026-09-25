@@ -5,7 +5,7 @@ import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { CodexUsageParser, parseCodexJsonl, usageFields, MAX_USAGE_LINE_BYTES } from '../factory/usage.mjs';
 import { BoundedLog } from '../factory/bounded-log.mjs';
-import { retainedCodexUsage } from '../factory/processes.mjs';
+import { retainedCodexUsage, executors } from '../factory/processes.mjs';
 import { createController } from '../factory/server.mjs';
 import { JobQueue } from '../factory/queue.mjs';
 
@@ -172,4 +172,26 @@ test('a failed actual attempt keeps completed Codex usage through SQLite restart
   assert.deepEqual(restarted.get(id).runs[0].usage, retained.usage);
   assert.equal(restarted.get(id).runs[0].token_usage, retained.token_usage);
   await restarted.close();
+});
+
+
+test('historical polling budgets I/O, never churns a full cache, and keeps stored usage independent', t => {
+  let now = 1000; t.mock.method(Date, 'now', () => now);
+  const log = new BoundedLog(); log.write('stdout', completed({input_tokens:20,output_tokens:3,cached_input_tokens:12}));
+  const fixture = privateAttempt(t, {log:log.finish({code:1})});
+  fixture.attempt.state = 'failed';
+  const adapter = executors(fixture.state);
+  for (let n=0;n<8;n++) adapter.usage({id:`job_missing${n}`},fixture.attempt);
+  assert.equal(adapter.usage(fixture.job,fixture.attempt).usage.status,'unknown','read budget exhausted');
+  now += 1000;
+  assert.equal(adapter.usage(fixture.job,fixture.attempt).token_usage,'23','later polling can recover the observation');
+  for(let n=8;n<520;n++) { if(n%8===0)now+=1000;adapter.usage({id:`job_missing${n}`},fixture.attempt); }
+  now+=1000;
+  writeFileSync(join(fixture.state,'jobs',fixture.job.id,fixture.attempt.id,'build.log'),'no completion event\n');
+  assert.equal(adapter.usage(fixture.job,fixture.attempt).token_usage,'23','old cache entry survives a queue larger than the cache');
+  const late = privateAttempt(t,{log:log.finish({code:1})});
+  // A second ID pointing at the same existing evidence is not needed: stored
+  // new-runtime measurements must bypass all historical cache/read limits.
+  const observed = {input_tokens:'20',output_tokens:'3',cached_input_tokens:'12',source:'codex_jsonl',coverage:'complete'};
+  assert.equal(adapter.usage({id:'job_stored'},{...late.attempt,state:'failed',usage:observed}).token_usage,'23');
 });

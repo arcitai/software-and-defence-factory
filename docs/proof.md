@@ -319,7 +319,7 @@ copy-link feedback and filtered previous/next navigation. Repository links use
 only a validated origin. Software and Defence share Tasks and can be separated
 in Analytics; Defence investigation does not grant production recovery authority.
 
-The integrated candidate passes 58 runtime/package and 50 dashboard tests.
+The integrated candidate passes 59 runtime/package and 50 dashboard tests.
 Browser inspection at normal zoom covers desktop and 320/390px, both themes,
 combined filters/reset/no-results, list/board, close/copy, task metadata,
 Software/Defence selection, Analytics, Workers, Workflows and Triggers. A
@@ -332,8 +332,11 @@ Token implementation was produced by real Factory job
 `job_24d2916a51fdff5ecd152d27`, from held source
 `3604275d25eba96976d6cfbc43055ed20e40da35`, candidate
 `5d8ad7310a7c72ee362d1653fac1602f1242dbe1`. Its native build and configured
-verification succeeded; final review and operator acceptance are separate from
-that evidence and recorded in the delivery PR.
+verification succeeded. Its separate review requested changes for a thrashing
+legacy-read cache and missing UI partial-coverage labels. Both are resolved in
+the integrated operator candidate, including bounded legacy read budgets and
+regressions. The original failed review stays failed and unaccepted; delivery
+uses independent review of the integrated candidate, recorded in the PR.
 
 A separate disposable Docker installation exercised stdout-only capture despite
 forged stderr events, an oversized line with partial observations, an absent
@@ -343,8 +346,8 @@ probe, with `gpt-6-luna` and `max` effort, captured 61,670 input and 854 output
 tokens, including 51,200 cached input tokens: 62,524 total, without double counting
 the cache. It changed no application source and is not a software delivery or
 model-quality qualification. The probe ran the integrated runtime at
-`55982257d6798a513987265e179138b153f6e796`; subsequent proof-document changes
-are not an additional runtime change.
+`55982257d6798a513987265e179138b153f6e796`; the subsequent historical-read budget change does not alter new stdout
+capture. That change has a separate cache/budget regression.
 
 Historical readback of existing real attempts remained unknown where the strict
 private-log/profile/stream evidence was insufficient. No old history was rewritten.

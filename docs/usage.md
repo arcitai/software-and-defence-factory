@@ -40,3 +40,8 @@ read-only and does not rewrite SQLite history. Missing, malformed, oversized,
 ambiguous-stream, and non-Codex evidence stays unknown. If the old bounded log
 omitted bytes, a recovered count is explicitly partial and is not represented
 as a complete total.
+
+Historical recovery is optional and budgeted to eight lookups per second and
+512 cached terminal attempts per controller lifetime. Further attempts remain
+unknown; new persisted measurements bypass these legacy read limits. This
+prevents large old queues from rereading all logs on every status poll.

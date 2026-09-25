@@ -65,12 +65,22 @@ function usageForAttempt(state, job, attempt) {
 export function executors(state) {
   const children = new Map();
   const usageCache = new Map();
+  let usageReadWindow = -1, usageReads = 0;
   function presentedUsage(job, attempt) {
+    const stored = usageFields(attempt.usage, attempt.execution, attempt.command);
+    if (stored.usage.status !== 'unknown' || !['succeeded', 'failed', 'cancelled', 'interrupted'].includes(attempt.state)) return stored;
     const key = `${job.id}/${attempt.id}/${attempt.state}`;
     if (usageCache.has(key)) return usageCache.get(key);
+    // A large historical queue must not churn the cache and reread hundreds
+    // of MiB on every status poll. Recovery is optional and remains unknown
+    // beyond a bounded controller-lifetime cache and per-second read budget.
+    if (usageCache.size >= 512) return stored;
+    const window = Math.floor(Date.now() / 1000);
+    if (window !== usageReadWindow) { usageReadWindow = window; usageReads = 0; }
+    if (usageReads >= 8) return stored;
+    usageReads++;
     const value = usageForAttempt(state, job, attempt);
     usageCache.set(key, value);
-    if (usageCache.size > 512) usageCache.delete(usageCache.keys().next().value);
     return value;
   }
   function prepare(job, attempt) {
