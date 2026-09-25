@@ -1,5 +1,9 @@
 # Documentation
 
+- [Contributing](../CONTRIBUTING.md): source setup, checks and PR/release policy.
+- [Factory development](development.md): use the released runtime to develop this project on a worker.
+- [Development queue](../todo.md): ordered, issue-backed work and dependencies.
+
 - [Setup plan](setup.md): host access, application/CI, inference, autostart, reboot proof and handoff.
 - [Quickstart](quickstart.md): connect a repository, configure inference, run and inspect a task.
 - [Install and update](npm.md): npm/npx, state paths, automatic updates and CI/CD.
