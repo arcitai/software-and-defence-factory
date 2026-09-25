@@ -6,6 +6,7 @@ import { hostname } from 'node:os';
 import { JobQueue, QueueError } from './queue.mjs';
 import { executors } from './processes.mjs';
 import { configAt, ROOT } from './lib.mjs';
+import { VERSION } from './updates.mjs';
 
 function equal(a, b) { return typeof a === 'string' && Buffer.byteLength(a) === Buffer.byteLength(b) && timingSafeEqual(Buffer.from(a), Buffer.from(b)); }
 async function body(request) {
@@ -42,7 +43,7 @@ export function createController(state, adapter = executors(state)) {
           outcome: attempt.outcome || (attempt.state === 'succeeded' ? 'complete' : undefined),
           executor: ['verify','handoff'].includes(attempt.command) ? 'deterministic' : config.agent,
           worker_name: hostname(), model: job.model || config.model })) }));
-        return send(200, { version: 1, workflows: ['software', 'defence'], commands: [], triggers: [], jobs, csrf_token: csrf,
+        return send(200, { version: 1, runtime_version: VERSION, maintenance: queue.maintenance, workflows: ['software', 'defence'], commands: [], triggers: [], jobs, csrf_token: csrf,
           workers: [{ name: hostname(), instance_id: 'local-executor', repositories: ['app'], connected: !queue.closing, last_seen_at: new Date().toISOString() }],
           repositories: ['app'], repo: config.repo, agent: config.agent });
       }
@@ -73,6 +74,10 @@ export function createController(state, adapter = executors(state)) {
         if (!authenticated) throw new QueueError('Session required', 403);
         if (!(request.headers['content-type'] || '').startsWith('application/json')) throw new QueueError('Use application/json', 415);
         const input = await body(request);
+        if (url.pathname === '/api/v1/maintenance') {
+          if (!equal(request.headers.authorization, `Bearer ${token}`)) throw new QueueError('Operator token required for maintenance', 403);
+          return send(200, queue.setMaintenance(input.enabled));
+        }
         if (url.pathname === '/api/v1/jobs') {
           if (input.model && input.model !== config.model && !['codex','pi'].includes(config.agent)) throw new QueueError('Model overrides require a codex or pi executor', 400);
           return send(201, queue.submit(input));

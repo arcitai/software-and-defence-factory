@@ -104,7 +104,7 @@ export async function bootstrap(args) {
   const busy = busyInstallations();
   const cachedVersion = installedEntry(DATA_HOME, preferences.version) ? preferences.version : VERSION;
   let selectedVersion = newer(cachedVersion, VERSION) ? cachedVersion : VERSION;
-  const automatic = !['stop', 'cancel', 'status', 'serve', 'version', '--version', '-v'].includes(command)
+  const automatic = !['stop', 'cancel', 'status', 'serve', 'service', 'tunnel', 'help', '--help', '-h', 'version', '--version', '-v'].includes(command)
     && preferences.enabled && process.env.SDF_AUTO_UPDATE !== '0'
     && Date.now() - preferences.lastCheckedAt >= DAY && busy.length === 0;
   if (explicit || automatic) {

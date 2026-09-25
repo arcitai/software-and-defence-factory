@@ -29,6 +29,8 @@ test('npm artifact installs without a checkout, keeps state outside the package,
   assert.ok(names.some(path => /^factory\/ui\/assets\/.+\.js$/.test(path)));
   assert.ok(names.includes('THIRD_PARTY_NOTICES.md'));
   assert.match(run(['help']), /state\/software-defence-factory\/platform/);
+  assert.equal(run(['--help']), run(['help']));
+  assert.equal(run(['-h']), run(['help']));
   const repo = join(dir, 'app'); mkdirSync(repo);
   command('git', ['init', '-q', repo]);
   command('git', ['-C', repo, '-c', 'user.name=Fixture', '-c', 'user.email=fixture@localhost', 'commit', '--allow-empty', '-qm', 'fixture']);

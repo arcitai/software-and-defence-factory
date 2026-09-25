@@ -76,3 +76,31 @@ a fresh private fixture for each invocation. The installed npm candidate passed
 all 12 Docker paths twice against one state, retaining both histories and the
 cross-install image assertions. All 20 runtime/package and 39 dashboard tests
 passed; application execution code is unchanged from 0.3.4.
+
+## 0.4.0 — managed services and remote access
+
+The installed npm candidate was exercised on Linux with a real systemd user
+manager and Docker. Service installation, native unit validation, repeated
+installation, ordinary `up`/`stop` routing, removal with retained state, and
+automatic recovery after a real SIGKILL passed. An existing account group could
+be applied through util-linux newgrp without a root controller or restarting
+the user's desktop session.
+
+A real synthetic executor blocked an attempted update before download. Injected
+registry versions then exercised the actual service stop/start and durable
+maintenance path: a working candidate preserved exact job history, and a broken
+entrypoint restored the prior healthy release and released maintenance. Those
+versions existed only in an isolated private test installation; they are not
+claims of npm publication. The daily timer was installed, enabled and removed
+using the CLI.
+
+On macOS, the installed package created a native LaunchAgent SSH tunnel. Plist
+validation, repeated installation, stop/start, and reconnect after SIGKILL passed.
+The remote dashboard's 18 historical synthetic records remained unchanged.
+This proves process recovery and login configuration, not a whole-machine reboot
+or a physical two-network test. Disk unlock and sleep remain host prerequisites.
+
+All 24 runtime/package tests and 39 dashboard tests passed. Added regressions
+cover argument escaping, existing-group launch arguments, durable maintenance,
+queued-work refusal, operator-only reservation and conventional help flags.
+No application development agent or production connector was started.
