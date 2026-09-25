@@ -7,7 +7,7 @@ version: 1
 
 The operator should immediately understand which project is selected, what is
 running and what needs a decision. The dashboard is the human interface to the
-same runtime used by the CLI. This is the implemented direction for issue #1. Optional project colors remain
+same runtime used by the CLI. This is the implemented direction for issues #1 and #45. Optional project colors remain
 a separate follow-up in #27.
 
 ## Reference and ownership
@@ -18,7 +18,7 @@ light and dark modes, with a narrow view. Follow its composition closely: a
 roughly 203px navigation rail; main content beginning around 56px from the rail
 with about 40px top spacing; a 36px project heading; compact toolbar; status
 filters beside a fine-divided task list; restrained controls and progressive
-task detail. Use Factory's own mark, name, records and actions. Do not use Warp
+task detail. Use the plain `factory.` wordmark, Factory records and actions. Do not use Warp
 logos, media or source code.
 
 The desktop composition is the fidelity target. At 320–390px, adapt the layout
@@ -45,6 +45,20 @@ reference's clipped narrow view is not part of the target.
 - Keep workers, machines, triggers, analytics and workflow descriptions
   accessible as secondary views. Worker health is not the primary work
   overview. Preserve existing actions and stale-action protection.
+- Derive View repo and New issue only from a validated GitHub origin on the
+  configured project. Unknown or credential-bearing origins expose no link.
+- Place real workflow, requested-model and state-badge filters beside search.
+  Their intersection drives both list and board; clear resets them together.
+  Status groups expand to their actual Factory states. Do not add unconnected
+  contributor or GitHub-label controls.
+- Task detail has previous/next navigation within the current filtered list,
+  copy-link feedback, a close button (Escape) and a metadata column. Open at
+  the top and restore the list position on return. Keep all artifact and
+  revision actions available inside the same detail.
+- Keep Software and Defence in the same task list, visibly named by workflow.
+  Filter tasks and analytics by workflow; a source issue link does not choose
+  the execution type. Defence remains scoped investigation, distinct from
+  software delivery and from production recovery authority.
 - One project/controller per dashboard. There is no global project hub.
 
 ## Typography, color and spacing
@@ -58,9 +72,8 @@ horizontal separators. Use about 40–56px main margins on desktop, 4/8px spacin
 increments and modest 6–8px corners. Prefer flat surfaces and rare shadows.
 
 The default visual palette is monochrome. Light mode uses white surfaces,
-#0a0a0a text and #e5e5e5 borders. Dark mode uses #09090b surfaces, #f5f5f5
-text and subtle charcoal borders. Primary controls are black in light mode and
-white in dark mode. Small semantic status colors may mark success, attention
+#0a0a0a text and #e5e5e5 borders. Dark mode uses #101012 surfaces, #f5f5f5
+text and subtle charcoal borders. Primary creation actions use the reference's restrained blue; other controls remain monochrome. Small semantic status colors may mark success, attention
 and failure, with text labels so color is never the only signal.
 
 An optional reviewed project accent belongs to issue #27. Until that shared

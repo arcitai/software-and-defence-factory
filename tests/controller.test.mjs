@@ -4,6 +4,7 @@ import { mkdtempSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import http from 'node:http';
+import { execFileSync } from 'node:child_process';
 import { JobQueue } from '../factory/queue.mjs';
 import { createController } from '../factory/server.mjs';
 
@@ -75,10 +76,13 @@ test('controller enforces host/origin/session checks and persists only bounded j
   const state = temp(t);
   writeFileSync(join(state, 'factory.json'), JSON.stringify({ version: 1, repo: state, agent: 'mock', command: ['mock'], port: 7332, timeoutSeconds: 10, memoryMiB: 256, image: 'fixture:1', network: 'none', check: 'true', scope: { project: 'p', service: 's', environment: 'test', owner: 'fixture' } }));
   writeFileSync(join(state, 'worker.token'), 'synthetic-private-token');
+  execFileSync('git', ['init', state], {stdio:'ignore'});
+  execFileSync('git', ['-C',state,'remote','add','origin','git@github.com:example/actual-project.git']);
   const controller = createController(state, adapter());
   await new Promise(resolve => controller.server.listen(0, '127.0.0.1', resolve)); t.after(() => controller.close());
   const origin = `http://127.0.0.1:${controller.server.address().port}`;
   const status = await (await fetch(origin + '/api/v1/status')).json();
+  assert.deepEqual(status.project_links, {repository:'https://github.com/example/actual-project',new_issue:'https://github.com/example/actual-project/issues/new',source:'configured_git_origin'});
   const post = headers => fetch(origin + '/api/v1/jobs', { method: 'POST', headers: { 'Content-Type': 'application/json', ...headers }, body: JSON.stringify(task) });
   assert.equal((await post({})).status, 403);
   assert.equal((await post({ Authorization: 'Bearer synthetic-private-token', Origin: 'https://untrusted.invalid' })).status, 403);

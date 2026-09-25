@@ -11,7 +11,7 @@ test("project view leads with identity and each control plane view keeps its pag
   ]);
 
   assert.match(main, /<ProjectContext identity=\{identity\}/);
-  assert.match(main, /<h2>Tasks<\/h2>/);
+  assert.match(main, /<h2[^>]*>Tasks<\/h2>/);
   assert.match(main, /aria-label="Search tasks"/);
   assert.match(analytics, /<PageHeading title="Task analytics"/);
   assert.match(catalog, /<Page title="Workers"/);

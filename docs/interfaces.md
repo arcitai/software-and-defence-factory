@@ -17,6 +17,8 @@ shell endpoint or a second scheduler.
 | Remove a stopped task | No command | `DELETE /api/v1/jobs/:id` | Remove action | Add CLI; keep existing recoverability/history semantics |
 | Evidence list/read/download | No command | Authenticated artifact routes | Files/preview/download | Add CLI with matching access and size/path rules |
 | Workflow definitions | No command | `GET /api/v1/definitions` | Workflows | Add structured CLI inspection |
+| Project repository links | Validated links in `status` | `project_links` from configured Git origin | View repo / New issue | Links only; no issue synchronization or creation API |
+| Recorded token usage | Per-attempt `usage` and `token_usage` in `status` | Same status records | Analytics, task rows, metadata/history | No billing estimate; partial/unknown coverage stays explicit |
 | Analytics/filtering | Raw status available | Source queue records | Derived views | Expose equivalent queries/summaries without inventing usage data |
 | Scoped incident admission | `incident --file` validates/deduplicates private evidence | No equivalent typed intake endpoint | Generic Defence form is not equivalent admission | Common typed intake, gaps and deduplication before execution |
 | Initialize/configure | `init` | No operator setup endpoint | None | Preserve app files, explicit state and private secrets |

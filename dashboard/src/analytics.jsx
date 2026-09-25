@@ -2,17 +2,20 @@ import { useMemo, useState } from "react";
 import { Card } from "@/components/ui/card";
 import { PageHeading, QuietState } from "@/components/ui/page-heading";
 import { analyticsState } from "@/analytics-state";
-import { formatDurationMillis, formatReportingCoverage, formatSuccessRate, formatTokenUsage, tokenUsageSummary } from "@/run-metrics";
+import { formatDurationMillis, formatReportingCoverage, formatSuccessRate, formatTokenUsage, formatRunTokenUsage, tokenUsageSummary } from "@/run-metrics";
 
-export function Analytics({ jobs, loaded, error }) {
+export function Analytics({ jobs, workflows = [], loaded, error }) {
+  const [workflow, setWorkflow] = useState("");
+  const workflowOptions = [...new Set([...workflows, ...jobs.map(job => job.workflow?.name || job.command)].filter(Boolean))];
   const [days, setDays] = useState("30");
-  const view = useMemo(() => analyticsState({ jobs, days, loaded, error }), [days, error, jobs, loaded]);
+  const view = useMemo(() => analyticsState({ jobs, days, workflow, loaded, error }), [days, error, jobs, loaded, workflow]);
   const runs = view.runs || [];
   const usage = useMemo(() => tokenUsageSummary(runs), [runs]);
 
-  return <div className="mx-auto max-w-[1500px] space-y-6 p-4 sm:p-6 lg:p-8">
+  return <div className="secondary-page mx-auto max-w-[1500px] space-y-6 p-4 sm:p-6 lg:p-8">
     <PageHeading title="Task analytics" description="Task outcomes with measured run duration and executor-reported token usage.">
-      <label className="w-full sm:w-40"><span className="field-label">Time window</span><select className="field-control" value={days} onChange={(event) => setDays(event.target.value)}><option value="7">Last 7 days</option><option value="30">Last 30 days</option></select></label>
+      <div className="flex flex-wrap gap-3"><label className="w-full sm:w-40"><span className="field-label">Workflow</span><select className="field-control" value={workflow} onChange={event=>setWorkflow(event.target.value)}><option value="">All workflows</option>{workflowOptions.map(name=><option key={name} value={name}>{name === "software" ? "Software" : name === "defence" ? "Defence" : name}</option>)}</select></label>
+      <label className="w-full sm:w-40"><span className="field-label">Time window</span><select className="field-control" value={days} onChange={(event) => setDays(event.target.value)}><option value="7">Last 7 days</option><option value="30">Last 30 days</option></select></label></div>
     </PageHeading>
 
     {view.kind === "error" ? <div role="alert" className="rounded-md border border-danger/35 bg-danger/10 px-3 py-2 text-sm text-danger">{view.message}</div> : view.kind === "loading" ? <Card><QuietState title="Measuring the work" description="Loading task outcomes and reported usage." role="status" /></Card> : <>
@@ -29,9 +32,10 @@ export function Analytics({ jobs, loaded, error }) {
         </div>
       </section>
 
-      <div className="grid gap-3 sm:grid-cols-2">
-        <Card className="min-w-0 p-4 sm:p-5"><p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Total reported tokens</p><p className="mt-2 break-all text-2xl font-semibold tabular-nums">{formatTokenUsage(usage.total)}</p><p className="mt-1 text-xs text-muted-foreground">Input plus output tokens reported in this window.</p></Card>
-        <Card className="p-4 sm:p-5"><p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Reporting coverage</p><p className="mt-2 text-2xl font-semibold tabular-nums">{formatReportingCoverage(usage)}</p><p className="mt-1 text-xs text-muted-foreground">{usage.unavailable ? `${usage.unavailable} completed ${usage.unavailable === 1 ? "run has" : "runs have"} unavailable usage.` : usage.completed ? "Every completed run reported usage." : "No completed runs in this window."}</p></Card>
+      <div className="grid gap-3 lg:grid-cols-3">
+        <Card className="min-w-0 p-4 sm:p-5"><p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Total reported tokens</p><p className="mt-2 break-all text-2xl font-semibold tabular-nums">{formatTokenUsage(usage.total)}</p><p className="mt-1 text-xs text-muted-foreground">Input plus output tokens reported in this window. Cached input is already included.</p></Card>
+        <Card className="p-4 sm:p-5"><p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Reporting coverage</p><p className="mt-2 text-2xl font-semibold tabular-nums">{formatReportingCoverage(usage)}</p><p className="mt-1 text-xs text-muted-foreground">{usage.unavailable ? `${usage.unavailable} completed AI ${usage.unavailable === 1 ? "run has" : "runs have"} unavailable usage.` : usage.completed ? usage.partial ? "Includes partial observations; missing events cannot be counted." : "Every completed AI run reported usage." : "No completed AI runs in this window."}</p></Card>
+        <Card className="p-4 sm:p-5"><p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Provider cost</p><p className="mt-2 text-2xl font-semibold">Not reported</p><p className="mt-1 text-xs text-muted-foreground">Token usage does not establish an invoice amount. No price is estimated.</p></Card>
       </div>
 
       <section aria-labelledby="completed-run-metrics">
@@ -44,7 +48,7 @@ export function Analytics({ jobs, loaded, error }) {
             <p className="truncate font-mono text-xs text-muted-foreground">{shortId(run.id)}</p>
             <p className="truncate text-sm font-medium capitalize">{run.command}</p>
             <p className="text-sm tabular-nums"><span className="sm:hidden text-muted-foreground">Duration · </span>{formatDurationMillis(run.duration_millis)}</p>
-            <p className="min-w-0 break-all text-sm tabular-nums"><span className="sm:hidden text-muted-foreground">Reported tokens · </span>{formatTokenUsage(run.token_usage)}</p>
+            <p className="min-w-0 break-all text-sm tabular-nums"><span className="sm:hidden text-muted-foreground">Reported tokens · </span>{formatRunTokenUsage(run)}</p>
           </div>) : <div className="grid place-items-center p-12 text-sm text-muted-foreground">No completed runs in this window.</div>}
         </Card>
       </section>

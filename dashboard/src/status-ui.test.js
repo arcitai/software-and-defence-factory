@@ -69,3 +69,12 @@ function deferred() {
   });
   return { promise, resolve, reject };
 }
+
+
+test("analytics separates Software and Defence measurements without changing source jobs", () => {
+  const jobs=[{...measuredJob, workflow:{name:"software"}}, {...measuredJob, workflow:{name:"defence"}, runs:[{...measuredJob.runs[0],id:"defence_run",token_usage:"123"}]}];
+  const defence=analyticsState({jobs,days:"30",loaded:true,workflow:"defence",now});
+  assert.equal(defence.metrics.totalTasks,1);assert.equal(defence.runs[0].id,"defence_run");assert.equal(defence.runs[0].token_usage,"123");
+  assert.equal(analyticsState({jobs,days:"30",loaded:true,now}).metrics.totalTasks,2);
+  assert.equal(jobs.length,2);
+});

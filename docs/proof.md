@@ -308,3 +308,55 @@ Independent final source review and public npm/installed asset readback are
 external delivery gates; their exact revision and results belong to the delivery
 PR. Optional reviewed project colors (#27), complete interface parity (#37),
 GitHub sign-in and Coolify hosting (#39) are not delivered by this visual slice.
+
+
+## Task navigation, Defence visibility and usage — 0.4.6
+
+Issues #45 and #44 refine the project work view and retain structured token
+usage. The plain wordmark replaces the geometric mark; real workflow/model/
+state filters combine with search. Task details preserve context with close,
+copy-link feedback and filtered previous/next navigation. Repository links use
+only a validated origin. Software and Defence share Tasks and can be separated
+in Analytics; Defence investigation does not grant production recovery authority.
+
+The integrated candidate passes 60 runtime/package and 50 dashboard tests.
+Browser inspection at normal zoom covers desktop and 320/390px, both themes,
+combined filters/reset/no-results, list/board, close/copy, task metadata,
+Software/Defence selection, Analytics, Workers, Workflows and Triggers. A
+loopback read-only preview uses real queue data. Explicit synthetic offline
+responses exercise initial errors, stale data and recovery. No product job is
+submitted by these UI checks. Component/API tests retain revision, retry and
+approval checks.
+
+Token implementation was produced by real Factory job
+`job_24d2916a51fdff5ecd152d27`, from held source
+`3604275d25eba96976d6cfbc43055ed20e40da35`, candidate
+`5d8ad7310a7c72ee362d1653fac1602f1242dbe1`. Its native build and configured
+verification succeeded. Its separate review requested changes for a thrashing
+legacy-read cache and missing UI partial-coverage labels. Both are resolved in
+the integrated operator candidate, including bounded legacy read budgets and
+regressions. The original failed review stays failed and unaccepted; delivery
+uses independent review of the integrated candidate, recorded in the PR.
+
+A separate disposable Docker installation exercised stdout-only capture despite
+forged stderr events, an oversized line with partial observations, an absent
+completion event, persistence and controller restart. These three cases used
+synthetic events and no provider calls. A separate live Codex build-only telemetry
+probe, with `gpt-6-luna` and `max` effort, captured 61,670 input and 854 output
+tokens, including 51,200 cached input tokens: 62,524 total, without double counting
+the cache. It changed no application source and is not a software delivery or
+model-quality qualification. The probe ran the integrated runtime at
+`55982257d6798a513987265e179138b153f6e796`; the subsequent historical-read budget change does not alter new stdout
+capture. That change has a separate cache/budget regression.
+
+Historical readback of existing real attempts remained unknown where the strict
+private-log/profile/stream evidence was insufficient. No old history was rewritten.
+The runtime exposes the same usage through CLI and API. Partial observations,
+missing AI runs and deterministic phases remain distinct; no billing amounts are
+estimated. Public npm, installed assets and idle-only activation are final delivery
+gates recorded in the PR, not claims made by these source checks.
+
+Independent integrated review also closed incomplete-turn coverage and hidden
+compact-header context: a later unfinished/failed Codex turn makes counts
+partial, and task detail retains the project path and explicit status freshness.
+Regression tests cover these paths; the compact header is rechecked visually.

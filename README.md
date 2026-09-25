@@ -42,7 +42,7 @@ flowchart LR
 
 Each result belongs to a specific candidate commit and policy. A failed check blocks delivery. Changing the candidate or check policy invalidates earlier evidence. Approval records a handoff; publishing, merging and deployment follow the application's separate authority.
 
-The dashboard provides a task board and list, results, files, history, analytics, workers and workflow descriptions. It binds to localhost and can be reached remotely through SSH. One controller executes one job phase at a time; each job has its own checkout and bounded Docker containers.
+The per-project dashboard keeps Software and Defence in one searchable task list, with workflow/model/status filters, a board, task details, files and history. Analytics separates workflows and shows recorded duration and token usage with explicit coverage; missing billing amounts stay unknown. View repo and New issue use the configured GitHub origin. Workers and workflow descriptions remain accessible. It binds to localhost and can be reached remotely through SSH. One controller executes one job phase at a time; each job has its own checkout and bounded Docker containers.
 
 The optional **defence** workflow accepts scoped incident evidence and produces a private, read-only draft. It does not monitor production or claim verified recovery. See [defence integration](docs/defence-integration.md).
 

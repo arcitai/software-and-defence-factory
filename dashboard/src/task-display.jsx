@@ -1,27 +1,14 @@
 import React from "react";
-import { Badge } from "@/components/ui/badge";
-import { cn } from "@/lib/utils";
+import { Check, Code2, CircleAlert, Eye, Circle } from "lucide-react";
 const zeroTime = "0001-01-01T00:00:00Z";
 
+const stateTone = value => ({ running: "violet", queued: "cyan", awaiting_approval: "pink", succeeded: "green", failed: "amber", timed_out: "amber", blocked: "amber", interrupted: "amber" })[value] || "neutral";
+export function TaskStateIcon({ value }) {
+  const Icon = value === "succeeded" ? Check : value === "running" ? Code2 : ["failed", "blocked", "timed_out", "interrupted"].includes(value) ? CircleAlert : value === "awaiting_approval" ? Eye : Circle;
+  return <span className={`task-status-icon tone-${stateTone(value)}`} aria-hidden="true"><Icon size={14} /></span>;
+}
 export function State({ value }) {
-  const tones = {
-    running: "border-warning/25 bg-warning/10 text-warning",
-    cancelling: "border-warning/25 bg-warning/10 text-warning",
-    queued: "border-border bg-muted text-muted-foreground",
-    blocked: "border-warning/25 bg-warning/10 text-warning",
-    interrupted: "border-warning/25 bg-warning/10 text-warning",
-    awaiting_approval: "border-warning/25 bg-warning/10 text-warning",
-    succeeded: "border-success/25 bg-success/10 text-success",
-    failed: "border-danger/25 bg-danger/10 text-danger",
-    timed_out: "border-danger/25 bg-danger/10 text-danger",
-    cancelled: "border-border bg-muted text-muted-foreground",
-  };
-  return (
-    <Badge className={cn("task-state gap-1.5", tones[value] || "border-border bg-muted text-muted-foreground")}>
-      <span className="size-1.5 rounded-full bg-current" />
-      {stateLabel(value)}
-    </Badge>
-  );
+  return <span className={`task-state tone-${stateTone(value)}`}><span className="state-dot" />{stateLabel(value)}</span>;
 }
 
 export function friendlyName(name) {

@@ -67,22 +67,39 @@ export function formatSuccessRate(rate) {
 }
 
 export function tokenUsageSummary(runs) {
-  let total = 0n;
-  let reported = 0;
-  let completed = 0;
+  let total = 0n, input = 0n, output = 0n, cached = 0n;
+  let reported = 0, completed = 0, partial = 0, structured = 0, notApplicable = 0;
   for (const run of runs) {
     if (!validDate(run.completed_at)) continue;
+    if (usageNotApplicable(run)) { notApplicable += 1; continue; }
     completed += 1;
     if (!validTokenUsage(run.token_usage)) continue;
     total += BigInt(run.token_usage);
     reported += 1;
+    if (run.usage?.coverage === "partial") partial += 1;
+    if ([run.usage?.input_tokens, run.usage?.output_tokens, run.usage?.cached_input_tokens].every(validTokenUsage)) {
+      structured += 1;
+      input += BigInt(run.usage.input_tokens);
+      output += BigInt(run.usage.output_tokens);
+      cached += BigInt(run.usage.cached_input_tokens);
+    }
   }
   return {
     total: reported ? total.toString() : undefined,
-    reported,
-    completed,
+    reported, completed, partial, notApplicable,
     unavailable: completed - reported,
+    ...(structured && structured === reported ? {input: input.toString(), output: output.toString(), cached: cached.toString()} : {}),
   };
+}
+
+export function usageNotApplicable(run) {
+  return run.usage?.status === "not_applicable" || ["verify", "handoff"].includes(run.command) || run.executor === "mock";
+}
+
+export function formatRunTokenUsage(run) {
+  if (usageNotApplicable(run)) return "Not applicable";
+  const tokens = formatTokenUsage(run.token_usage);
+  return tokens === "Unavailable" ? tokens : `${tokens}${run.usage?.coverage === "partial" ? " · partial" : ""}`;
 }
 
 export function runModelSummary(runs) {
@@ -107,15 +124,17 @@ export function taskDurationMillis(runs) {
 }
 
 export function formatReportingCoverage(summary) {
-  if (!summary.completed) return "No completed runs";
-  return `${summary.reported} of ${summary.completed} run${summary.completed === 1 ? "" : "s"}`;
+  if (!summary.completed) return "No completed AI runs";
+  return `${summary.reported} of ${summary.completed} AI run${summary.completed === 1 ? "" : "s"}${summary.partial ? ` · ${summary.partial} partial` : ""}`;
 }
 
 export function formatTaskTokenUsage(summary) {
   if (summary.total === undefined) return "Not reported";
   const total = `${formatTokenUsage(summary.total)} tokens`;
-  if (!summary.unavailable) return total;
-  return `${total} reported · ${summary.unavailable} run${summary.unavailable === 1 ? "" : "s"} unreported`;
+  const limits = [];
+  if (summary.partial) limits.push("partial");
+  if (summary.unavailable) limits.push(`${summary.unavailable} run${summary.unavailable === 1 ? "" : "s"} unreported`);
+  return limits.length ? `${total} reported · ${limits.join(" · ")}` : total;
 }
 
 export function runDetails(run) {
@@ -123,7 +142,7 @@ export function runDetails(run) {
   if (run.worker_name) values.push(run.worker_name);
   if (run.model) values.push(run.model);
   if (Number.isSafeInteger(run.duration_millis)) values.push(formatDurationMillis(run.duration_millis));
-  if (validDate(run.completed_at)) values.push(validTokenUsage(run.token_usage) ? `${formatTokenUsage(run.token_usage)} tokens` : "Token usage unavailable");
+  if (validDate(run.completed_at) && !usageNotApplicable(run)) values.push(validTokenUsage(run.token_usage) ? `${formatRunTokenUsage(run)} tokens` : "Token usage unavailable");
   return values.join(" · ");
 }
 

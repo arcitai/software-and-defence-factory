@@ -11,6 +11,7 @@ const jobs = [
 
 test("runs default to the searchable list and share state filters across board and list", async (context) => {
   const dom = new JSDOM('<div id="root"></div>', { url: "http://localhost/#/runs" });
+  dom.window.scrollTo = () => {};
   const priorGlobals = new Map();
   for (const name of ["window", "document", "navigator", "localStorage", "Event", "MouseEvent"]) {
     priorGlobals.set(name, Object.getOwnPropertyDescriptor(globalThis, name));
