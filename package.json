@@ -1,6 +1,6 @@
 {
   "name": "software-defence-factory",
-  "version": "0.4.4",
+  "version": "0.4.5",
   "description": "Scoped software delivery and defence investigations with isolated jobs, evidence and review",
   "type": "module",
   "license": "MIT",

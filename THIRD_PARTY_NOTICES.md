@@ -4,7 +4,7 @@
 
 The dashboard is adapted from the MIT-licensed interface at
 https://github.com/owainlewis/machinist/tree/39435164faf1ff7fad49e41c38a7eb1a00538f21/internal/controlplane/web.
-The interface is retained at the owner's request; branding and runtime integration are modified.
+The dashboard retains adapted components from that source. Its project-focused layout, branding, styles and runtime integration are rebuilt for Factory.
 The upstream execution engine is not bundled.
 
 MIT License
@@ -31,9 +31,10 @@ SOFTWARE.
 
 ## Bundled UI dependencies
 
-## @fontsource-variable/manrope 5.3.0
+## @fontsource-variable/geist 5.3.0
 
-Copyright 2019 The Manrope Project Authors (https://github.com/sharanda/manrope)
+Copyright 2024 The Geist Project Authors (https://github.com/vercel/geist-font)
+Geist-Italic[wght].ttf: Copyright 2024 The Geist Project Authors (https://github.com/vercel/geist-font)
 
 This Font Software is licensed under the SIL Open Font License, Version 1.1.
 This license is copied below, and is also available with a FAQ at:

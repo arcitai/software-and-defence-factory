@@ -272,3 +272,39 @@ published/installed-artifact readback remain pending at this source revision;
 the delivery PR for #30/#40 will record that external evidence. This proves supervised self-development,
 not autonomous issue intake, source snapshots (#28), PR publication (#29), full
 interface parity (#37), security qualification or the future dashboard redesign.
+
+
+## Warp-style dashboard — 0.4.5
+
+The #1 frontend began as a real Factory build from source
+`ebefe163506558236acfe26d31eb124fe7ff2f8e`, job
+`job_2de982c6e7c8d98096de88d1`. It reached the configured 1,800-second phase
+budget before runtime candidate/check/review/handoff completion. Its original
+failed attempt and private source are preserved; it is not recorded as an
+accepted Factory job. The operator recovered the source into an isolated branch,
+finished bounded presentation corrections and validated the full recovered diff.
+Supported checkpoint continuation is tracked in #42; live activity is #32.
+
+The release uses a list-first project overview, a compact status rail, searchable
+real task data, Geist and monochrome defaults. The operator corrected mobile
+heading layout, legacy CLI issue-title presentation, recent-activity ordering,
+and claims about generic task completion/initial approval. Unknown mobile counts
+remain unknown while status is unavailable. Independent review also corrected
+retry guidance/actions to match controller policy and removed the empty unknown-state
+board lane; regressions cover blocked/timed-out actions and explicit cancelled retry.
+No backend, credentials, workflow
+policy or Docker execution path changes in this release.
+
+The complete build/check passes 46 runtime/package and 48 dashboard tests.
+Browser inspection covers desktop and 320/390px CSS widths, light/dark themes,
+search combined with status filters, reset/empty results, list/board navigation,
+keyboard focus, the task composer, project identity, result/history/files and
+failed-review feedback controls. Real project data is read through a loopback
+candidate preview. Long-name and offline/error states use explicitly synthetic
+preview responses. No product job is submitted by these browser checks; action
+request/current-run semantics remain covered by the existing component/API tests.
+
+Independent final source review and public npm/installed asset readback are
+external delivery gates; their exact revision and results belong to the delivery
+PR. Optional reviewed project colors (#27), complete interface parity (#37),
+GitHub sign-in and Coolify hosting (#39) are not delivered by this visual slice.

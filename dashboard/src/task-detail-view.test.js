@@ -15,12 +15,14 @@ test('failed review offers explicit revision, preserves denied/stale feedback, a
   t.after(async()=>{await act(()=>root.unmount());await server.close();dom.window.close();for(const [key,descriptor]of prior){if(descriptor)Object.defineProperty(globalThis,key,descriptor);else delete globalThis[key];}});
   const {TaskDetail}=await server.ssrLoadModule('/src/task-detail.jsx');
   const runs=[{id:'run_a',command:'build',state:'failed',started_at:'2026-09-25T00:00:00Z',summary:'Old failed build'},
-    {id:'run_b',command:'review',state:'failed',outcome:'blocked',review_verdict:'changes',started_at:'2026-09-25T01:00:00Z',summary:'Fix the concern',executor:'codex',model:'requested-model',worker_name:'fixture',execution:{runtimeVersion:'test-version',image:'sha256:fixture',policyHash:'policy-fixture'}}];
+    {id:'run_b',command:'review',state:'failed',outcome:'blocked',review_verdict:'changes',started_at:'2026-09-25T01:00:00Z',summary:'Fix the concern. Claimed PR: https://github.com/example/app/pull/42',executor:'codex',model:'requested-model',worker_name:'fixture',execution:{runtimeVersion:'test-version',image:'sha256:fixture',policyHash:'policy-fixture'}}];
   const job={id:'job_fixture',state:'failed',repository:'app',task:{title:'Revision fixture'},workflow:{name:'software',steps:['build','verify','review','handoff'],current_step:2},runs,can_request_changes:true};
   let captured, denied=true;
   const render=async()=>act(()=>root.render(createElement(TaskDetail,{job,loaded:true,csrfToken:'fixture',onWorkflowAction:async(...args)=>{captured=args;/* parent retains job and exposes API error on rejection */if(!denied)job.state='queued';}})));
   await render();
   const button=name=>[...document.querySelectorAll('button')].find(b=>b.textContent.trim()===name);
+  assert.match(document.body.textContent,/Agent-reported text/);
+  assert.equal(document.querySelector('a[href="https://github.com/example/app/pull/42"]'),null,'a model summary does not create a verified PR action');
   assert(button('Request changes'));assert(![...document.querySelectorAll('button')].some(b=>b.textContent.startsWith('Approve')));
   await act(()=>button('Request changes').click());
   const area=document.querySelector('textarea');assert(area);
@@ -41,4 +43,24 @@ test('failed review offers explicit revision, preserves denied/stale feedback, a
   }
   job.can_request_changes=false;await render();
   await act(()=>document.querySelector('[role="tab"][id$="result"]').click());assert(!button('Request changes'));
+
+  for (const state of ['blocked', 'timed_out']) {
+    job.state=state; await render();
+    assert(![...document.querySelectorAll('button')].some(b=>b.textContent.trim().startsWith('Retry ')), `${state} cannot retry under controller policy`);
+    assert.equal(Boolean(button('Cancel task')), state==='blocked');
+  }
+  job.state='cancelled';await render();
+  const retry=button('Retry review');assert(retry?.disabled);
+  await act(()=>document.querySelector('input[type="checkbox"]').click());
+  assert.equal(button('Retry review').disabled,false);
+  await act(()=>button('Retry review').click());assert.equal(captured[1],'retry');assert.equal(captured[2],true);
+
+  job.state='awaiting_approval';job.workflow.current_step=3;job.can_request_changes=true;
+  runs.push({id:'run_handoff',command:'handoff',state:'awaiting_approval',reviewed_run_id:'run_b'});
+  await render();
+  assert.match(document.body.textContent,/Awaiting acceptance/);
+  assert(button('Approve and start handoff'));
+  await act(()=>button('Approve and start handoff').click());
+  assert.equal(captured[1],'approve','approval is the explicit action that starts handoff');
+  assert(![...document.querySelectorAll('button')].some(b=>b.textContent.trim()==='Open PR'));
 });

@@ -1,18 +1,17 @@
 import { TaskDetail } from "./task-detail.jsx";
-import { State, friendlyName, relativeTime } from "./task-display.jsx";
+import { State, friendlyName, relativeTime, stateLabel } from "./task-display.jsx";
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import { createRoot } from "react-dom/client";
-import "@fontsource-variable/manrope";
-import { Activity, BarChart3, Bot, GitBranch, LayoutDashboard, Moon, Play, Plus, Server, Sun, Table2, TimerReset, X } from "lucide-react";
+import "@fontsource-variable/geist";
+import { Activity, BarChart3, Bot, LayoutDashboard, Menu, Moon, Play, Plus, Search, Server, Sun, Table2, TimerReset, X } from "lucide-react";
 import { Analytics } from "@/analytics";
 import { CommandsPage, WorkersPage } from "@/catalog";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { PageHeading } from "@/components/ui/page-heading";
 import { cn } from "@/lib/utils";
 import { routeFromHash } from "@/routes";
-import { boardColumns, currentRun, filterJobs, groupJobsByBoardColumn, jobCounts, jobDisplayTitle } from "@/runs-board";
+import { boardColumns, filterJobs, groupJobsByBoardColumn, jobsByRecentActivity, jobCounts, jobDisplayTitle, nextOperatorAction, searchJobs, taskPhase } from "@/runs-board";
 import { projectIdentity, repositoryLabel } from "@/project-identity";
 import { createStatusLoader } from "@/status-loader";
 import { TriggersPage } from "@/triggers";
@@ -35,8 +34,9 @@ function App() {
   const [submitting, setSubmitting] = useState(false);
   const [composerOpen, setComposerOpen] = useState(false);
   const [filter, setFilter] = useState("all");
-  const [runsView, setRunsView] = useState("board");
-  const [dark, setDark] = useState(() => localStorage.getItem("factory-theme") !== "light");
+  const [runsView, setRunsView] = useState(() => localStorage.getItem("factory-runs-view") === "board" ? "board" : "list");
+  const [search, setSearch] = useState("");
+  const [dark, setDark] = useState(() => localStorage.getItem("factory-theme") === "dark");
   const [route, setRoute] = useState(() => routeFromHash(window.location.hash));
   const view = route.view;
   const statusLoader = useRef(null);
@@ -97,10 +97,15 @@ function App() {
   const identity = projectIdentity(status.repo);
 
   const counts = useMemo(() => jobCounts(status.jobs), [status.jobs]);
-  const visibleJobs = useMemo(() => filterJobs(status.jobs, filter), [filter, status.jobs]);
+  const matchingJobs = useMemo(() => searchJobs(status.jobs, search), [search, status.jobs]);
+  const visibleJobs = useMemo(() => jobsByRecentActivity(filterJobs(matchingJobs, filter)), [filter, matchingJobs]);
 
-  const connectedWorkers = status.workers.filter((worker) => worker.connected).length;
   const selectedJob = route.jobID ? status.jobs.find((job) => job.id === route.jobID) : undefined;
+
+  function changeRunsView(nextView) {
+    localStorage.setItem("factory-runs-view", nextView);
+    setRunsView(nextView);
+  }
 
   async function submit(event) {
     event.preventDefault();
@@ -165,21 +170,22 @@ function App() {
 
   return (
     <div className="app-shell min-h-screen bg-background text-foreground md:flex">
-      <aside className="app-sidebar sticky top-0 z-20 flex shrink-0 items-center border-b border-border bg-sidebar px-3 py-2 md:h-screen md:w-56 md:flex-col md:items-stretch md:border-b-0 md:border-r md:px-4 md:py-5">
-        <div className="brand-lockup flex h-10 items-center gap-3 px-1">
+      <aside className="app-sidebar sticky top-0 z-20 flex shrink-0 items-center border-b border-border bg-sidebar px-4 py-2 md:h-screen md:w-[203px] md:flex-col md:items-stretch md:border-b-0 md:border-r md:px-4 md:py-5">
+        <div className="brand-lockup flex h-10 shrink-0 items-center gap-3 px-1">
           <FactoryMark />
           <span className="brand-wordmark">Factory</span>
         </div>
-        <nav className="ml-4 flex flex-1 gap-1 overflow-x-auto md:ml-0 md:mt-9 md:block md:overflow-visible" aria-label="Primary">
-          <a href="#/runs" aria-current={view === "runs" || view === "task" ? "page" : undefined} className={cn("nav-item", (view === "runs" || view === "task") && "nav-item-active")}><Activity className="size-4" /><span>Tasks</span><span className="ml-auto text-xs text-muted-foreground">{counts.all}</span></a>
-          <a href="#/analytics" aria-current={view === "analytics" ? "page" : undefined} className={cn("nav-item", view === "analytics" && "nav-item-active")}><BarChart3 className="size-4" /><span>Analytics</span></a>
-          <a href="#/workers" aria-current={view === "workers" ? "page" : undefined} className={cn("nav-item", view === "workers" && "nav-item-active")}><Server className="size-4" /><span>Workers</span></a>
-          <a href="#/triggers" aria-current={view === "triggers" ? "page" : undefined} className={cn("nav-item", view === "triggers" && "nav-item-active")}><TimerReset className="size-4" /><span>Triggers</span><span className="ml-auto text-xs text-muted-foreground">{status.triggers?.length || 0}</span></a>
-          <a href="#/workflows" aria-current={["commands", "workflows"].includes(view) ? "page" : undefined} className={cn("nav-item", ["commands", "workflows"].includes(view) && "nav-item-active")}><Bot className="size-4" /><span>Workflows</span></a>
+        <nav className="desktop-nav" aria-label="Primary">
+          <PrimaryLinks view={view} count={statusLoaded ? counts.all : undefined} triggerCount={status.triggers?.length} />
         </nav>
-        <div className="hidden border-t border-border pt-3 md:block">
-          <div className="nav-item" title={`${connectedWorkers} connected · ${status.workers.length} registered`}><Server className="size-4 shrink-0" /><span className="min-w-0 truncate whitespace-nowrap">{connectedWorkers ? `${connectedWorkers} worker${connectedWorkers === 1 ? "" : "s"} online` : "No workers online"}</span></div>
-          <button onClick={() => setDark((value) => !value)} className="nav-item w-full" aria-label={`Switch to ${dark ? "light" : "dark"} theme`}>
+        <details className="mobile-nav">
+          <summary aria-label="Open navigation"><Menu className="size-4" /><span>Menu</span></summary>
+          <nav aria-label="Primary mobile">
+            <PrimaryLinks view={view} count={statusLoaded ? counts.all : undefined} triggerCount={status.triggers?.length} mobile />
+          </nav>
+        </details>
+        <div className="sidebar-bottom">
+          <button onClick={() => setDark((value) => !value)} className="nav-item theme-switch" aria-label={`Switch to ${dark ? "light" : "dark"} theme`}>
             {dark ? <Moon className="size-4" /> : <Sun className="size-4" />}<span>{dark ? "Dark" : "Light"} theme</span>
           </button>
         </div>
@@ -189,60 +195,168 @@ function App() {
       </aside>
 
       <main className="workshop min-w-0 flex-1">
-        <ProjectContext identity={identity} loaded={statusLoaded} error={statusError} />
-        {view === "task" ? <TaskDetail csrfToken={status.csrf_token} job={selectedJob} loaded={statusLoaded} error={statusError || taskActionError} deleting={deletingJob === route.jobID} onDelete={deleteJob} onWorkflowAction={workflowAction} /> : view === "analytics" ? <Analytics jobs={status.jobs} loaded={statusLoaded} error={statusError} /> : view === "workers" ? <WorkersPage workers={status.workers} loaded={statusLoaded} error={statusError} /> : view === "triggers" ? <TriggersPage triggers={status.triggers || []} loaded={statusLoaded} error={statusError} /> : ["commands", "workflows"].includes(view) ? <CommandsPage /> : <div className="mx-auto max-w-[1500px] space-y-6 p-4 sm:p-6 lg:p-8">
-          <PageHeading title="Tasks" description={status.agent === "mock" ? "Synthetic installation demo — no model calls." : "Describe the work. Review the result."}>
-            <div className="flex items-center gap-2">
-              <Button className="text-xs!" onClick={() => setComposerOpen(true)}><Plus className="size-4" />New task</Button>
-            </div>
-          </PageHeading>
-
-          {composerOpen && <RunComposer title={title} setTitle={setTitle} sourceURL={sourceURL} setSourceURL={setSourceURL} choices={choices} repositories={repositories} identity={identity} selection={selection} setSelection={setSelection} repository={repository} setRepository={setRepository} prompt={prompt} setPrompt={setPrompt} model={model} setModel={setModel} submitting={submitting} submit={submit} close={() => setComposerOpen(false)} />}
-          {(statusError || submitError) && <div role="alert" className="rounded-md border border-danger/35 bg-danger/10 px-3 py-2 text-sm text-danger">{submitError || statusError}</div>}
-
-          <section>
-            <div className="mb-3 flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
-              <div className="flex flex-wrap items-center gap-1" role="group" aria-label="Filter runs">
-                {[["all", "All"], ["active", "Active"], ["failed", "Failed"], ["succeeded", "Succeeded"]].map(([value, label]) => (
-                  <Button key={value} variant="ghost" size="sm" aria-pressed={filter === value} onClick={() => setFilter(value)} className={cn("text-xs!", filter === value && "bg-muted text-foreground")}>{label}<span className="text-muted-foreground">{counts[value]}</span></Button>
-                ))}
-              </div>
-              <div className="flex flex-wrap items-center justify-between gap-3 lg:justify-end">
-                <p className="text-xs text-muted-foreground">{counts.all} task{counts.all === 1 ? "" : "s"}</p>
-                <div className="inline-flex rounded-lg bg-muted/60 p-1" role="group" aria-label="Runs view">
-                  <Button variant="ghost" size="sm" className={cn("h-7 border-transparent px-2.5 text-xs!", runsView === "board" && "bg-surface text-foreground shadow-xs")} aria-pressed={runsView === "board"} onClick={() => setRunsView("board")}><LayoutDashboard className="size-3.5" />Board</Button>
-                  <Button variant="ghost" size="sm" className={cn("h-7 border-transparent px-2.5 text-xs!", runsView === "table" && "bg-surface text-foreground shadow-xs")} aria-pressed={runsView === "table"} onClick={() => setRunsView("table")}><Table2 className="size-3.5" />List</Button>
-                </div>
-              </div>
-            </div>
-
-            {runsView === "board" ? <RunBoard jobs={visibleJobs} /> : <Card className="overflow-hidden">
-              {visibleJobs.length ? visibleJobs.map((job) => <RunRow key={job.id} job={job} />) : <EmptyRuns filtered={filter !== "all"} openComposer={() => setComposerOpen(true)} />}
-            </Card>}
-          </section>
-
-        </div>}
+        <ProjectContext identity={identity} loaded={statusLoaded} error={statusError} showNewTask={view === "runs"} onNewTask={() => setComposerOpen(true)} />
+        {view === "task" ? <TaskDetail csrfToken={status.csrf_token} job={selectedJob} loaded={statusLoaded} error={statusError || taskActionError} deleting={deletingJob === route.jobID} onDelete={deleteJob} onWorkflowAction={workflowAction} />
+          : view === "analytics" ? <Analytics jobs={status.jobs} loaded={statusLoaded} error={statusError} />
+            : view === "workers" ? <WorkersPage workers={status.workers} loaded={statusLoaded} error={statusError} />
+              : view === "triggers" ? <TriggersPage triggers={status.triggers || []} loaded={statusLoaded} error={statusError} />
+                  : ["commands", "workflows"].includes(view) ? <CommandsPage />
+                  : <RunsOverview
+                    visibleJobs={visibleJobs}
+                    counts={counts}
+                    loaded={statusLoaded}
+                    statusError={statusError}
+                    submitError={submitError}
+                    synthetic={status.agent === "mock"}
+                    filter={filter}
+                    setFilter={setFilter}
+                    search={search}
+                    setSearch={setSearch}
+                    runsView={runsView}
+                    setRunsView={changeRunsView}
+                    refresh={() => statusLoader.current.refresh()}
+                    openComposer={() => setComposerOpen(true)}
+                    composer={composerOpen && <RunComposer title={title} setTitle={setTitle} sourceURL={sourceURL} setSourceURL={setSourceURL} choices={choices} repositories={repositories} identity={identity} selection={selection} setSelection={setSelection} repository={repository} setRepository={setRepository} prompt={prompt} setPrompt={setPrompt} model={model} setModel={setModel} submitting={submitting} submit={submit} close={() => setComposerOpen(false)} />}
+                  />}
       </main>
     </div>
   );
 }
 
-function ProjectContext({ identity, loaded, error }) {
+function PrimaryLinks({ view, count, triggerCount, mobile = false }) {
+  const link = (href, Icon, label, active, badge) => <a href={href} aria-current={active ? "page" : undefined} className={cn("nav-item", active && "nav-item-active")} onClick={(event) => { if (mobile) event.currentTarget.closest("details")?.removeAttribute("open"); }}>
+    <Icon className="size-4" /><span>{label}</span>{badge !== undefined && <span className="nav-count">{badge}</span>}
+  </a>;
+  return <>
+    {link("#/runs", Activity, "Tasks", view === "runs" || view === "task", count)}
+    {link("#/analytics", BarChart3, "Analytics", view === "analytics")}
+    {link("#/workers", Server, "Workers", view === "workers")}
+    {link("#/triggers", TimerReset, "Triggers", view === "triggers", triggerCount)}
+    {link("#/workflows", Bot, "Workflows", ["commands", "workflows"].includes(view))}
+  </>;
+}
+
+function ProjectContext({ identity, loaded, error, showNewTask, onNewTask }) {
   const title = identity?.name || (!loaded && !error ? "Loading configured project…" : "Project identity unavailable");
   const freshness = error ? loaded ? "Status stale" : "Status unavailable" : loaded ? "Status current" : "Loading status";
-  return <header aria-label="Configured project" className="sticky top-14 z-30 border-b border-border bg-background/95 px-4 py-2 backdrop-blur md:top-0 sm:px-6 lg:px-8">
-    <div className="mx-auto grid min-w-0 max-w-[1500px] grid-cols-[minmax(0,1fr)_auto] items-center gap-x-3 gap-y-1">
-      <div className="flex min-w-0 items-center gap-2">
-        <span className="shrink-0 text-xs text-muted-foreground">Project</span>
-        <strong className="min-w-0 truncate text-sm font-semibold" title={identity?.name}>{title}</strong>
+  return <header aria-label="Configured project" className="project-header">
+    <div className="project-heading">
+      <div className="project-heading-copy">
+        <span className="project-eyebrow">Project</span>
+        <h1 title={identity?.name}>{title}</h1>
+        {identity && <details className="project-path">
+          <summary>Configured path</summary>
+          <div>{identity.path}</div>
+        </details>}
+        <span className={cn("project-freshness", error && "is-stale")} title={error || undefined} aria-label={error ? `${freshness}: ${error}` : freshness} aria-live="polite">{freshness}</span>
       </div>
-      {identity && <details className="col-span-2 row-start-2 min-w-0 text-xs text-muted-foreground">
-        <summary className="w-fit cursor-pointer rounded-sm focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring">Configured path</summary>
-        <div className="break-all pt-1">{identity.path}</div>
-      </details>}
-      <span className={cn("row-start-1 col-start-2 shrink-0 text-right text-xs", error ? "text-warning" : "text-muted-foreground")} title={error || undefined} aria-label={error ? `${freshness}: ${error}` : freshness} aria-live="polite">{freshness}</span>
+      {showNewTask && <Button className="project-new-task" onClick={onNewTask}><Plus className="size-4" />New task</Button>}
     </div>
   </header>;
+}
+
+const filterOptions = [
+  { id: "all", label: "All tasks", count: "all" },
+  { id: "in_progress", label: "In progress", count: "active" },
+  { id: "queued", label: "Queued", count: "queued" },
+  { id: "running", label: "Running", count: "running" },
+  { id: "cancelling", label: "Cancelling", count: "cancelling" },
+  { id: "needs_attention", label: "Needs attention", count: "needsAttention" },
+  { id: "failed", label: "Failed work", count: "failed" },
+  { id: "failed_review", label: "Failed review", count: "reviewFailed" },
+  { id: "review_changes", label: "Review changes available", count: "reviewChanges" },
+  { id: "blocked", label: "Blocked", count: "blocked" },
+  { id: "interrupted", label: "Interrupted", count: "interrupted" },
+  { id: "awaiting_approval", label: "Awaiting acceptance", count: "awaitingApproval" },
+  { id: "succeeded", label: "Completed", count: "succeeded" },
+  { id: "cancelled", label: "Cancelled", count: "cancelled" },
+  { id: "other", label: "Other state", count: "other" },
+];
+
+function formatCount(counts, key) {
+  return counts[key] ?? "—";
+}
+
+function RunsOverview({ visibleJobs, counts, loaded, statusError, submitError, synthetic, filter, setFilter, search, setSearch, runsView, setRunsView, refresh, openComposer, composer }) {
+  const filtering = filter !== "all" || Boolean(search.trim());
+  return <div className="runs-page">
+    <div className="tasks-toolbar">
+      <div className="tasks-heading">
+        <h2>Tasks</h2>
+        <p>{synthetic ? "Synthetic installation demo — no model calls." : loaded ? `${counts.all} task${counts.all === 1 ? "" : "s"}` : "Work from this project"}</p>
+      </div>
+      <div className="tasks-tools">
+        <div className="task-search" role="search">
+          <Search className="size-4" aria-hidden="true" />
+          <input type="search" aria-label="Search tasks" placeholder="Search tasks" value={search} onChange={(event) => setSearch(event.target.value)} />
+          {search && <button type="button" className="clear-search" aria-label="Clear search" onClick={() => setSearch("")}><X className="size-3.5" /></button>}
+        </div>
+        <div className="view-toggle" role="group" aria-label="Tasks view">
+          <Button variant="ghost" size="sm" className={cn(runsView === "list" && "view-active")} aria-pressed={runsView === "list"} onClick={() => setRunsView("list")}><Table2 className="size-3.5" />List</Button>
+          <Button variant="ghost" size="sm" className={cn(runsView === "board" && "view-active")} aria-pressed={runsView === "board"} onClick={() => setRunsView("board")}><LayoutDashboard className="size-3.5" />Board</Button>
+        </div>
+      </div>
+    </div>
+
+    {composer}
+    {submitError && <div role="alert" className="form-error">{submitError}</div>}
+    {statusError && loaded && <div className="stale-banner" role="status"><span><strong>Status stale.</strong> Showing the last available task data. {statusError}</span><Button variant="outline" size="sm" onClick={refresh}>Refresh</Button></div>}
+
+    <div className="run-workspace">
+      <TaskFilterRail counts={counts} loaded={loaded} filter={filter} setFilter={setFilter} />
+      <section className="task-results" aria-label="Task results">
+        <label className="mobile-filter">
+          <span>Filter tasks</span>
+          <select className="field-control" aria-label="Filter tasks by status" value={filter} onChange={(event) => setFilter(event.target.value)} disabled={!loaded}>
+            {filterOptions.map((option) => <option key={option.id} value={option.id}>{option.label} · {formatCount(loaded ? counts : {}, option.count)}</option>)}
+          </select>
+        </label>
+        {!loaded && !statusError ? <TaskMessage kind="loading" title="Loading tasks" description="Checking the latest task state." />
+          : !loaded && statusError ? <TaskMessage kind="error" title="Task status unavailable" description={statusError} action="Retry status" onAction={refresh} />
+            : !visibleJobs.length ? <EmptyRuns filtered={filtering} clearFilters={() => { setFilter("all"); setSearch(""); }} openComposer={openComposer} />
+              : runsView === "board" ? <RunBoard jobs={visibleJobs} />
+                : <div className="task-list" role="list">{visibleJobs.map((job) => <RunRow key={job.id} job={job} />)}</div>}
+      </section>
+    </div>
+  </div>;
+}
+
+function TaskFilterRail({ counts, loaded, filter, setFilter }) {
+  const groups = [
+    { id: "in_progress", label: "In progress", count: "active", description: "Work in the queue", children: [["queued", "Queued", "queued"], ["running", "Running", "running"], ["cancelling", "Cancelling", "cancelling"]] },
+    { id: "needs_attention", label: "Needs attention", count: "needsAttention", description: "Stopped for a decision or fix", children: [["failed", "Failed", "failed"], ["blocked", "Blocked", "blocked"], ["interrupted", "Interrupted", "interrupted"]], subset: ["review_changes", "Review changes available", "reviewChanges"] },
+    { id: "awaiting_approval", label: "Awaiting acceptance", count: "awaitingApproval", description: "Operator approval needed" },
+    { id: "succeeded", label: "Completed", count: "succeeded", description: "Completed successfully" },
+    { id: "cancelled", label: "Cancelled", count: "cancelled", description: "Stopped by the operator" },
+  ];
+  if (counts.other) groups.push({ id: "other", label: "Other state", count: "other", description: "Inspect an unrecognized runtime state" });
+  return <aside className="task-filter-rail" aria-label="Filter tasks by status">
+    <h2>Filter by status</h2>
+    <section className="filter-card">
+      <button className="filter-card-main" type="button" aria-pressed={filter === "all"} onClick={() => setFilter("all")} disabled={!loaded}>
+        <span className="filter-card-heading"><span>All tasks</span><span className="filter-card-count">{loaded ? counts.all : "—"}</span></span>
+        <span className="filter-card-description">Every task in this project</span>
+      </button>
+    </section>
+    {groups.map((group) => <section className="filter-card" key={group.id}>
+      <button className="filter-card-main" type="button" aria-pressed={filter === group.id} onClick={() => setFilter(group.id)} disabled={!loaded}>
+        <span className="filter-card-heading"><span>{group.label}</span><span className="filter-card-count">{loaded ? counts[group.count] : "—"}</span></span>
+        <span className="filter-card-description">{group.description}</span>
+      </button>
+      {group.children && <div className="filter-card-children">
+        {group.children.map(([id, label, count]) => <button type="button" className="filter-substate" key={id} aria-pressed={filter === id} onClick={() => setFilter(id)} disabled={!loaded}><span>{label}</span><span>{formatCount(loaded ? counts : {}, count)}</span></button>)}
+        {group.subset && <button type="button" className="filter-substate is-subset" aria-pressed={filter === group.subset[0]} onClick={() => setFilter(group.subset[0])} disabled={!loaded}><span>{group.subset[1]}</span><span>{formatCount(loaded ? counts : {}, group.subset[2])}</span></button>}
+      </div>}
+    </section>)}
+  </aside>;
+}
+
+function TaskMessage({ kind, title, description, action, onAction }) {
+  return <div className={`task-message task-message-${kind}`} role={kind === "error" ? "alert" : "status"}>
+    <h3>{title}</h3>
+    <p>{description}</p>
+    {action && <Button variant="outline" size="sm" onClick={onAction}>{action}</Button>}
+  </div>;
 }
 
 function RunComposer({ title,setTitle,sourceURL,setSourceURL,choices,repositories,identity,selection,setSelection,repository,setRepository,prompt,setPrompt,model,setModel,submitting,submit,close }) {
@@ -257,7 +371,7 @@ function RunComposer({ title,setTitle,sourceURL,setSourceURL,choices,repositorie
         <div className="grid gap-4 sm:grid-cols-2">
           <label><span className="field-label">{isTask ? "Workflow" : "Command"}</span><select className="field-control" value={selection} onChange={e=>setSelection(e.target.value)} required>{choices.map(c=><option key={c.value} value={c.value}>{c.label}</option>)}</select></label>
           <label><span className="field-label">Repository</span><select className="field-control" value={repository} onChange={e=>setRepository(e.target.value)} required>{!repositories.length && <option value="">No repositories available</option>}{repositories.map(r=><option key={r} value={r}>{repositoryLabel(r,identity)}</option>)}</select></label>
-          {isTask && <><label><span className="field-label">Title · optional</span><input className="field-control" value={title} onChange={e=>setTitle(e.target.value)} maxLength={512} placeholder="From your instructions by default" /><span className="mt-1 block text-xs text-muted-foreground">Shown in the task board</span></label><label><span className="field-label">Source link · optional</span><input type="url" className="field-control" value={sourceURL} onChange={e=>setSourceURL(e.target.value)} placeholder="https://github.com/…" /><span className="mt-1 block text-xs text-muted-foreground">Preserved with the task requirements</span></label></>}
+          {isTask && <><label><span className="field-label">Title · optional</span><input className="field-control" value={title} onChange={e=>setTitle(e.target.value)} maxLength={512} placeholder="From your instructions by default" /><span className="mt-1 block text-xs text-muted-foreground">Shown in the task list and board</span></label><label><span className="field-label">Source link · optional</span><input type="url" className="field-control" value={sourceURL} onChange={e=>setSourceURL(e.target.value)} placeholder="https://github.com/…" /><span className="mt-1 block text-xs text-muted-foreground">Preserved with the task requirements</span></label></>}
           <label><span className="field-label">Model · optional</span><input className="field-control" value={model} onChange={e=>setModel(e.target.value)} maxLength={128} placeholder="Workflow default" /></label>
         </div>
       </section>
@@ -270,7 +384,7 @@ function RunComposer({ title,setTitle,sourceURL,setSourceURL,choices,repositorie
 function RunBoard({ jobs }) {
   const groupedJobs = groupJobsByBoardColumn(jobs);
   return <div className="grid min-w-0 gap-4 md:grid-cols-2 xl:grid-cols-4">
-    {boardColumns.map((column) => <section key={column.id} className="run-column min-w-0 border border-border bg-muted/20" aria-labelledby={`board-${column.id}`}>
+    {boardColumns.filter((column) => column.id !== "other" || groupedJobs.other.length > 0).map((column) => <section key={column.id} className="run-column min-w-0 border border-border bg-muted/20" aria-labelledby={`board-${column.id}`}>
       <header className="flex items-center justify-between gap-3 border-b border-border px-3 py-2.5">
         <div className="min-w-0"><h2 id={`board-${column.id}`} className="text-sm font-semibold">{column.title}</h2><p className="break-words text-xs text-muted-foreground">{column.description}</p></div>
         <Badge className="shrink-0 border-border bg-surface text-muted-foreground" aria-label={`${groupedJobs[column.id].length} visible ${column.title.toLowerCase()} runs`}>{groupedJobs[column.id].length}</Badge>
@@ -284,22 +398,38 @@ function RunBoard({ jobs }) {
 
 function RunCard({ job }) {
   const title = jobDisplayTitle(job);
-  const run = currentRun(job);
-  return <Card className="overflow-hidden"><a href={`#/runs/${encodeURIComponent(job.id)}`} className="block min-w-0 space-y-3 p-4 transition hover:bg-muted/35 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring/50" aria-label={`Open task ${title}`}>
-    <p className="line-clamp-2 text-sm font-medium leading-5">{title}</p>
-    <p className="text-xs text-muted-foreground">{job.repository} · {friendlyName(run?.command || job.command)}</p>
-    <State value={job.state} />
+  return <Card className="overflow-hidden"><a href={`#/runs/${encodeURIComponent(job.id)}`} className="run-card-link" aria-label={`Open task ${title}`}>
+    <p className="run-card-title">{title}</p>
+    <p className="run-card-meta">{friendlyName(job.workflow?.name || job.command)} · {friendlyName(taskPhase(job))}</p>
+    <div className="run-card-status"><State value={job.state} /><span>{nextOperatorAction(job)}</span></div>
   </a></Card>;
 }
 
 function RunRow({ job }) {
-  const title=jobDisplayTitle(job);
-  const run=currentRun(job);
-  return <article className="border-b border-border last:border-b-0"><a href={`#/runs/${encodeURIComponent(job.id)}`} className="flex items-center justify-between gap-4 px-5 py-4 hover:bg-muted/35" aria-label={`Open task ${title}`}><div className="min-w-0"><p className="truncate text-sm font-medium">{title}</p><p className="mt-1 text-xs text-muted-foreground">{job.repository} · {friendlyName(run?.command || job.command)}</p></div><div className="flex shrink-0 flex-col items-end gap-1"><State value={job.state} /><time className="text-xs text-muted-foreground" dateTime={job.created_at}>{relativeTime(job.created_at)}</time></div></a></article>;
+  const title = jobDisplayTitle(job);
+  const workflow = job.workflow?.name || job.command;
+  const phase = taskPhase(job);
+  return <article className="task-row" role="listitem">
+    <a href={`#/runs/${encodeURIComponent(job.id)}`} className="task-row-link" aria-label={`Open task ${title}, ${stateLabel(job.state)}, ${nextOperatorAction(job)}`}>
+      <div className="task-row-content">
+        <p className="task-row-title">{title}</p>
+        <div className="task-row-meta">
+          {(workflow || phase) && <span>{[workflow, phase].filter(Boolean).map(friendlyName).join(" · ")}</span>}
+          <time dateTime={job.updated_at}>{job.updated_at ? `Last activity ${relativeTime(job.updated_at)}` : "Last activity unavailable"}</time>
+          <span className="task-row-next">Next: {nextOperatorAction(job)}</span>
+        </div>
+      </div>
+      <State value={job.state} />
+    </a>
+  </article>;
 }
 
-function EmptyRuns({ filtered, openComposer }) {
-  return <div className="grid place-items-center px-6 py-16 text-center"><span className="grid size-10 place-items-center rounded-full bg-muted text-muted-foreground"><GitBranch className="size-5" /></span><h3 className="mt-3 text-sm font-semibold">{filtered ? "No matching tasks" : "No tasks yet"}</h3><p className="mt-1 max-w-sm text-xs leading-5 text-muted-foreground">{filtered ? "Try a different state filter." : "Describe the work or paste an issue link to get started."}</p>{!filtered && <Button variant="outline" size="sm" className="mt-4" onClick={openComposer}><Plus className="size-3.5" />New task</Button>}</div>;
+function EmptyRuns({ filtered, clearFilters, openComposer }) {
+  return <div className="empty-tasks" role="status">
+    <h3>{filtered ? "No matching tasks" : "No tasks yet"}</h3>
+    <p>{filtered ? "Try another state or search term." : "Describe the work to start a task in this project."}</p>
+    {filtered ? <Button variant="outline" size="sm" onClick={clearFilters}>Clear filters</Button> : <Button variant="outline" size="sm" onClick={openComposer}><Plus className="size-3.5" />New task</Button>}
+  </div>;
 }
 
 function FactoryMark() {

@@ -94,6 +94,8 @@ test("project identity stays visible, app keeps its submission key, and stale or
   firstStatus.reject(new Error("initial status connection lost"));
   await eventually(() => assert.match(projectName().textContent, /Project identity unavailable/));
   assert.match(projectContext().textContent, /Status unavailable/);
+  assert.equal(document.querySelector('select[aria-label="Filter tasks by status"]').disabled, true);
+  assert.match(document.querySelector('select[aria-label="Filter tasks by status"] option').textContent, /—/, "unavailable mobile counts are not reported as zero");
   await eventually(() => assert.match(document.body.textContent, /initial status connection lost/));
   await runNextPoll();
   await eventually(() => assert.equal(projectName().textContent, "customer-portal"));
@@ -130,7 +132,7 @@ test("project identity stays visible, app keeps its submission key, and stale or
   await eventually(() => assert.match(projectName().textContent, /Project identity unavailable/));
   assert.match(projectContext().textContent, /Status current/);
   window.location.hash = "#/runs";
-  await eventually(() => assert.ok([...document.querySelectorAll("h1")].some((heading) => heading.textContent === "Tasks")));
+  await eventually(() => assert.ok([...document.querySelectorAll("h2")].some((heading) => heading.textContent === "Tasks")));
   button("New task").click();
   await eventually(() => assert.equal(document.querySelector('select[required]:last-of-type option[value="app"]').textContent, "Project identity unavailable"));
   document.querySelector('button[aria-label="Close new task form"]').click();
@@ -158,7 +160,7 @@ test("project identity stays visible, app keeps its submission key, and stale or
     return element;
   }
 
-  function projectName() { return projectContext().querySelector("strong"); }
+  function projectName() { return projectContext().querySelector("h1"); }
 
   function button(label) {
     const match = [...document.querySelectorAll("button")].find((element) => element.textContent.includes(label));
