@@ -311,8 +311,8 @@ function ExecutionDetails({ run }) {
           }
         />
         <RunMetric label="Run ID" value={run.id} mono />
-        <RunMetric label="Executor" value={run.executor} />
-        <RunMetric label="Worker" value={run.worker_name || "Unassigned"} />
+        <RunMetric label="Executor" value={run.execution ? run.executor : run.started_at ? "Not recorded (legacy/unknown)" : "Not started"} />
+        <RunMetric label="Worker" value={run.worker_name || (run.started_at ? "Not recorded" : "Not assigned yet")} />
         <RunMetric
           label="Duration"
           value={
@@ -321,7 +321,10 @@ function ExecutionDetails({ run }) {
               : "Not available"
           }
         />
-        <RunMetric label="Model" value={run.model || "Executor default"} />
+        <RunMetric label="Requested model" value={!run.execution ? "Not recorded" : run.executor === "deterministic" ? "Not applicable" : run.model || "Provider default requested"} />
+        <RunMetric label="Runtime version" value={run.execution?.runtimeVersion || "Not recorded"} />
+        <RunMetric label="Job image" value={run.execution ? run.execution.image || "Not applicable" : "Not recorded"} mono />
+        <RunMetric label="Policy hash" value={run.execution?.policyHash || "Not recorded"} mono />
         <RunMetric
           label="Tokens"
           value={
@@ -374,6 +377,7 @@ function TaskActions({ job, result, onAction }) {
   const retry = ["blocked", "failed", "interrupted", "cancelled"].includes(
     job.state,
   );
+  const canRevise = job.can_request_changes ?? (job.state === "awaiting_approval" && job.workflow?.name === "software");
   return (
     <div className="space-y-3">
       {prURL && (
@@ -383,16 +387,16 @@ function TaskActions({ job, result, onAction }) {
           </a>
         </Button>
       )}
-      {job.state === "awaiting_approval" && (
+      {(job.state === "awaiting_approval" || canRevise) && (
         <div className="space-y-3">
           <div className="flex flex-wrap gap-2">
-            <Button
+            {job.state === "awaiting_approval" && <Button
               disabled={busy || requesting}
               onClick={() => action("approve")}
             >
               Approve and start {friendlyName(latest?.command).toLowerCase()}
-            </Button>
-            {latest?.reviewed_run_id && (
+            </Button>}
+            {canRevise && (
               <Button
                 variant="outline"
                 disabled={busy}
@@ -415,7 +419,7 @@ function TaskActions({ job, result, onAction }) {
                 />
               </label>
               <p className="text-xs text-muted-foreground">
-                You’ll review the revised result before continuing.
+                Starts a new build with your feedback, followed by new checks and review. Previous attempts are retained.
               </p>
               <div className="flex flex-wrap gap-2">
                 <Button
@@ -464,10 +468,11 @@ function TaskActions({ job, result, onAction }) {
           Cancel task
         </Button>
       )}
+      {retry && <p className="text-xs text-muted-foreground">Retry repeats the stopped {friendlyName(latest?.command).toLowerCase()} phase.{latest?.command === "review" && " It does not change the candidate."}{canRevise && " Request changes when the implementation needs revision."}</p>}
       {retry && (
         <Button
           disabled={
-            busy ||
+            busy || requesting ||
             (["interrupted", "cancelled"].includes(job.state) && !stopped)
           }
           onClick={() => action("retry")}

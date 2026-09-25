@@ -95,13 +95,18 @@ completes any browser or other external acceptance before approving.
 
 Inspect failures rather than resubmitting blindly. `cancel JOB_ID` stops the
 selected attempt; after reconciliation, `retry JOB_ID` retains prior evidence.
-The dashboard's request-changes path currently works only at the approval gate.
-A review returning `changes` or `blocked` stops as a failed review; retry repeats
-that review on the same immutable candidate. It does not reopen implementation.
-Until #35 adds that transition, preserve the failed job and use a separate
-continuation task or a delivery branch with fresh checks and independent review.
-Do not edit an accepted candidate, rewrite reports or force a passing verdict.
-Follow [recovery](recovery.md) before starting a replacement writer.
+A validated software review returning `changes` or `blocked` can receive explicit
+revision feedback through **Request changes**, or:
+
+```sh
+software-defence-factory revise JOB_ID --file /private/revision.md --state /private/state/factory-development
+```
+
+This preserves the failed review, candidate and evidence and begins a new build,
+checks and independent review before a new approval gate. **Retry** repeats the
+stopped phase on the same candidate; it does not implement review feedback.
+Missing or malformed reviews must first be diagnosed, not reclassified as passes.
+See [recovery](recovery.md) for logs, attempt profiles and legacy evidence.
 
 UI tasks need a browser-capable operator to inspect the built assets, including
 any corrections made after automated review. A stopped review may legitimately

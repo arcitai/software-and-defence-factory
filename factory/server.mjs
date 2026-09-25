@@ -7,6 +7,7 @@ import { JobQueue, QueueError } from './queue.mjs';
 import { executors } from './processes.mjs';
 import { configAt, ROOT } from './lib.mjs';
 import { VERSION } from './updates.mjs';
+import { attemptPresentation } from './execution-profile.mjs';
 
 function equal(a, b) { return typeof a === 'string' && Buffer.byteLength(a) === Buffer.byteLength(b) && timingSafeEqual(Buffer.from(a), Buffer.from(b)); }
 async function body(request) {
@@ -39,10 +40,8 @@ export function createController(state, adapter = executors(state)) {
       const url = new URL(request.url, `http://${request.headers.host}`);
       const authenticated = equal(request.headers.authorization, `Bearer ${token}`) || equal(request.headers['x-factory-session'], csrf);
       if (request.method === 'GET' && url.pathname === '/api/v1/status') {
-        const jobs = queue.all().map(job => ({ ...job, runs: job.runs.map(attempt => ({ ...attempt,
-          outcome: attempt.outcome || (attempt.state === 'succeeded' ? 'complete' : undefined),
-          executor: ['verify','handoff'].includes(attempt.command) ? 'deterministic' : config.agent,
-          worker_name: hostname(), model: job.model || config.model })) }));
+        const jobs = queue.all().map(job => ({ ...job, can_request_changes: queue.canRequestChanges(job), runs: job.runs.map(attempt => attemptPresentation({ ...attempt,
+          outcome: attempt.outcome || (attempt.state === 'succeeded' ? 'complete' : undefined) })) }));
         return send(200, { version: 1, runtime_version: VERSION, maintenance: queue.maintenance, workflows: ['software', 'defence'], commands: [], triggers: [], jobs, csrf_token: csrf,
           workers: [{ name: hostname(), instance_id: 'local-executor', repositories: ['app'], connected: !queue.closing, last_seen_at: new Date().toISOString() }],
           repositories: ['app'], repo: config.repo, agent: config.agent });

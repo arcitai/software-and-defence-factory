@@ -11,10 +11,10 @@ export class QueueError extends Error { constructor(message, status = 409) { sup
 // One controller owns this database and one executor at a time. Each transition
 // is committed before execution starts; a restart never assumes a result.
 export class JobQueue {
-  constructor(state, { execute, stop, reconcile }) {
+  constructor(state, { execute, stop, reconcile, prepare, reviewVerdict = () => undefined }) {
     this.db = new DatabaseSync(join(state, 'jobs.sqlite'));
     this.db.exec('PRAGMA journal_mode=WAL; PRAGMA busy_timeout=5000; CREATE TABLE IF NOT EXISTS jobs(id TEXT PRIMARY KEY, data TEXT NOT NULL);');
-    this.execute = execute; this.stop = stop; this.reconcile = reconcile;
+    this.execute = execute; this.stop = stop; this.reconcile = reconcile; this.prepare = prepare; this.reviewVerdict = reviewVerdict;
     this.maintenanceFile = join(state, 'maintenance.json');
     this.active = null; this.closing = false; this.pumping = false; this.actions = new Set(); this.maintenance = existsSync(this.maintenanceFile);
     for (const job of this.all()) if (['running', 'cancelling'].includes(job.state)) {
@@ -67,12 +67,16 @@ export class JobQueue {
         const started = Date.now(); Object.assign(attempt, { state: 'running', started_at: now() }); job.state = 'running'; this.save(job);
         this.active = { jobId: job.id, runId: attempt.id };
         let outcome;
-        try { outcome = await this.execute(job, attempt); }
+        try {
+          if (this.prepare) { attempt.execution = this.prepare(job, attempt); this.save(job); }
+          outcome = await this.execute(job, attempt);
+        }
         catch (error) { outcome = { outcome: 'blocked', summary: error.message }; }
         job = this.get(job.id); attempt = job.runs.find(run => run.id === attempt.id);
         if (job.state === 'running') {
           const succeeded = outcome?.outcome === 'complete';
           Object.assign(attempt, { state: succeeded ? 'succeeded' : 'failed', outcome: succeeded ? 'complete' : 'blocked', completed_at: now(), duration_millis: Date.now() - started, summary: outcome?.summary || 'No result', exit_code: succeeded ? 0 : 1 });
+          if (phase === 'review' && ['pass', 'changes', 'blocked'].includes(outcome?.review_verdict)) attempt.review_verdict = outcome.review_verdict;
           if (!succeeded) { job.state = 'failed'; attempt.error = attempt.summary; }
           else if (step === job.workflow.steps.length - 1) job.state = 'succeeded';
           else {
@@ -94,6 +98,13 @@ export class JobQueue {
     try { return await perform(); } finally { this.actions.delete(jobId); }
   }
   action(jobId, action, input) { return this.exclusive(jobId, () => this.applyAction(jobId, action, input)); }
+  canRequestChanges(job) {
+    if (job.workflow?.name !== 'software') return false;
+    if (job.state === 'awaiting_approval') return true;
+    const attempt = job.runs.at(-1);
+    return job.state === 'failed' && attempt?.state === 'failed' && attempt.command === 'review'
+      && ['changes', 'blocked'].includes(attempt.review_verdict ?? this.reviewVerdict(job, attempt));
+  }
   async applyAction(jobId, action, input) {
     if (this.closing) throw new QueueError('Controller is stopping');
     const job = this.get(jobId), attempt = job.runs.at(-1);
@@ -102,11 +113,15 @@ export class JobQueue {
       if (job.state !== 'awaiting_approval') throw new QueueError('Job is not awaiting approval');
       job.state = 'queued'; attempt.state = 'queued'; this.save(job); this.schedule();
     } else if (action === 'request_changes') {
-      if (job.state !== 'awaiting_approval' || job.workflow.name !== 'software') throw new QueueError('Only a reviewed software task can be revised');
+      if (!this.canRequestChanges(job)) throw new QueueError('Only a reviewed software task can be revised');
       if (typeof input.feedback !== 'string' || !input.feedback.trim() || input.feedback.length > 4000) throw new QueueError('Provide revision feedback under 4000 characters', 400);
+      const revisedPrompt = job.prompt + `\n\nRequested revision: ${input.feedback}`;
+      if (Buffer.byteLength(revisedPrompt) > 240000) throw new QueueError('Accumulated revision instructions exceed 240 KB; create a bounded continuation task', 400);
       await this.reconcile(jobId, 'build');
-      Object.assign(attempt, { state: 'succeeded', outcome: 'changes_requested', summary: input.feedback, completed_at: now(), duration_millis: 0 });
-      job.prompt += `\n\nRequested revision: ${input.feedback}`;
+      // A failed review stays failed. Revision feedback must not rewrite its result.
+      attempt.revision = { feedback: input.feedback, requested_at: now() };
+      if (job.state === 'awaiting_approval') Object.assign(attempt, { state: 'succeeded', outcome: 'changes_requested', summary: input.feedback, completed_at: now(), duration_millis: 0 });
+      job.prompt = revisedPrompt;
       job.workflow.current_step = 0; job.state = 'queued'; this.save(job); this.schedule();
     } else if (action === 'cancel') {
       if (!['queued', 'running', 'awaiting_approval', 'blocked', 'interrupted'].includes(job.state)) throw new QueueError('Job is already stopped');

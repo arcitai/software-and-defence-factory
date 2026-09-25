@@ -115,22 +115,16 @@ async function jobAction(action) {
   if(!job)throw new Error('Job not found');
   const current=job.runs.at(-1);
   if(action==='approve'&&job.state!=='awaiting_approval')throw new Error('Job is not awaiting approval');
-  if(action==='retry') {
-    if(!['interrupted','failed','blocked','cancelled'].includes(job.state))throw new Error('Only a stopped attempt can be retried');
-    stopContainers(state,id);
-    const folder=join(state,'jobs',id),lock=join(folder,'active.json');
-    if(existsSync(lock)) {
-      const owner=json(lock);
-      if(alive(owner.pid))throw new Error('Previous executor is still present; retry refused');
-      if(!owner.pgid)throw new Error('Previous process group unknown; reconcile it manually before retry');
-      const groups=run('ps',['-axo','pgid=']).split('\n').map(Number);
-      if(groups.includes(owner.pgid))throw new Error('Previous process group still exists; retry refused');
-      rmSync(lock);
-    }
-    if(['build','defence'].includes(current.command)&&existsSync(join(folder,'checkout')))renameSync(join(folder,'checkout'),join(folder,`previous-checkout-${Date.now()}`));
+  if(action==='retry'&&!['interrupted','failed','blocked','cancelled'].includes(job.state))throw new Error('Only a stopped attempt can be retried');
+  let feedback;
+  if(action==='request_changes') {
+    if(!flags.file)throw new Error('revise requires --file feedback.md');
+    feedback=readFileSync(resolve(flags.file),'utf8');
+    if(!feedback.trim()||feedback.length>4000)throw new Error('Provide revision feedback under 4000 characters');
   }
-  await api(state,`/api/v1/jobs/${id}/${action}`,{run_id:current?.id,...(action==='retry'?{previous_process_stopped:true}:{})});
-  if(action==='cancel')stopContainers(state,id);
+  // The controller validates the current run and owns reconciliation atomically.
+  // A CLI-side stop after a stale snapshot could terminate a newer attempt.
+  await api(state,`/api/v1/jobs/${id}/${action}`,{run_id:current?.id,...(feedback===undefined?{}:{feedback})});
   console.log(`${action}: ${id}`);
 }
 
@@ -177,6 +171,7 @@ try {
     if(!flags.file)throw new Error('Use --file incident.json; see factory/examples/incident.json');
     console.log(JSON.stringify(await admitIncident(state,json(resolve(flags.file)),submit)));
   } else if(['approve','cancel','retry'].includes(command))await jobAction(command);
+  else if(command==='revise')await jobAction('request_changes');
   else if(command==='demo') {
     state=resolve(flags.state || DEFAULT_DEMO_STATE);
     const repo=join(state,'sample-app');
@@ -216,6 +211,7 @@ try {
   incident --file incident.json            Submit a private, read-only incident draft
   approve JOB_ID | cancel JOB_ID           Review gate / stop this attempt
   retry JOB_ID                            Prove stop; retain old checkout and retry
+  revise JOB_ID --file feedback.md         New build/check/review after a stopped review
   version                                 Show the active CLI version
   update | update --check                 Update the npm CLI / inspect the latest release
   update --auto on|off                    Control automatic daily CLI updates

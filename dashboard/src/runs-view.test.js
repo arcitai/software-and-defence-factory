@@ -24,7 +24,7 @@ test("runs default to board view and share filters when switching views", async 
     created_at: "2026-01-01T00:00:00Z", updated_at: "2026-01-01T00:01:00Z",
     runs: [
       { id: "plan", command: "plan", state: "succeeded", outcome: "complete", summary: "Planned" },
-      { id: "build", command: "build", state: "succeeded", outcome: "complete", summary: "Built", executor: "test-executor", model: "test-model", worker_name: "test-worker", duration_millis: 1000, exit_code: 0 },
+      { id: "build", command: "build", state: "succeeded", outcome: "complete", summary: "Built", execution: {executor: "test-executor", requestedModel: "test-model", runtimeVersion: "test-runtime", image: "sha256:fixture", policyHash: "fixture"}, executor: "test-executor", model: "test-model", worker_name: "test-worker", duration_millis: 1000, exit_code: 0 },
     ],
   };
   const interruptedJob = { ...detailJob, id: "job_interrupted", state: "interrupted", workflow: { name: "build", steps: ["build"], current_step: 0 }, runs: [{ id: "interrupted", command: "build", state: "interrupted" }] };

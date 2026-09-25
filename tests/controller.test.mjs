@@ -105,3 +105,58 @@ test('concurrent retries cannot overwrite a running attempt or its history', asy
   await until(() => queue.get(id).state === 'failed');
   assert.equal(queue.get(id).runs.length, 2);
 });
+
+test('stopped reviews with changes or blocked can revise without rewriting their failed result', async t => {
+  for (const verdict of ['changes', 'blocked']) await t.test(verdict, async t => {
+    let rejected = true, unsafe = true;
+    const phases = [], reconciled = [];
+    const queue = new JobQueue(temp(t), {
+      ...adapter(async (job, run) => {
+        phases.push(run.command);
+        return run.command === 'review' && rejected
+          ? { outcome: 'blocked', summary: 'Correct the candidate', review_verdict: verdict }
+          : { outcome: 'complete', review_verdict: run.command === 'review' ? 'pass' : undefined };
+      }),
+      reconcile: async (id, phase) => { if (unsafe) throw new Error('Previous writer unknown'); reconciled.push(phase); },
+    });
+    t.after(() => queue.close());
+    const { id } = queue.submit(task);
+    await until(() => queue.get(id).state === 'failed' && !queue.active);
+    const original = queue.get(id), failed = original.runs.at(-1);
+    assert.equal(failed.review_verdict, verdict);
+    const input = { run_id: failed.id, feedback: 'Fix the failing behavior.' };
+    await assert.rejects(queue.action(id, 'approve', { run_id: failed.id }), /not awaiting/);
+    await assert.rejects(queue.action(id, 'request_changes', { ...input, run_id: 'stale' }), /changed/);
+    for (const feedback of ['', ' ', 'a'.repeat(4001)])
+      await assert.rejects(queue.action(id, 'request_changes', { ...input, feedback }), /feedback/);
+    await assert.rejects(queue.action(id, 'request_changes', input), /writer unknown/);
+    assert.deepEqual(queue.get(id), original);
+    unsafe = false; rejected = false;
+    await queue.action(id, 'request_changes', input);
+    await assert.rejects(queue.action(id, 'request_changes', input), /changed|reviewed|already changing/);
+    await until(() => queue.get(id).state === 'awaiting_approval');
+    const job = queue.get(id), prior = job.runs.find(run => run.id === failed.id);
+    assert.deepEqual({ ...prior, revision: undefined }, { ...failed, revision: undefined });
+    assert.equal(prior.revision.feedback, input.feedback);
+    assert.deepEqual(reconciled, ['build']);
+    assert.deepEqual(phases, ['build', 'verify', 'review', 'build', 'verify', 'review']);
+    assert.equal(job.runs.at(-1).reviewed_run_id, job.runs.at(-2).id);
+    await assert.rejects(queue.action(id, 'approve', { run_id: failed.id }), /changed/);
+    await queue.action(id, 'approve', { run_id: job.runs.at(-1).id });
+    await until(() => queue.get(id).state === 'succeeded');
+  });
+});
+
+test('revision is not offered for active, crashed, non-review or defence attempts', async t => {
+  const queue = new JobQueue(temp(t), adapter()); t.after(() => queue.close());
+  for (const [state, phase, workflow, verdict] of [
+    ['running','review','software','changes'], ['failed','review','software',undefined],
+    ['failed','verify','software','changes'], ['failed','defence','defence','blocked'],
+    ['failed','review','software','pass'],
+  ]) {
+    const job = { id: 'job_fixture', state, prompt: 'Fixture', workflow: { name: workflow, steps: [phase], current_step: 0 },
+      runs: [{ id: 'run_fixture', state, command: phase, review_verdict: verdict }] };
+    queue.save(job);
+    await assert.rejects(queue.action(job.id,'request_changes',{run_id:'run_fixture',feedback:'Fix it'}), /reviewed/);
+  }
+});
