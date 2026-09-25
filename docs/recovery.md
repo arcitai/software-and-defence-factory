@@ -90,3 +90,12 @@ and any contemporaneous private configuration backup. Record only corroborated
 facts in a separate private incident note with evidence paths and unknowns; leave
 the original queue/evidence unchanged. Without that evidence, model/image facts
 cannot be reconstructed reliably.
+
+### Interrupted image selection or controller startup
+
+`installation.lock` serializes image changes with controller startup, including
+managed boot/restarts. A live supervisor then prevents image changes while work
+can run. If an operation is interrupted, preserve the lock and inspect its PID
+and action. Remove it only after confirming that process and its image build or
+startup have stopped, then run `doctor` and reconcile image metadata before
+starting again. The CLI does not automatically clear an unknown lock.

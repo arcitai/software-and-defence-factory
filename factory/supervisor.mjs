@@ -2,10 +2,18 @@ import { writeFileSync, rmSync } from 'node:fs';
 import { join } from 'node:path';
 import { pathToFileURL } from 'node:url';
 import { configAt, stopContainers } from './lib.mjs';
+import { acquireInstallationLock } from './installation-lock.mjs';
+import { assertInstalledJobImage } from './image-install.mjs';
 import { createController } from './server.mjs';
 export async function supervise(state) {
-const config = configAt(state), lock = join(state, 'supervisor.json');
-writeFileSync(lock, JSON.stringify({ pid: process.pid }), { flag: 'wx', mode: 0o600 });
+const lock = join(state, 'supervisor.json');
+const release = acquireInstallationLock(state, 'start controller');
+let config;
+try {
+  config = configAt(state);
+  assertInstalledJobImage(state, config);
+  writeFileSync(lock, JSON.stringify({ pid: process.pid }), { flag: 'wx', mode: 0o600 });
+} finally { release(); }
 let controller, stopping = false;
 async function shutdown(code = 0) {
   if (stopping) return; stopping = true;

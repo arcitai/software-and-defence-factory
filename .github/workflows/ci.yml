@@ -55,6 +55,6 @@ jobs:
       - if: steps.release.outputs.publish == 'true'
         run: npm publish --access public --ignore-scripts
         # npm OIDC is bound to arcitai/software-and-defence-factory + ci.yml.
-        # The source repo is private, so npm provenance is not supported.
+        # npm provenance is not currently emitted; OIDC authenticates publication.
         env:
           NPM_CONFIG_PROVENANCE: 'false'

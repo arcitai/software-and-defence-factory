@@ -220,3 +220,55 @@ and the `mock` profile; they make no model calls. Never use an application state
 for qualification. When exercising a source candidate, set `SDF_BOOTSTRAPPED=1`
 so its child CLI commands use that same candidate rather than a managed release.
 See [recovery](recovery.md) for diagnostic limits, safe revision and legacy facts.
+
+## Issue #30 — supported custom job-image selection — 25 September 2026
+
+The CLI now accepts `install --image LOCAL_IMAGE_REF`. Its deterministic
+regressions use temporary state and a fake Docker executable: they cover exact
+ID pinning/retention, repeat selection, shared-tag movement, custom-to-custom
+selection, invalid selection preservation, failed metadata-write rollback,
+active/unreconciled execution refusal, sibling installation preservation,
+ordinary standard-image installation, and `doctor` image/metadata checks.
+`npm run build:dashboard` and `npm run check` passed; the final check included
+44 runtime/package tests and 44 dashboard tests. These fake-Docker tests do not
+prove a real daemon, image or container lifecycle.
+
+The implementation container had no Docker socket and did not attempt one.
+Disposable real-image checks remain assigned to the operator before acceptance:
+exercise selecting twice, move a tag shared by two states and confirm each
+selected ID remains pinned, change between two custom images, reject a missing
+image without changing the working state, reject selection with active or
+unreconciled work, then verify `doctor` and `up` against the selected image.
+No model or toolchain qualification is claimed by image installation or by
+these source tests.
+
+### Operator proof and real self-development delivery
+
+The real Factory development job `job_622021808e2f7e09d4a9b0b2` used the released
+0.4.3 runtime and Codex `gpt-6-luna` with `max` reasoning. Its source was held at
+`0ea5a204f6454e0e6264060529a1f788c1874a5f`; the recorded base matched. Factory
+produced candidate `567c3665cdb42f353877f8a7f4f83196a2f2d576`, ran the configured
+full checks, obtained a separate passing review, and completed explicitly
+approved handoff for that same candidate/policy. This was a real repository
+change, not the arithmetic demo. The local-model profile remains unqualified.
+
+The operator separately exercised 11 real-Docker cases on that candidate:
+custom selection/doctor, repeat selection, shared-tag movement across two
+installations, missing-image preservation, live-controller refusal, unresolved
+attempt refusal, retained-container refusal, mismatched metadata/failed startup,
+custom-to-custom selection, ordinary standard installation, and preservation of
+the real profile and application source. All passed. Those fixtures made no
+model calls. Failed metadata-write rollback is covered by deterministic fault
+injection; power-loss recovery is not claimed.
+
+The 0.4.4 delivery adds the generic repository-readiness guide, staged issue form,
+capability inventory and accepted future dashboard design to the Factory-owned
+implementation. The integrated package passed 46 runtime/package tests and
+44 dashboard tests. Final review also found and closed a managed-startup/image
+selection race: a shared installation fence now covers selection through metadata
+commit and startup through its supervisor PID claim. Deterministic regressions
+cover both orderings, including managed launch during a pending image build. The existing UI source is unchanged. Publication and
+published/installed-artifact readback remain pending at this source revision;
+the delivery PR for #30/#40 will record that external evidence. This proves supervised self-development,
+not autonomous issue intake, source snapshots (#28), PR publication (#29), full
+interface parity (#37), security qualification or the future dashboard redesign.

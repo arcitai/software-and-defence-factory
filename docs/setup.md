@@ -104,6 +104,9 @@ anything. Verify the canonical GitHub origin and main branch's tracking target;
 a fork may still track its upstream product. Move application sources into the
 chosen workspace, not into the npm package or private runtime state.
 
+Use [repository readiness](../kit/repository.md) for issue forms, labels, CI
+policy and the explicit issue-to-job handoff. A ready label does not start a job.
+
 Before admitting development work, establish:
 
 - Reproducible toolchain/dependency pins and an actual build/check command.
@@ -123,11 +126,20 @@ software-defence-factory install --state /private/state/my-app
 software-defence-factory doctor --state /private/state/my-app
 ```
 
-Replace the agent/check/paths with the accepted application profile. `install`
-builds the standard image: do not use it to overwrite an existing custom image
-selection. Follow the application image's own build/pinning procedure instead.
-`init` does not edit the app, install personal skills or submit a task. Runtime
-jobs receive the bundled method and six skills automatically.
+Replace the agent/check/paths with the accepted application profile. Plain
+`install` builds the standard image. To use an application-specific image, build
+it on the worker first and select its existing local tag instead:
+
+```sh
+software-defence-factory install --image LOCAL_IMAGE_REF --state /private/state/my-app
+```
+
+This command checks the local Docker daemon, records and retains the exact image
+ID, and does not download or build the selected image. Stop the installation and
+reconcile every job before changing its image. Running plain `install` later
+still rebuilds and selects the standard image. `init` does not edit the app,
+install personal skills or submit a task. Runtime jobs receive the bundled
+method and six skills automatically.
 
 For a local model, verify the existing model service, intended model name and
 its startup. Test the model API from a disposable container using the **selected
