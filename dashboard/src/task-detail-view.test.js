@@ -44,6 +44,17 @@ test('failed review offers explicit revision, preserves denied/stale feedback, a
   job.can_request_changes=false;await render();
   await act(()=>document.querySelector('[role="tab"][id$="result"]').click());assert(!button('Request changes'));
 
+  for (const state of ['blocked', 'timed_out']) {
+    job.state=state; await render();
+    assert(![...document.querySelectorAll('button')].some(b=>b.textContent.trim().startsWith('Retry ')), `${state} cannot retry under controller policy`);
+    assert.equal(Boolean(button('Cancel task')), state==='blocked');
+  }
+  job.state='cancelled';await render();
+  const retry=button('Retry review');assert(retry?.disabled);
+  await act(()=>document.querySelector('input[type="checkbox"]').click());
+  assert.equal(button('Retry review').disabled,false);
+  await act(()=>button('Retry review').click());assert.equal(captured[1],'retry');assert.equal(captured[2],true);
+
   job.state='awaiting_approval';job.workflow.current_step=3;job.can_request_changes=true;
   runs.push({id:'run_handoff',command:'handoff',state:'awaiting_approval',reviewed_run_id:'run_b'});
   await render();

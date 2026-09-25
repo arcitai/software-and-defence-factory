@@ -90,6 +90,8 @@ test("rows use the current workflow phase and action implied by runtime state", 
   const queued = { state: "queued", workflow: { steps: ["build", "verify", "review"], current_step: 1 }, runs: [{ command: "build", state: "succeeded" }] };
   assert.equal(taskPhase(queued), "verify");
   assert.equal(nextOperatorAction(queued), "Waiting for a worker");
+  assert.equal(nextOperatorAction({ state: "blocked" }), "Resolve the blocker; cancel before retry");
+  assert.equal(nextOperatorAction({ state: "timed_out" }), "Inspect timeout evidence and recovery options");
 
   const failedReview = { state: "failed", can_request_changes: true, workflow: { steps: ["build", "verify", "review", "handoff"], current_step: 2 }, runs: [{ command: "review", state: "failed" }] };
   assert.equal(taskPhase(failedReview), "review");

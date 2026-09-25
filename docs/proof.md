@@ -289,7 +289,10 @@ The release uses a list-first project overview, a compact status rail, searchabl
 real task data, Geist and monochrome defaults. The operator corrected mobile
 heading layout, legacy CLI issue-title presentation, recent-activity ordering,
 and claims about generic task completion/initial approval. Unknown mobile counts
-remain unknown while status is unavailable. No backend, credentials, workflow
+remain unknown while status is unavailable. Independent review also corrected
+retry guidance/actions to match controller policy and removed the empty unknown-state
+board lane; regressions cover blocked/timed-out actions and explicit cancelled retry.
+No backend, credentials, workflow
 policy or Docker execution path changes in this release.
 
 The complete build/check passes 46 runtime/package and 48 dashboard tests.

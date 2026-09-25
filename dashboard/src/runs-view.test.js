@@ -89,6 +89,8 @@ test("runs default to the searchable list and share state filters across board a
   button("Board").click();
   await eventually(() => assert.equal(button("Board").getAttribute("aria-pressed"), "true"));
   assert.match(document.body.textContent, /Waiting to start/);
+  assert.equal(document.querySelectorAll(".run-column").length, 4, "ordinary board has no empty Other state lane");
+  assert.equal(document.querySelector("#board-other"), null);
 
   button("Failed").click();
   await eventually(() => assert.doesNotMatch(document.body.textContent, /Succeeded fixture/));

@@ -154,9 +154,9 @@ export function nextOperatorAction(job) {
         ? "Revise or retry review"
         : "Retry the failed phase";
     case "timed_out":
-      return "Retry the timed out phase";
+      return "Inspect timeout evidence and recovery options";
     case "blocked":
-      return "Resolve the blocker, then retry";
+      return "Resolve the blocker; cancel before retry";
     case "interrupted":
     case "cancelled":
       return "Verify the worker stopped before retry";

@@ -379,7 +379,7 @@ function TaskActions({ job, result, onAction }) {
       setBusy(false);
     }
   };
-  const retry = ["blocked", "failed", "interrupted", "cancelled"].includes(
+  const retry = ["failed", "interrupted", "cancelled"].includes(
     job.state,
   );
   const canRevise = job.can_request_changes ?? (job.state === "awaiting_approval" && job.workflow?.name === "software");
@@ -440,9 +440,10 @@ function TaskActions({ job, result, onAction }) {
       )}
       {job.state === "blocked" && (
         <p className="text-sm text-muted-foreground">
-          Update the issue or resolve the blocker, then retry this step.
+          Resolve the blocker, then cancel this task to reconcile the worker before retrying.
         </p>
       )}
+      {job.state === "timed_out" && <p className="text-sm text-muted-foreground">Inspect the timeout evidence and recovery options. This state cannot be retried directly.</p>}
       {["interrupted", "cancelled"].includes(job.state) && (
         <label className="flex items-start gap-2 text-sm">
           <input
