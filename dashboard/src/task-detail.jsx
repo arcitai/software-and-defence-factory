@@ -207,7 +207,7 @@ export function TaskDetail({
                             />
                           </div>
                           {run.summary && (
-                            <p className="whitespace-pre-wrap leading-6">
+                            <p className="whitespace-pre-wrap break-words leading-6">
                               {run.summary}
                             </p>
                           )}
@@ -256,7 +256,7 @@ export function TaskDetail({
                 {result?.summary && (
                   <section>
                     <h2 className="mb-2 font-medium">Full summary</h2>
-                    <p className="whitespace-pre-wrap leading-6">
+                    <p className="whitespace-pre-wrap break-words leading-6">
                       {result.summary}
                     </p>
                   </section>
