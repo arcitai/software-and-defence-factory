@@ -100,7 +100,11 @@ The remote dashboard's 18 historical synthetic records remained unchanged.
 This proves process recovery and login configuration, not a whole-machine reboot
 or a physical two-network test. Disk unlock and sleep remain host prerequisites.
 
-All 24 runtime/package tests and 39 dashboard tests passed. Added regressions
+All 25 runtime/package tests and 39 dashboard tests passed. Added regressions
 cover argument escaping, existing-group launch arguments, durable maintenance,
-queued-work refusal, operator-only reservation and conventional help flags.
+queued-work refusal, operator-only reservation, conventional help flags and
+separate ordinary CLI/managed service release selection. The installed artifact
+also proved that a foreground server releases its startup lock, allowing an
+independent stop process. All eleven service scenarios and twelve synthetic
+Docker qualification paths passed.
 No application development agent or production connector was started.
