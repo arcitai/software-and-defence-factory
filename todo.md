@@ -80,3 +80,8 @@ and the [self-development recipe](docs/development.md) before submitting work.
 - #42: supported continuation from retained, unreviewed build checkpoints after a bounded timeout.
 - #32: bounded/redacted real worker progress through the shared API/CLI/dashboard.
 - #27: optional reviewed DESIGN.md project colors; monochrome remains the complete default.
+
+## Current workbench slice
+
+- [x] [#47 — shared workflows/skills and clearer task intake](https://github.com/arcitai/software-and-defence-factory/issues/47): implementation, 114 automated tests, Node 22/24 CI, independent code review and desktop/narrow light/dark browser acceptance passed. Includes generic worker identity, checkbox filters, horizontal Kanban, GitHub issue chooser and modal issue import. Normal publication and installed readback are recorded in PR #48.
+- Workflow editing and optional issue triggers remain under #37, with common CLI/API policy; issue creation alone must not start execution.

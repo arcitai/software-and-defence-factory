@@ -84,3 +84,5 @@ PR publication is Factory #29, not an installed feature of this guide.
 Link issue, job, base, candidate, checks, review, external proof and PR. Keep
 private paths, credentials and raw incident/model logs outside public records.
 One successful scoped task qualifies that path, not arbitrary unattended work.
+
+The staged kit includes Factory task, Bug report and Feature request forms. Review them before adoption. Its export deliberately omits this repository’s security contact links; configure a private reporting route owned by the adopting repository. New issues remain backlog until explicitly admitted.

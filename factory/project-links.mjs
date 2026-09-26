@@ -7,7 +7,7 @@ export function githubProjectLinks(remote) {
   const match = remote.trim().match(/^(?:https:\/\/github\.com\/|git@github\.com:|ssh:\/\/git@github\.com\/)([A-Za-z0-9-]+)\/([A-Za-z0-9_.-]+?)(?:\.git)?\/?$/);
   if (!match || ['.', '..'].includes(match[2])) return undefined;
   const repository = `https://github.com/${match[1]}/${match[2]}`;
-  return { repository, new_issue: `${repository}/issues/new`, source: 'configured_git_origin' };
+  return { repository, new_issue: `${repository}/issues/new/choose`, source: 'configured_git_origin' };
 }
 export function readProjectLinks(repo) {
   try {

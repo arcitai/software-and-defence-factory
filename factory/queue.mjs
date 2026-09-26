@@ -4,7 +4,7 @@ import { join } from 'node:path';
 import { existsSync, writeFileSync, rmSync } from 'node:fs';
 import { usageFields } from './usage.mjs';
 
-const workflows = { software: ['build', 'verify', 'review', 'handoff'], defence: ['defence'] };
+import { WORKFLOWS as workflows } from './workflows.mjs';
 const id = prefix => prefix + '_' + randomBytes(12).toString('hex');
 const now = () => new Date().toISOString();
 export class QueueError extends Error { constructor(message, status = 409) { super(message); this.status = status; } }

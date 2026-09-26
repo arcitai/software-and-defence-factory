@@ -25,7 +25,9 @@ if (args.length === 1 && args[0] === "--help") {
     }
     sources.set(".factory-kit/LICENSE", "LICENSE");
     sources.set(".factory-kit/labels.json", "config/labels.json");
-    sources.set(".github/ISSUE_TEMPLATE/factory-task.yml", ".github/ISSUE_TEMPLATE/factory-task.yml");
+    for (const name of ["factory-task.yml", "bug-report.yml", "feature-request.yml"])
+      sources.set(`.github/ISSUE_TEMPLATE/${name}`, `.github/ISSUE_TEMPLATE/${name}`);
+    // Repository-specific security contact links are deliberately not exported.
     // Read only the public kit allowlist, before creating anything at destination.
     const files = new Map([...sources].map(([target, source]) => [target, readFileSync(join(root, source))]));
     files.set("START-HERE.md", Buffer.from("# Software & Defence Factory kit\n\nRead [the adoption guide](.factory-kit/README.md). The kit folders start with a dot and may be hidden in your file browser. This is a staged package; no app, workflow or service has been configured.\n"));

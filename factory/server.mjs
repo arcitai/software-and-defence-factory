@@ -2,7 +2,9 @@ import http from 'node:http';
 import { randomBytes, timingSafeEqual } from 'node:crypto';
 import { existsSync, readFileSync, readdirSync, lstatSync, realpathSync } from 'node:fs';
 import { join, resolve, sep } from 'node:path';
-import { hostname } from 'node:os';
+import { readIssue } from './issue-intake.mjs';
+import { machineInfo } from './machine.mjs';
+import { workflowDefinitions } from './workflows.mjs';
 import { JobQueue, QueueError } from './queue.mjs';
 import { executors } from './processes.mjs';
 import { configAt, ROOT } from './lib.mjs';
@@ -30,6 +32,7 @@ export function createController(state, adapter = executors(state)) {
   const token = readFileSync(join(state, 'worker.token'), 'utf8').trim();
   const queue = new JobQueue(state, adapter);
   const projectLinks = readProjectLinks(config.repo);
+  const definitions = workflowDefinitions(config), machine = machineInfo();
   const server = http.createServer(async (request, response) => {
     const send = (status, value, type = 'application/json; charset=utf-8') => { response.writeHead(status, { 'Content-Type': type }); response.end(type.startsWith('application/json') ? JSON.stringify(value) : value); };
     response.setHeader('Cache-Control', 'no-store'); response.setHeader('X-Content-Type-Options', 'nosniff'); response.setHeader('Referrer-Policy', 'no-referrer');
@@ -44,20 +47,12 @@ export function createController(state, adapter = executors(state)) {
       if (request.method === 'GET' && url.pathname === '/api/v1/status') {
         const jobs = queue.all().map(job => ({ ...job, can_request_changes: queue.canRequestChanges(job), runs: job.runs.map(attempt => attemptPresentation({ ...attempt,
           outcome: attempt.outcome || (attempt.state === 'succeeded' ? 'complete' : undefined) }, adapter.usage?.(job, attempt))) }));
-        return send(200, { version: 1, runtime_version: VERSION, maintenance: queue.maintenance, workflows: ['software', 'defence'], commands: [], triggers: [], jobs, csrf_token: csrf,
-          workers: [{ name: hostname(), instance_id: 'local-executor', repositories: ['app'], connected: !queue.closing, last_seen_at: new Date().toISOString() }],
+        return send(200, { version: 1, runtime_version: VERSION, maintenance: queue.maintenance, workflows: Object.keys(definitions.workflows), commands: [], triggers: [], jobs, csrf_token: csrf,
+          workers: [{ name: machine.hardware || machine.hostname, machine, instance_id: 'local-executor', repositories: ['app'], connected: !queue.closing, last_seen_at: new Date().toISOString() }],
           repositories: ['app'], repo: config.repo, project_links: projectLinks, agent: config.agent });
       }
       if (request.method === 'GET' && url.pathname === '/api/v1/definitions') {
-        const descriptions = {
-          build: 'Implement the accepted task in an isolated checkout, using the bundled policy and skills. Produce a candidate commit and implementation evidence.',
-          verify: `Run the configured application check on the candidate commit: ${config.check}`,
-          review: 'Independently review the candidate diff and checks. Record pass, changes or blocked with concrete findings.',
-          handoff: 'After operator approval, verify the candidate and policy still match the checks and review. Record acceptance without pushing, merging or deploying.',
-          defence: 'Read-only triage of an admitted, scoped incident. Produce a private draft, preserve unknowns and make no production change or recovery claim.',
-        };
-        return send(200, { workflows: { software: ['build','verify','review','handoff'].map(name => ({ name, approval: name === 'handoff' })), defence: [{ name: 'defence' }] },
-          commands: Object.entries(descriptions).map(([name,prompt]) => ({ name, prompt, executor: ['verify','handoff'].includes(name) ? 'deterministic' : config.agent, timeout: `${config.timeoutSeconds}s` })) });
+        return send(200, definitions);
       }
       const content = url.pathname.match(/^\/api\/v1\/artifacts\/(job_[a-f0-9]+)~(run_[a-f0-9]+)~([\w.-]+)\/content$/);
       const artifactList = url.pathname.match(/^\/api\/v1\/jobs\/(job_[a-f0-9]+)\/artifacts$/);
@@ -78,6 +73,10 @@ export function createController(state, adapter = executors(state)) {
         if (url.pathname === '/api/v1/maintenance') {
           if (!equal(request.headers.authorization, `Bearer ${token}`)) throw new QueueError('Operator token required for maintenance', 403);
           return send(200, queue.setMaintenance(input.enabled));
+        }
+        if (url.pathname === '/api/v1/issues/preview') {
+          try { return send(200, await readIssue(config.repo, input.url)); }
+          catch (error) { throw new QueueError(error.message, 400); }
         }
         if (url.pathname === '/api/v1/jobs') {
           if (input.model && input.model !== config.model && !['codex','pi'].includes(config.agent)) throw new QueueError('Model overrides require a codex or pi executor', 400);

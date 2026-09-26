@@ -1,35 +1,43 @@
-import React from "react";
+import React, { useEffect, useId, useRef, useState } from "react";
 import { ChevronDown, Layers, Tag, Cpu } from "lucide-react";
 import { friendlyName } from "./task-display.jsx";
 
 export function taskModels(job) {
   return [...new Set([job.model, ...(job.runs || []).map(run => run.model || run.execution?.requestedModel)].filter(Boolean))];
 }
+const selections = value => Array.isArray(value) ? value : value ? [value] : [];
 export function filterTaskFacets(jobs, workflow, model) {
-  return jobs.filter(job => (!workflow || (job.workflow?.name || job.command) === workflow)
-    && (!model || taskModels(job).includes(model)));
+  const workflows = selections(workflow), models = selections(model);
+  return jobs.filter(job => (!workflows.length || workflows.includes(job.workflow?.name || job.command))
+    && (!models.length || taskModels(job).some(value => models.includes(value))));
 }
 export function TaskFilters({ jobs, availableWorkflows = [], workflow, setWorkflow, model, setModel, filter, setFilter, options, disabled }) {
   const workflows = [...new Set([...availableWorkflows, ...jobs.map(job => job.workflow?.name || job.command)].filter(Boolean))].sort();
   const models = [...new Set(jobs.flatMap(taskModels))].sort();
   return <div className="task-facets" aria-label="Task filters">
-    <Facet label="Workflow" placeholder="Workflows" value={workflow} change={setWorkflow} disabled={disabled} Icon={Layers}>
-      {workflows.map(value => <option key={value} value={value}>{friendlyName(value)}</option>)}
-    </Facet>
-    <Facet label="Model" placeholder="Models" value={model} change={setModel} disabled={disabled} Icon={Cpu}>
-      {models.map(value => <option key={value} value={value}>{value}</option>)}
-    </Facet>
-    <Facet label="Badge" placeholder="Badges" value={filter === "all" ? "" : filter} change={value => setFilter(value || "all")} disabled={disabled} Icon={Tag}>
-      {options.filter(option => option.id !== "all").map(option => <option key={option.id} value={option.id}>{option.label}</option>)}
-    </Facet>
+    <Facet label="Workflows" value={workflow} change={setWorkflow} disabled={disabled} Icon={Layers} options={workflows.map(id => ({id, label:friendlyName(id)}))} />
+    <Facet label="Models" value={model} change={setModel} disabled={disabled} Icon={Cpu} options={models.map(id => ({id, label:id}))} />
+    <Facet label="Statuses" value={filter} change={setFilter} disabled={disabled} Icon={Tag} options={options.filter(option => option.id !== "all")} />
   </div>;
 }
-function Facet({ label, placeholder, value, change, disabled, Icon, children }) {
-  return <label className={`task-facet${value ? " is-selected" : ""}`}>
-    <Icon size={14} aria-hidden="true" />
-    <select aria-label={`Filter by ${label.toLowerCase()}`} value={value} onChange={event => change(event.target.value)} disabled={disabled}>
-      <option value="">{placeholder}</option>{children}
-    </select>
-    <ChevronDown size={12} aria-hidden="true" />
-  </label>;
+function Facet({ label, value, change, disabled, Icon, options }) {
+  const [open, setOpen] = useState(false), root = useRef(null), trigger = useRef(null), id = useId();
+  const selected = selections(value), all = options.length > 0 && options.every(option => selected.includes(option.id));
+  useEffect(() => {
+    if (!open) return;
+    const outside = event => { if (!root.current?.contains(event.target)) setOpen(false); };
+    const escape = event => { if (event.key === 'Escape') { event.stopPropagation(); setOpen(false); trigger.current?.focus(); } };
+    document.addEventListener('pointerdown', outside); document.addEventListener('keydown', escape);
+    return () => { document.removeEventListener('pointerdown', outside); document.removeEventListener('keydown', escape); };
+  }, [open]);
+  return <div ref={root} className="facet-container" onBlur={event => { if (!event.currentTarget.contains(event.relatedTarget)) setOpen(false); }}>
+    <button ref={trigger} type="button" className={`task-facet${selected.length ? " is-selected" : ""}`} aria-label={`Filter by ${label.toLowerCase()}`} aria-expanded={open} aria-controls={id} disabled={disabled} onClick={() => setOpen(value => !value)}>
+      <Icon size={14} aria-hidden="true" /><span>{label}</span>{selected.length > 0 && <span className="facet-count">{selected.length}</span>}<ChevronDown size={12} aria-hidden="true" />
+    </button>
+    {open && <div id={id} className="facet-popover" role="group" aria-label={`${label} filter options`}>
+      <div className="facet-popover-heading"><span>{label}</span><button type="button" disabled={!selected.length} onClick={() => change([])}>Reset</button></div>
+      <label className="facet-option facet-select-all"><input type="checkbox" checked={all} disabled={!options.length} onChange={() => change(all ? [] : options.map(option => option.id))} />Select all</label>
+      <div className="facet-options">{options.length ? options.map(option => <label className="facet-option" key={option.id}><input type="checkbox" checked={selected.includes(option.id)} onChange={() => change(selected.includes(option.id) ? selected.filter(item => item !== option.id) : [...selected, option.id])} /><span>{option.label}</span></label>) : <p className="facet-empty">No recorded options</p>}</div>
+    </div>}
+  </div>;
 }

@@ -360,3 +360,15 @@ Independent integrated review also closed incomplete-turn coverage and hidden
 compact-header context: a later unfinished/failed Codex turn makes counts
 partial, and task detail retains the project path and explicit status freshness.
 Regression tests cover these paths; the compact header is rechecked visually.
+
+## Workflow workbench and task intake — 0.4.7 (#47)
+
+Automated checks cover one workflow/skill catalog shared by CLI, controller and queue; non-Codex configuration, generic host metadata, authenticated and origin-bounded issue reads, modal import/preview/submission, filter intersection/navigation and unchanged telemetry/recovery contracts. UI interaction tests use jsdom and do not establish rendered layout, native dialog focus containment or scrollbar behavior.
+
+Independent scoped code review passed at `1fda11a680704295db73b1170fcdc9544cd0cece` with no actionable findings. The full check passed 63 runtime/package and 51 dashboard tests; protected Node 22/24 CI also passed. The candidate issue reader fetched public issue #47 on the actual worker host through GitHub CLI, and OS discovery returned that host’s real model, architecture and resources. This read-only probe submitted no job.
+
+Rendered acceptance was completed on the same source through native Zen browser control after the initial connector failure. Inspection covers 1440px desktop and 320/390px narrow viewports, both themes, stable filtered counts, select-all/reset and combined model/status/search, the horizontal board and keyboard scrolling, project tooltip, Software/Defence execution, all six skills and expanded instructions, configuration and detected worker capacity. The native modal hides the underlying document from interaction, focuses its close control on opening and restores the start button on Escape. The configured browser can still move keyboard focus to its own chrome; this is not a document focus escape.
+
+The loopback preview served the candidate's compiled assets and read the existing real project queue. Importing public issue #47 exercised the actual issue reader. A preview-only rejected start exercised the visible submission error without creating a job. Explicit synthetic HTTP 503 responses exercised stale status, initial failure and recovery. No application work was started. Preview status used the prior controller's repository links; the new issue-chooser URL is covered by the API regression and must be read back from the released controller.
+
+Code review and rendered acceptance now pass. Protected CI, public npm artifact matching and idle managed activation remain delivery checks recorded in PR #48; these UI checks do not claim live execution qualification or complete CLI/dashboard parity.

@@ -27,6 +27,7 @@ export function needsAttention(state) {
 }
 
 export function filterJobs(jobs, filter) {
+  if (Array.isArray(filter)) return filter.length ? jobs.filter(job => filter.some(value => filterJobs([job], value).length)) : jobs;
   return jobs.filter((job) => {
     switch (filter) {
       case "active":

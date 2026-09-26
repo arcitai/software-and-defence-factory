@@ -1,14 +1,14 @@
 import { repositoryLabel } from "./project-identity.js";
 import { Tabs } from "@/components/ui/tabs";
 import { useEffect, useState } from "react";
-import { Server } from "lucide-react";
+import { Server, Bot, ShieldCheck, Code2, BookOpen, Settings2 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
 import { PageHeading, QuietState } from "@/components/ui/page-heading";
 
 export function WorkersPage({ identity, workers, loaded, error }) {
-  return <Page title="Workers" description="The machines available to pick up and execute work.">{error && <Failure value={error} />}{!loaded && !error ? <Loading description="Checking live worker status." /> : loaded && (workers.length ? <Card className="overflow-hidden">{workers.map((worker) => <article key={worker.instance_id} className="grid gap-4 border-b border-border p-4 last:border-b-0 sm:grid-cols-[minmax(12rem,1fr)_minmax(12rem,1fr)_10rem] sm:items-center sm:px-5">
-    <div className="min-w-0"><div className="flex items-center gap-2"><Server className="size-4 text-muted-foreground" /><h2 className="truncate text-sm font-medium">{worker.name}</h2></div><p className="mt-1 truncate font-mono text-xs text-muted-foreground">{worker.instance_id}</p></div>
+  return <Page title="Workers" description="The host running this project’s controller and isolated jobs. Host capacity is separate from each job’s configured limits.">{error && <Failure value={error} />}{!loaded && !error ? <Loading description="Checking live worker status." /> : loaded && (workers.length ? <Card className="overflow-hidden">{workers.map((worker) => <article key={worker.instance_id} className="grid gap-4 border-b border-border p-4 last:border-b-0 sm:grid-cols-[minmax(12rem,1fr)_minmax(12rem,1fr)_10rem] sm:items-center sm:px-5">
+    <div className="min-w-0"><div className="flex items-center gap-2"><Server className="size-4 text-muted-foreground" /><h2 className="truncate text-sm font-medium">{worker.name}</h2></div><p className="mt-1 text-xs text-muted-foreground">{worker.machine ? `${worker.machine.hostname} · ${worker.machine.platform} ${worker.machine.architecture}` : worker.instance_id}</p>{worker.machine && <p className="mt-1 text-xs text-muted-foreground">{worker.machine.logicalCpus} logical CPUs · {Math.round(worker.machine.memoryMiB / 1024)} GiB host memory</p>}</div>
     <div className="flex flex-wrap gap-1.5">{worker.repositories?.length ? worker.repositories.map((repository) => <Badge key={repository} className="border-border bg-muted font-mono text-muted-foreground">{repositoryLabel(repository, identity)}</Badge>) : <span className="text-xs text-muted-foreground">No repositories</span>}</div>
     <div className="flex items-center justify-between gap-2 sm:flex-col sm:items-end"><Badge className={worker.connected ? "gap-1.5 border-success/25 bg-success/10 text-success" : "gap-1.5 border-border bg-muted text-muted-foreground"}><span className="size-1.5 rounded-full bg-current" />{worker.connected ? "Connected" : "Disconnected"}</Badge><time className="text-xs text-muted-foreground sm:text-right" dateTime={worker.last_seen_at} title={new Date(worker.last_seen_at).toLocaleString()}>Last seen {relativeTime(worker.last_seen_at)}</time></div>
   </article>)}</Card> : <Empty value="No workers registered." description="Start a worker to register this machine with the control plane." />)}</Page>;
@@ -18,42 +18,41 @@ const displayName = name => String(name).replaceAll("_", " ").replaceAll("-", " 
 
 export function CommandsPage() {
   const definitions = useDefinitions();
-  const [selection, setSelection] = useState("");
-  const data = definitions.value;
-  const names = Object.keys(data.workflows || {});
+  const [selection, setSelection] = useState("software");
+  const data = definitions.value, names = Object.keys(data.workflows || {});
   const selected = names.includes(selection) ? selection : names[0];
   const steps = data.workflows?.[selected] || [];
-  const commands = steps.map(step => data.commands.find(command => command.name === step.name));
-  return <Page title="Workflows" description="Choose how a task gets done, from one agent to a sequence of steps.">
-    {definitions.loading ? <Loading /> : definitions.error ? <Failure value={definitions.error} /> : names.length ? <div className="max-w-4xl space-y-6">
-      <div className="flex flex-wrap items-end justify-between gap-4">
-        <label className="block w-full max-w-sm"><span className="field-label">Workflow</span><select className="field-control" value={selected} onChange={event=>setSelection(event.target.value)}>{names.map(name=><option key={name} value={name}>{displayName(name)}</option>)}</select></label>
-        <p className="text-sm text-muted-foreground">{steps.length} step{steps.length === 1 ? "" : "s"} · Runs in order</p>
+  const config = data.configuration;
+  const skills = data.skills || [];
+  return <Page title="Workflows" description="Factory coordinates the work. Skills guide the agent. You choose the agent and project checks.">
+    {definitions.loading ? <Loading /> : definitions.error ? <Failure value={definitions.error} /> : names.length ? <div className="workflow-page">
+      <div className="method-overview">
+        <div><span className="method-eyebrow">01 · Define</span><h2>Issue</h2><p>The problem, scope and acceptance criteria. Creating an issue does not start execution.</p></div>
+        <div><span className="method-eyebrow">02 · Execute</span><h2>Workflow</h2><p>The ordered steps, checks and approval gates. A task records an execution of this workflow.</p></div>
+        <div><span className="method-eyebrow">03 · Guide</span><h2>Skills</h2><p>Reusable instructions used by the configured agent. A skill is not a separate agent or scheduler.</p></div>
       </div>
-      <Tabs key={selected} label="Workflow information" items={[
-        {id:"steps",label:"Steps",content:<section className="space-y-4">
-          <ol className="overflow-hidden rounded-lg border border-border bg-surface">{steps.map((step,index)=><li key={index} className="flex items-start gap-4 border-b border-border p-5 last:border-0">
-            <span className="flex size-7 shrink-0 items-center justify-center rounded-full bg-muted text-xs text-muted-foreground">{index+1}</span>
-            <div className="min-w-0 flex-1"><h2 className="text-sm font-semibold">{displayName(step.name)}</h2><p className="mt-1 text-sm text-muted-foreground">{step.approval ? "Waits for your approval before starting." : index === 0 ? "Starts when you submit a task." : "Starts when the previous step completes."}</p></div>
-            {step.approval && <Badge className="shrink-0 border-warning/25 bg-warning/10 text-warning">Approval</Badge>}
-          </li>)}</ol>
-          <p className="text-sm leading-6 text-muted-foreground">The candidate commit and its evidence carry forward between steps. A failed check or review stops delivery. Handoff requires operator approval.</p>
-          <p className="text-xs text-muted-foreground">Choose this workflow when creating a new task. These workflows ship with the CLI; configure the repository, agent and checks in the private factory.json.</p>
-        </section>},
-        {id:"prompts",label:"Prompts",content:<div className="space-y-5">{steps.map((step,index)=><Card key={index} className="overflow-hidden"><header className="flex flex-wrap justify-between gap-2 border-b border-border px-5 py-3"><h2 className="text-sm font-semibold">{index+1}. {displayName(step.name)}</h2><p className="text-xs text-muted-foreground">{commands[index]?.executor} · {commands[index]?.timeout}</p></header><pre tabIndex={0} aria-label={`${step.name} prompt template`} className="max-h-96 overflow-auto whitespace-pre-wrap break-words p-5 font-mono text-xs leading-6">{commands[index]?.prompt || "Uses the task instructions directly."}</pre></Card>)}</div>},
-        {id:"help",label:"Template help",content:<TemplateHelp />},
+      <Tabs label="Factory method" items={[
+        { id:"workflow", label:"Execution", content:<section className="space-y-5">
+          <div className="workflow-choices" role="group" aria-label="Choose workflow">{names.map(name => <button type="button" key={name} aria-pressed={selected === name} onClick={() => setSelection(name)}>{name === "defence" ? <ShieldCheck size={16} /> : <Code2 size={16} />}<span>{displayName(name)}</span></button>)}</div>
+          <div className="workflow-intro"><h2>{selected === "defence" ? "Investigate within a defined boundary" : "From accepted scope to reviewed delivery"}</h2><p>{selected === "defence" ? "The runtime produces a private investigation draft. Findings need validation; production recovery is a separate authorized action." : "Prepare the scope before starting. Factory then runs these steps in order, preserving the candidate and evidence."}</p></div>
+          {config && <div className="workflow-profile"><Bot size={15} /><span>Configured agent <strong>{displayName(config.agent)}</strong></span><span>Model <strong>{config.model || "Executor default"}</strong></span><span>{config.cpus} CPUs · {config.memoryMiB} MiB per job</span></div>}
+          <ol className="workflow-steps">{steps.map((step,index) => {
+            const command = data.commands.find(command => command.name === step.name);
+            return <li key={step.name}><span className="step-number">{index+1}</span><div className="step-body"><div className="step-heading"><h3>{command?.title || displayName(step.name)}</h3><Badge>{step.approval ? "Your approval + Factory" : command?.owner === "agent" ? "Configured agent" : "Factory check"}</Badge></div><p>{command?.description || command?.prompt}</p>
+              {step.name === "verify" && config && <code className="workflow-check">{config.check || "No check configured — configure before software work"}</code>}
+              {command?.skills?.length > 0 && <div className="step-skills"><BookOpen size={13} /><span>{command.skills.join(" · ")}</span></div>}
+            </div></li>;
+          })}</ol>
+          <div className="method-note"><h3>Before and after execution</h3><p><strong>Triage &amp; specification</strong> prepare a bounded issue using factory-triage and factory-spec. <strong>Evaluation</strong> uses factory-evaluate for a separately scoped comparison. These are method activities, not hidden automatic steps.</p></div>
+        </section> },
+        { id:"skills", label:`Skills · ${skills.length}`, content:<section className="space-y-4"><div className="workflow-intro"><h2>The actual instructions available to agents</h2><p>{data.method?.instructions || "Skills are packaged with the CLI."} Expand a skill to read the installed file.</p></div><div className="skill-library">{skills.map(skill => <details key={skill.id} className="skill-card"><summary><BookOpen size={16} /><span><strong>{skill.id}</strong><small>{skill.purpose}</small></span></summary><div className="skill-instructions"><p>{skill.path}</p><pre tabIndex={0} aria-label={`${skill.id} instructions`}>{skill.content}</pre><small>Installed file SHA-256: {skill.sha256}</small></div></details>)}</div></section> },
+        { id:"configuration", label:"Configuration", content:<section className="space-y-5"><div className="workflow-intro"><h2>One setup for CLI and dashboard</h2><p>{data.method?.customization || "The installation selects its agent and checks. The packaged workflow controls execution."}</p></div>
+          {config && <dl className="workflow-settings">{[["Agent",displayName(config.agent)],["Model",config.model || "Executor default"],["Check command",config.check || "Not configured"],["Phase time limit",`${config.timeoutSeconds} seconds`],["Job resources",`${config.cpus} CPUs · ${config.memoryMiB} MiB`]].map(([label,value]) => <div key={label}><dt>{label}</dt><dd>{value}</dd></div>)}</dl>}
+          <div className="method-note"><h3><Settings2 size={15} />Inspect the same catalog from the CLI</h3><code>software-defence-factory workflows --state PATH</code><p>Both interfaces use the installed workflow and skill files. This view is read-only; changing text here would not safely change the execution policy.</p></div>
+        </section> },
       ]} />
-    </div> : data.commands.length ? <div className="max-w-4xl space-y-5"><p className="text-sm text-muted-foreground">The runtime exposes these phase contracts through its packaged workflows.</p><pre className="rounded-lg border border-border p-4 text-sm">{`[workflows.deliver]\nsteps = ["${data.commands[0].name}"]`}</pre>{data.commands.map(command=><Card key={command.name} className="p-5"><h2 className="text-sm font-semibold">{displayName(command.name)}</h2><p className="mt-1 text-xs text-muted-foreground">{command.executor} · {command.timeout}</p></Card>)}</div> : <Empty value="No workflows configured." />}
+    </div> : <Empty value="No workflows configured." />}
   </Page>;
-}
-
-function TemplateHelp() {
-  return <section className="space-y-5 text-sm"><h2 className="font-semibold">Task context and evidence</h2><p className="text-muted-foreground">The factory passes your task to the configured agent together with the project policy and relevant skills. Source links are untrusted task data. The source repository stays unchanged while work happens in an isolated checkout.</p><dl className="grid gap-4 sm:grid-cols-2">{[
-    ["Requirements", "The description entered when creating the task."],
-    ["Source", "The linked issue or reference, when supplied."],
-    ["/workspace", "The job checkout. Writable only during implementation."],
-    ["/output", "The current attempt’s reports and evidence."],
-  ].map(([field,description])=><div key={field}><dt className="font-mono text-xs">{field}</dt><dd className="mt-1 text-muted-foreground">{description}</dd></div>)}</dl><p className="text-muted-foreground">Workflow phase contracts are packaged with the CLI. Local configuration selects the agent, model, verification command and resource limits. This release does not interpret editable prompt templates.</p></section>;
 }
 
 function Page({ title, description, children }) { return <div className="secondary-page mx-auto max-w-[1500px] space-y-6 p-4 sm:p-6 lg:p-8"><PageHeading title={title} description={description} />{children}</div>; }

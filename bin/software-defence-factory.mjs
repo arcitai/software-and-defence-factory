@@ -6,6 +6,8 @@ import { spawn } from 'node:child_process';
 import { createServer } from 'node:net';
 import { ROOT, PINS, DEFAULT_STATE, configAt, save, json, run, stream, digest, api, sleep, stopContainers } from '../factory/lib.mjs';
 import { assertInstalledJobImage, installCustomJobImage, installStandardJobImage, inspectImageInstallation } from '../factory/image-install.mjs';
+import { readIssue } from '../factory/issue-intake.mjs';
+import { workflowDefinitions } from '../factory/workflows.mjs';
 import { admitIncident } from '../factory/incident.mjs';
 import { DEFAULT_DEMO_STATE } from '../factory/paths.mjs';
 import { bootstrap, registerInstallation, VERSION } from '../factory/updates.mjs';
@@ -140,6 +142,7 @@ try {
     else await manageService('controller',positional[0],state,flags);
   }
   else if(command==='tunnel')await manageService('tunnel',positional[0],state,flags);
+  else if(command==='workflows')console.log(JSON.stringify(workflowDefinitions(configAt(state)),null,2));
   else if(command==='status') { const snapshot=await api(state,'/api/v1/status');delete snapshot.csrf_token;console.log(JSON.stringify(snapshot,null,2)); }
   else if(command==='doctor') {
     const config=configAt(state),dockerVersion=run('docker',['info','--format','{{.ServerVersion}}']),imageStatus=inspectImageInstallation(state,config);
@@ -148,12 +151,7 @@ try {
   } else if(command==='run') {
     let spec;
     if(flags.issue) {
-      if(!/^https:\/\/github\.com\/[^/]+\/[^/]+\/issues\/\d+$/.test(flags.issue))throw new Error('Expected a GitHub issue URL');
-      const origin=run('git',['-C',configAt(state).repo,'remote','get-url','origin']);
-      const match=origin.match(/^(?:https:\/\/github\.com\/|git@github\.com:)([^/]+\/[^/]+?)(?:\.git)?$/);
-      if(!match||!flags.issue.toLowerCase().startsWith(`https://github.com/${match[1].toLowerCase()}/issues/`))throw new Error('Issue does not belong to the configured app origin; use a scoped task file for other input');
-      const issue=JSON.parse(run('gh',['issue','view',flags.issue,'--json','title,body,url']));
-      spec=`Issue: ${issue.url}\n${issue.title}\n\n${issue.body}`;
+      spec=(await readIssue(configAt(state).repo,flags.issue)).spec;
     } else if(flags.file)spec=readFileSync(resolve(flags.file),'utf8');
     else throw new Error('Use --file task.md or --issue https://github.com/owner/repo/issues/123');
     if(!configAt(state).check?.trim())throw new Error('Configure an app check before submitting software work');
@@ -188,6 +186,7 @@ try {
   init --repo PATH --agent codex|pi|custom --check "npm ci && npm test"
   install [--image LOCAL_REF]             Build the standard image, or select an existing local image
   doctor | up | status | stop              Inspect / operate your private installation
+  workflows                               Inspect actual workflow phases, skills and configuration
   serve                                   Foreground supervisor
   service [print]                         Print a systemd user-service definition
   service install|start|stop|restart       Manage a Linux user service (--state PATH)

@@ -1,0 +1,24 @@
+name: Feature request
+description: Propose a concrete improvement to Software & Defence Factory.
+title: "[Feature] "
+labels: ["enhancement", "factory:triage"]
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: Who needs what to improve?
+      description: Describe the problem and when it occurs.
+    validations:
+      required: true
+  - type: textarea
+    id: outcome
+    attributes:
+      label: Desired behavior and acceptance criteria
+      description: Include what should be possible through both CLI and dashboard, when relevant.
+    validations:
+      required: true
+  - type: textarea
+    id: boundaries
+    attributes:
+      label: Boundaries and alternatives
+      description: What should remain outside this change?

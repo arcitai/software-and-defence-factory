@@ -18,7 +18,7 @@ light and dark modes, with a narrow view. Follow its composition closely: a
 roughly 203px navigation rail; main content beginning around 56px from the rail
 with about 40px top spacing; a 36px project heading; compact toolbar; status
 filters beside a fine-divided task list; restrained controls and progressive
-task detail. Use the plain `factory.` wordmark, Factory records and actions. Do not use Warp
+task detail. Use the bold `factory.` wordmark with a smaller SOFTWARE & DEFENCE descriptor, Factory records and actions. Do not use Warp
 logos, media or source code.
 
 The desktop composition is the fidelity target. At 320–390px, adapt the layout
@@ -29,10 +29,10 @@ reference's clipped narrow view is not part of the target.
 ## Composition and navigation
 
 - Keep the configured project name prominent across routes. Let long names and
-  paths wrap safely; expose the full configured path as a secondary disclosure.
+  paths wrap safely; expose the full configured path in a hover/focus/tap tooltip that does not shift the layout.
   Do not infer an owner/repository, source revision or active model from a path.
 - Make Tasks the main view and default to its searchable list. Keep Board as an
-  alternate view. Use a compact left status rail on wide screens and a labelled
+  alternate view with readable, non-wrapping columns in a horizontally scrollable region, a visible scrollbar and keyboard access. Use a compact left status rail on wide screens and a labelled
   status selector at narrow widths.
 - Show real Factory state groups and counts. Include queued/running work,
   failed or blocked work, review revision availability, pending acceptance,
@@ -47,9 +47,9 @@ reference's clipped narrow view is not part of the target.
   overview. Preserve existing actions and stale-action protection.
 - Derive View repo and New issue only from a validated GitHub origin on the
   configured project. Unknown or credential-bearing origins expose no link.
-- Place real workflow, requested-model and state-badge filters beside search.
+- Place real workflow, requested-model and status checkbox multiselects beside search, with Select all, individual toggle-off and Reset. Keep the result-count and clear-action row at a stable height.
   Their intersection drives both list and board; clear resets them together.
-  Status groups expand to their actual Factory states. Do not add unconnected
+  Status groups expand to their actual Factory states and clicking the selected group clears it. Do not add unconnected
   contributor or GitHub-label controls.
 - Task detail has previous/next navigation within the current filtered list,
   copy-link feedback, a close button (Escape) and a metadata column. Open at
@@ -59,6 +59,8 @@ reference's clipped narrow view is not part of the target.
   Filter tasks and analytics by workflow; a source issue link does not choose
   the execution type. Defence remains scoped investigation, distinct from
   software delivery and from production recovery authority.
+- New issue opens GitHub’s issue chooser. Start work opens a modal with issue import/review or a scoped brief; project/model defaults are inherited and advanced options stay secondary. No automatic execution is implied.
+- Workflows distinguish method preparation, execution order, agent skills and configuration; both interfaces inspect the same installed catalog.
 - One project/controller per dashboard. There is no global project hub.
 
 ## Typography, color and spacing
