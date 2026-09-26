@@ -469,7 +469,7 @@ discovery, hosted authentication or live model execution. Executor/isolation cod
 is unchanged; the existing 0.5.0 Docker qualification remains the execution proof.
 SQLite receipts are not a mirrored backlog or persistent unsent drafts.
 
-## 0.7.0 candidate — immutable source admission (#28)
+## 0.7.0 — immutable source admission (#28)
 
 Admission resolves the configured or explicit ref from the configured local Git
 repository, verifies a private per-job bare object store, and records the
@@ -499,7 +499,7 @@ and `npm run check` passed after this repair; the full check reported 85
 runtime/package tests and 51 dashboard tests. The npm artifact test also checks
 that the factored qualification fixture ships with the CLI package.
 
-The host Git boundary follow-up starts at the uncommitted repair base
+The host Git boundary follow-up starts at repair base
 `f5513763b42de65c3c82241d983c74fc76f29647`. CLI `init`, the demo fixture's
 init/add/commit, project link/provider origin lookup, and the review probe's
 local checkout assertion now use the shared bounded Git environment. Two new
@@ -520,8 +520,33 @@ checks the candidate base, status/evidence SHA, approval handoff and untouched
 operator checkout. Existing candidate-change, policy-change, approval, retry,
 cancellation and isolation paths remain in that probe.
 
-External operator proof is pending. Run the candidate on a dedicated synthetic
-Docker installation only; never use an application state:
+The packed and separately installed candidate
+`873ab5d31f33f38d79b86a24d1c6e616ca96dc42` passed all 13 real Docker qualification
+paths on Linux x64. Qualification ran with inherited Git overrides aimed only at
+a separate disposable sentinel checkout; its files, HEAD, index, refs and objects
+remained unchanged. The retained-source scenario passed after source-ref
+deletion, garbage collection, controller restart and build retry. Candidate and
+policy guards, disk scratch, read-only cache cleanup, cancellation, timeout,
+incident deduplication and the second installation also passed.
+
+Independent Factory verification passed all 138 tests against that exact head.
+Independent review passed with no actionable findings and reproduced 11 focused
+Git/source regressions. The operator then approved the real development job;
+native handoff completed and recorded the same accepted head. Previous failed
+attempts remain intact. This is candidate acceptance, not automatic publication.
+
+Safari inspection exercised invalid and valid source admission, preserved forms
+and revision feedback, resolved source identity, a fresh revision and approval
+through handoff. Genuine accepted and failed 0.6.0 histories opened unchanged in
+0.7.0, with legacy provenance marked unknown and unsafe retry/revision disabled.
+Desktop, 390px and 320px were inspected with light and dark coverage. All eight
+UI files in the final package match the inspected build. Two follow-ups remain
+under #37: a narrow revision error can be above the current viewport, and a
+320px legacy detail can overflow horizontally. No application job was started
+by these browser fixtures.
+
+To repeat qualification, use a dedicated synthetic Docker installation only;
+never use an application state:
 
 ```sh
 SDF_BOOTSTRAPPED=1 node bin/software-defence-factory.mjs demo --state /private/state/sdf-0.7.0-proof
@@ -536,9 +561,7 @@ tracked/untracked files, refs and object IDs before and after; all must match.
 The fixture must also show that source A is absent from its intended source repo
 after pruning while the admitted job still builds from A.
 
-The lead should retain `qualification.json` and the nested
-`source-admission-*` fixture evidence. Rendered UI inspection is also pending:
-inspect the built candidate at desktop and narrow widths, in light/dark themes,
-including source selection, resolved-source details and the revision form. The
-implementation container has no Docker or browser executable, so neither proof
-is claimed as passed here.
+Retain `qualification.json` and the nested `source-admission-*` fixture evidence.
+Repeat browser inspection when UI assets change. The implementation and review
+containers do not have Docker or browser access; the operator proof above was
+performed outside those containers against the packed candidate.

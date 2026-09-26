@@ -31,7 +31,7 @@ autonomous publisher is not a prerequisite for this scoped development path.
 
 ## Remove remaining operator work
 
-1. [#28 — immutable source admission](https://github.com/arcitai/software-and-defence-factory/issues/28): eliminate the controlled-checkout workaround.
+1. Completed: [#28 — immutable source admission](https://github.com/arcitai/software-and-defence-factory/issues/28): retained source, explicit revisions and honest legacy provenance; 138 tests, independent review, 13 installed Docker paths and browser proof. Delivery: [PR #65](https://github.com/arcitai/software-and-defence-factory/pull/65).
 2. [#29 — optional trusted PR handoff](https://github.com/arcitai/software-and-defence-factory/issues/29), after #28. [#12](https://github.com/arcitai/software-and-defence-factory/issues/12) retains the overall source/delivery contract.
 
 ## One Factory, two interfaces
@@ -51,6 +51,16 @@ explicit [capability matrix](docs/interfaces.md):
 
 Current gaps are tracked work, not shipped capabilities. Do not hide unsupported
 operations behind decorative buttons or introduce another scheduler for the GUI.
+
+## Next bounded slices
+
+- [ ] [#60 — repository Inbox lifecycle](https://github.com/arcitai/software-and-defence-factory/issues/60): show the repository backlog, create through its templates, and admit execution explicitly. Remove the overlapping import chooser.
+- [ ] [#61 — Factory naming and release migration](https://github.com/arcitai/software-and-defence-factory/issues/61): Factory, with Software & Defence as subtitle; preserve installed state, command and update compatibility.
+- [ ] [#62 — operator and runtime skills](https://github.com/arcitai/software-and-defence-factory/issues/62): separate repository/setup guidance from instructions mounted into isolated jobs.
+- [ ] [#63 — deployment, architecture and process diagrams](https://github.com/arcitai/software-and-defence-factory/issues/63): three focused editable views aligned with the delivered boundaries.
+
+The narrow revision-error visibility and legacy-detail overflow found during
+#28 browser inspection remain part of #37's UI follow-up.
 
 ## Dashboard track
 
