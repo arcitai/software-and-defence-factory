@@ -23,10 +23,10 @@ test('workflow, model, badge and search compose; task navigation preserves the f
   await act(async()=>{root=(await server.ssrLoadModule('/src/main.jsx')).appRoot;});
   const rows=()=>[...document.querySelectorAll('.task-list a')].map(a=>a.textContent);
   const setSelect=async(label,value)=>{
-    const names={'Filter by workflow':'Filter by workflows','Filter by model':'Filter by models','Filter by badge':'Filter by statuses'};
+    const names={'Filter by workflow':'Filter by work type','Filter by model':'Filter by models','Filter by badge':'Filter by statuses'};
     const values={software:'Software',succeeded:'Completed'};
     await act(()=>document.querySelector(`button[aria-label="${names[label]}"]`).click());
-    await act(()=>[...document.querySelectorAll('.facet-options label')].find(item=>item.textContent === (values[value] || value)).querySelector('input').click());
+    await act(()=>[...document.querySelectorAll('.facet-options button')].find(item=>item.textContent === (values[value] || value)).click());
     await act(()=>document.dispatchEvent(new dom.window.KeyboardEvent('keydown',{key:'Escape',bubbles:true})));
   };
   const click=async selector=>act(()=>document.querySelector(selector).click());
@@ -34,23 +34,27 @@ test('workflow, model, badge and search compose; task navigation preserves the f
   assert.equal(rows().length,3);
   assert.equal(document.querySelector('[aria-label="Factory home"]').getAttribute('href'),'#/runs');
   assert.equal(document.querySelector('.repo-action').href,status.project_links.repository);
-  assert.equal(document.querySelectorAll('.repo-action')[1].href,status.project_links.new_issue);
+  assert.equal(document.querySelectorAll('.repo-action')[1].textContent.trim(),'New task');
   await setSelect('Filter by workflow','software');assert.equal(rows().length,2);
   await setSelect('Filter by model','model-a');assert.equal(rows().length,1);assert.match(rows()[0],/Alpha/);
   await route('#/runs/job_alpha');assert.match(document.querySelector('.detail-position').textContent,/1 \/ 1/);
   assert.equal(document.querySelector('a[aria-label="Next task"]'),null);
-  await route('#/runs');assert.equal(rows().length,1);assert.match(document.querySelector('[aria-label="Filter by workflows"]').textContent,/1/);
+  await route('#/runs');assert.equal(rows().length,1);assert.match(document.querySelector('[aria-label="Filter by work type"]').textContent,/1/);
   await click('.active-filters button');assert.equal(rows().length,3);
   // Multiple selections OR within a facet, while other facets/search intersect.
   await setSelect('Filter by workflow','software');
-  await act(()=>document.querySelector('button[aria-label="Filter by workflows"]').click());
-  await act(()=>[...document.querySelectorAll('.facet-options label')].find(item=>item.textContent==='Defence').querySelector('input').click());
+  await act(()=>document.querySelector('button[aria-label="Filter by work type"]').click());
+  await act(()=>[...document.querySelectorAll('.facet-options button')].find(item=>item.textContent==='Defence').click());
   assert.equal(rows().length,3);
-  assert(document.querySelector('.facet-select-all input').checked);
+  await act(()=>document.querySelector('.facet-options button').dispatchEvent(new dom.window.FocusEvent('focusout',{bubbles:true,relatedTarget:null})));
+  assert(document.querySelector('.facet-popover'),'window blur must not dismiss an active filter');
+  assert.equal(document.querySelector('.facet-select-all').getAttribute('aria-checked'),'true');
   await act(()=>document.querySelector('.facet-popover-heading button').click());
-  assert.equal(rows().length,3);assert(!document.querySelector('.facet-select-all input').checked);
+  assert.equal(rows().length,3);assert.equal(document.querySelector('.facet-select-all').getAttribute('aria-checked'),'false');
+  assert(document.querySelector('.facet-popover'),'Reset keeps the dropdown open');
+  assert.equal(document.querySelector('.facet-popover-heading button').disabled,false,'Reset remains focusable after clearing');
   await act(()=>document.dispatchEvent(new dom.window.KeyboardEvent('keydown',{key:'Escape',bubbles:true})));
-  assert.equal(document.activeElement.getAttribute('aria-label'),'Filter by workflows');
+  assert.equal(document.activeElement.getAttribute('aria-label'),'Filter by work type');
   await click('.filter-card-main');assert.equal(rows().length,0);
   await click('.filter-card-main');assert.equal(rows().length,3,'clicking the selected status clears it');
 

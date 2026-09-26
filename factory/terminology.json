@@ -1,0 +1,12 @@
+{
+  "host": "The machine that provides CPU, memory, storage and networking.",
+  "controller": "The service that owns one project's queue, policy, API and dashboard.",
+  "worker": "The execution process that runs isolated jobs on a host; not the host or an agent role.",
+  "harness": "The program that runs an agent, such as Codex, Pi or a custom command.",
+  "agent": "A configured work role with a responsibility and instructions, executed through a harness.",
+  "skill": "Reusable instructions available to an agent or operator; not a process or an access grant.",
+  "workflow": "The ordered agent steps, deterministic checks and approval gates for a work type.",
+  "task": "A bounded work request admitted to the controller; stored as a job with retained run attempts.",
+  "automation": "A trigger, filters and target that admits work automatically. Not yet implemented.",
+  "definition": "The effective work roles, workflows, skills and installation settings, separate from runtime records."
+}

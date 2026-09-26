@@ -1,7 +1,10 @@
-# Setup plan: operator, worker and application
+# Factory Foundation: repository and execution setup
+
+The operator skill is available through `software-defence-factory foundation`.
+See [Factory concepts](concepts.md) for host, worker, harness and agent roles.
 
 Use this plan for a new installation or when moving an existing Factory to a
-worker machine. Complete the applicable checkpoints in order and record the
+execution host. Complete the applicable checkpoints in order and record the
 result in a **private** copy of the checklist below. The plan applies to any
 operator/worker names and any suitable private network; it requires no personal
 context system, particular VPN provider or Factory source checkout.
@@ -18,7 +21,7 @@ installed package.
 | --- | --- |
 | Method only or runtime | Method export needs no Docker, background service or model |
 | Operator/client | Local machine, user and how the dashboard will be opened |
-| Worker | Linux/systemd for managed controllers; macOS can use manual `up` |
+| Execution host | Linux/systemd for managed controllers; macOS can use manual `up` |
 | Applications | Canonical repository, branch, preserved WIP and responsible owner |
 | Runtime | Stable Node executable (22.13+), Git, Docker, CPU/RAM/disk budget |
 | State | Private state path and unused loopback port for each installation |
@@ -121,12 +124,12 @@ Before admitting development work, establish:
 Configure a new installation using [the quickstart](quickstart.md):
 
 ```sh
-software-defence-factory init --repo /absolute/path/to/app --agent pi --check "npm ci && npm test" --state /private/state/my-app --port 7331
+software-defence-factory init --repo /absolute/path/to/app --harness pi --check "npm ci && npm test" --state /private/state/my-app --port 7331
 software-defence-factory install --state /private/state/my-app
 software-defence-factory doctor --state /private/state/my-app
 ```
 
-Replace the agent/check/paths with the accepted application profile. Plain
+Replace the harness/check/paths with the accepted application profile. Plain
 `install` builds the standard image. To use an application-specific image, build
 it on the worker first and select its existing local tag instead:
 

@@ -1,3 +1,4 @@
+import { harnessOf } from '../factory/lib.mjs';
 // Opt-in actual Docker diagnostics/profile regression; never a model benchmark.
 import assert from 'node:assert/strict';
 import { readFileSync, statSync, existsSync } from 'node:fs';
@@ -5,7 +6,7 @@ import { resolve, join } from 'node:path';
 import { configAt, api, save, json, stream, sleep, ROOT } from '../factory/lib.mjs';
 import { VERSION } from '../factory/updates.mjs';
 const state=resolve(process.argv[2] || ''), original=configAt(state);
-assert.equal(original.agent,'mock','Use a separate synthetic installation');
+assert.equal(harnessOf(original),'mock','Use a separate synthetic installation');
 assert.equal(readFileSync(join(original.repo,'value.txt'),'utf8'),'broken\n');
 assert(!(await api(state,'/api/v1/status')).jobs.some(j=>['queued','running','awaiting_approval'].includes(j.state)),'Finish active fixture jobs first');
 const snapshot=async id=>(await api(state,'/api/v1/status')).jobs.find(j=>j.id===id);

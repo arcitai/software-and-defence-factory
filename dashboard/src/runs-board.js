@@ -1,10 +1,13 @@
-export const boardColumns = [
-  { id: "queued", title: "Queued", description: "Waiting to start" },
-  { id: "running", title: "In progress", description: "Work underway" },
-  { id: "attention", title: "Needs attention", description: "Failure, blocker, or approval" },
-  { id: "finished", title: "Finished", description: "Completed or stopped" },
-  { id: "other", title: "Other state", description: "Unrecognized runtime state" },
+// One partition owns list and board groups; detailed filters may overlap within a group.
+export const statusGroups = [
+  { id: "in_progress", label: "In progress", count: "active", tone: "violet", states: ["queued", "running", "cancelling"], children: [["queued", "Queued", "queued"], ["running", "Running", "running"], ["cancelling", "Cancelling", "cancelling"]] },
+  { id: "needs_attention", label: "Needs attention", count: "needsAttention", tone: "amber", states: ["failed", "timed_out", "blocked", "interrupted"], children: [["failed", "Failed", "failed"], ["blocked", "Blocked", "blocked"], ["interrupted", "Interrupted", "interrupted"], ["review_changes", "Revisions available · subset", "reviewChanges"]] },
+  { id: "awaiting_approval", label: "Awaiting acceptance", count: "awaitingApproval", tone: "pink", states: ["awaiting_approval"] },
+  { id: "succeeded", label: "Completed", count: "succeeded", tone: "green", states: ["succeeded"] },
+  { id: "cancelled", label: "Cancelled", count: "cancelled", tone: "neutral", states: ["cancelled"] },
+  { id: "other", label: "Other state", count: "other", tone: "neutral", states: [] },
 ];
+export const boardColumns = statusGroups.map(group => ({ ...group, title: group.label }));
 
 const activeStates = new Set(["queued", "running", "cancelling"]);
 const failedStates = new Set(["failed", "timed_out"]);
@@ -15,11 +18,7 @@ const knownStates = new Set([
 ]);
 
 export function boardColumnForState(state) {
-  if (state === "queued") return "queued";
-  if (activeStates.has(state)) return "running";
-  if (attentionStates.has(state) || state === "awaiting_approval") return "attention";
-  if (["succeeded", "cancelled"].includes(state)) return "finished";
-  return "other";
+  return statusGroups.find(group => group.states.includes(state))?.id || "other";
 }
 
 export function needsAttention(state) {
@@ -80,7 +79,7 @@ export function searchJobs(jobs, query) {
 }
 
 export function groupJobsByBoardColumn(jobs) {
-  const groups = { queued: [], running: [], attention: [], finished: [], other: [] };
+  const groups = Object.fromEntries(statusGroups.map(group => [group.id, []]));
   for (const job of jobs) groups[boardColumnForState(job.state)].push(job);
   return groups;
 }

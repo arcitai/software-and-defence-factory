@@ -13,6 +13,20 @@ branch protection/ruleset: required checks, current-base behavior, PR policy and
 merge authority. If an account plan prevents enforcement, record the limitation;
 do not silently change billing or repository visibility.
 
+## Carry project contracts into execution
+
+Use the repository's maintained instructions and canonical standards. Discover
+coding rules in CODE_STANDARDS.md, CODING_STANDARDS.md or CONTRIBUTING; keep one
+home. DESIGN.md owns the visual direction; a separate DESIGN_SYSTEM.md may own
+reusable components/tokens. Preserve existing paths, link code/configuration,
+and update guidance with the changes it describes. Do not manufacture duplicate
+files or assume that an old implementation is the intended standard.
+
+Before admission, check that the committed source contains the relevant guidance
+and AGENTS routes a fresh job to it. Record terminology and durable decisions
+where the project already keeps them. Skills guide behavior; enforce mechanical
+rules through actual checks and access limits. A prose rule is not a sandbox.
+
 ## Adopt the issue form and labels
 
 The exported kit includes `.github/ISSUE_TEMPLATE/factory-task.yml` and
@@ -64,8 +78,9 @@ tracked separately in Factory #28; naming a SHA in task text does not pin it.
 Submit the selected issue with `software-defence-factory run --issue URL --state
 PATH`, or submit a reviewed task file using `run --file`. Issue submission uses
 the operator's `gh` authentication and checks the issue against the configured
-origin. The dashboard's task form submits text to the same runtime; it does not
-currently browse or import a live GitHub backlog. Keep external link/issue/job
+origin. The dashboard submits briefs to the same runtime and can preview/import a
+selected GitHub issue using the operator host’s authentication. It does not
+synchronize the backlog; browser GitHub login is separate. Keep external link/issue/job
 mapping in the trusted handoff record. No automatic GitHub polling is enabled.
 
 ## Review and deliver

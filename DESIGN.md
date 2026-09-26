@@ -31,7 +31,7 @@ reference's clipped narrow view is not part of the target.
 - Keep the configured project name prominent across routes. Let long names and
   paths wrap safely; expose the full configured path in a hover/focus/tap tooltip that does not shift the layout.
   Do not infer an owner/repository, source revision or active model from a path.
-- Make Tasks the main view and default to its searchable list. Keep Board as an
+- Make Inbox the main view and default to its searchable list. Keep Board as an
   alternate view with readable, non-wrapping columns in a horizontally scrollable region, a visible scrollbar and keyboard access. Use a compact left status rail on wide screens and a labelled
   status selector at narrow widths.
 - Show real Factory state groups and counts. Include queued/running work,
@@ -42,10 +42,10 @@ reference's clipped narrow view is not part of the target.
   operator action scannable in each row. Use the runtime's `updated_at` for
   activity. Put result, workflow stages, instructions, execution details,
   history and artifact controls in progressive task detail.
-- Keep workers, machines, triggers, analytics and workflow descriptions
+- Keep Analytics, Agents, Skills, Automations, Definition and Infrastructure
   accessible as secondary views. Worker health is not the primary work
   overview. Preserve existing actions and stale-action protection.
-- Derive View repo and New issue only from a validated GitHub origin on the
+- Derive View repo and optional source-issue links only from a validated GitHub origin on the
   configured project. Unknown or credential-bearing origins expose no link.
 - Place real workflow, requested-model and status checkbox multiselects beside search, with Select all, individual toggle-off and Reset. Keep the result-count and clear-action row at a stable height.
   Their intersection drives both list and board; clear resets them together.
@@ -59,8 +59,8 @@ reference's clipped narrow view is not part of the target.
   Filter tasks and analytics by workflow; a source issue link does not choose
   the execution type. Defence remains scoped investigation, distinct from
   software delivery and from production recovery authority.
-- New issue opens GitHub’s issue chooser. Start work opens a modal with issue import/review or a scoped brief; project/model defaults are inherited and advanced options stay secondary. No automatic execution is implied.
-- Workflows distinguish method preparation, execution order, agent skills and configuration; both interfaces inspect the same installed catalog.
+- New task opens a brief modal; optional issue import/review is a separate mode. Project/model defaults are inherited and advanced options stay secondary. Submission explicitly starts work.
+- Agents distinguish roles from deterministic checks and operator gates. Skills expose actual instructions; Definition exposes shared settings. Automations show their unimplemented state honestly. Both interfaces inspect the same installed catalog.
 - One project/controller per dashboard. There is no global project hub.
 
 ## Typography, color and spacing

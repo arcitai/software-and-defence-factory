@@ -17,7 +17,7 @@ npx software-defence-factory@latest help
 Both commands use the same package. A development checkout is unnecessary.
 Use `software-defence-factory kit --output /new/staging/directory` to export the portable
 method. It refuses an existing destination and does not modify an app. Use
-`software-defence-factory init --repo /path/to/app --agent codex --check "npm ci && npm test"`
+`software-defence-factory init --repo /path/to/app --harness codex --check "npm ci && npm test"`
 only when configuring the optional local job runner. `init` does not start jobs,
 copy skills into the app, or copy account credentials. Runtime jobs receive the
 bundled policy and skills directly. Model access is configured separately.

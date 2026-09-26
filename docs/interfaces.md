@@ -9,15 +9,15 @@ shell endpoint or a second scheduler.
 
 | Capability | CLI | Shared API | Dashboard | Remaining work |
 | --- | --- | --- | --- | --- |
-| Project/queue/attempt state | `status` JSON | `GET /api/v1/status` | Project, tasks, details/history | Stable versioned agent result/error contract |
-| Submit software text | `run --file` | `POST /api/v1/jobs` | Start work modal | Equivalent title/source/model options and validation |
+| Project/queue/attempt state | `status`, `inbox` JSON | `GET /api/v1/status` | Project, tasks, details/history | Stable versioned agent result/error contract |
+| Submit software text | `run --file` | `POST /api/v1/jobs` | New task modal | Equivalent title/source/model options and validation |
 | Import a GitHub issue | `run --issue` via operator `gh` | Authenticated `POST /api/v1/issues/preview` using the same reader | Import, review and explicitly start | Backlog/listing, stronger issue/job identity and optional qualified triggers remain; no implicit polling |
 | Cancel/retry/approve | Commands | Job action endpoints with current run ID | Task controls | JSON action results and consistent needs-attention outcomes |
 | Request changes | `revise --file` | `request_changes` action | Feedback form | JSON action result; retain shared stale-action guards |
 | Remove a stopped task | No command | `DELETE /api/v1/jobs/:id` | Remove action | Add CLI; keep existing recoverability/history semantics |
 | Evidence list/read/download | No command | Authenticated artifact routes | Files/preview/download | Add CLI with matching access and size/path rules |
-| Workflow definitions and packaged skills | `workflows` JSON (also while stopped) | `GET /api/v1/definitions` | Execution, Skills and Configuration | Shared read-only catalog; future editing must preserve common policy/gates |
-| Project repository links | Validated links in `status` | `project_links` from configured Git origin | View repo / New issue | Links only; no issue synchronization or creation API |
+| Roles, workflows and packaged skills | `definition`, `agents`, `skills` JSON (also while stopped) | `GET /api/v1/definitions` | Agents, Skills and Definition | Shared read-only catalog; future editing must preserve common policy/gates |
+| Project repository links | Validated links in `status` | `project_links` from configured Git origin | View repo / optional GitHub issue link | Links only; no issue synchronization or creation API |
 | Recorded token usage | Per-attempt `usage` and `token_usage` in `status` | Same status records | Analytics, task rows, metadata/history | No billing estimate; partial/unknown coverage stays explicit |
 | Analytics/filtering | Raw status available | Source queue records | Derived views | Expose equivalent queries/summaries without inventing usage data |
 | Scoped incident admission | `incident --file` validates/deduplicates private evidence | No equivalent typed intake endpoint | Generic Defence form is not equivalent admission | Common typed intake, gaps and deduplication before execution |
@@ -42,3 +42,12 @@ stopped, preserves least privilege and cannot expose host commands to task text.
 Do not equate the browser's current project session with host administrator
 authority. Headless use and GUI use must ultimately reach the same outcomes;
 intermediate releases must explicitly retain their unimplemented rows here.
+
+Infrastructure exposes detected host capacity and the local worker through
+`infrastructure` and the same status API. `automations` returns the supported
+empty list; the UI explicitly states that automatic admission is unavailable.
+`foundation` prints the packaged operator skill without configuring anything;
+the Skills page reads that same file. Full safe setup controls remain #37.
+The roadmap is split into Defence #50, quality measurement #51, GitHub intake
+#52, editable definitions #53 and scoped MCP #54. Existing REST endpoints are
+local single-operator interfaces, not a public multi-user API.

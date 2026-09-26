@@ -5,18 +5,17 @@ import { State, TaskStateIcon, friendlyName, relativeTime, stateLabel } from "./
 import React, { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import { createRoot } from "react-dom/client";
 import "@fontsource-variable/geist";
-import { Activity, BarChart3, Bot, LayoutDashboard, Menu, Moon, Play, Plus, Search, Server, Sun, Table2, TimerReset, X, ExternalLink, CircleHelp, ChevronDown, CheckCircle2, CirclePause, Code2, ShieldCheck, CircleAlert } from "lucide-react";
+import { Activity, BarChart3, Bot, Menu, Moon, Plus, Search, Server, Sun, List, Columns3, BookOpen, Settings2, TimerReset, X, ExternalLink, CircleHelp, ChevronDown, CheckCircle2, CirclePause, Code2, ShieldCheck, CircleAlert } from "lucide-react";
 import { Analytics } from "@/analytics";
-import { CommandsPage, WorkersPage } from "@/catalog";
+import { DefinitionPage, InfrastructurePage, AutomationsPage } from "@/catalog";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 import { routeFromHash } from "@/routes";
-import { boardColumns, filterJobs, groupJobsByBoardColumn, jobsByRecentActivity, jobCounts, jobDisplayTitle, nextOperatorAction, searchJobs, taskPhase } from "@/runs-board";
-import { projectIdentity, repositoryLabel } from "@/project-identity";
+import { statusGroups, boardColumns, filterJobs, groupJobsByBoardColumn, jobsByRecentActivity, jobCounts, jobDisplayTitle, nextOperatorAction, searchJobs, taskPhase } from "@/runs-board";
+import { projectIdentity } from "@/project-identity";
 import { createStatusLoader } from "@/status-loader";
-import { TriggersPage } from "@/triggers";
 import { TaskFilters, filterTaskFacets } from "./task-filters.jsx";
 import { tokenUsageSummary, formatTaskTokenUsage } from "./run-metrics.js";
 import "./styles.css";
@@ -218,12 +217,12 @@ function App() {
       </aside>
 
       <main className="workshop min-w-0 flex-1">
-        <ProjectContext identity={identity} links={status.project_links} compact={view === "task"} loaded={statusLoaded} error={statusError} showNewTask={view === "runs"} />
+        <ProjectContext identity={identity} links={status.project_links} compact={view === "task"} loaded={statusLoaded} error={statusError} showNewTask={view === "runs"} onNewTask={() => (setSubmitError(""), setComposerOpen(true))} />
         {view === "task" ? <TaskDetail identity={identity} links={status.project_links} navigation={visibleJobs.map(job => ({ id: job.id, title: jobDisplayTitle(job) }))} csrfToken={status.csrf_token} job={selectedJob} loaded={statusLoaded} error={statusError || taskActionError} deleting={deletingJob === route.jobID} onDelete={deleteJob} onWorkflowAction={workflowAction} />
           : view === "analytics" ? <Analytics jobs={status.jobs} workflows={status.workflows || []} loaded={statusLoaded} error={statusError} />
-            : view === "workers" ? <WorkersPage workers={status.workers} identity={identity} loaded={statusLoaded} error={statusError} />
-              : view === "triggers" ? <TriggersPage triggers={status.triggers || []} loaded={statusLoaded} error={statusError} />
-                  : ["commands", "workflows"].includes(view) ? <CommandsPage />
+            : view === "infrastructure" ? <InfrastructurePage infrastructure={status.infrastructure} workers={status.workers} identity={identity} loaded={statusLoaded} error={statusError} />
+              : view === "automations" ? <AutomationsPage loaded={statusLoaded} error={statusError} />
+                  : ["agents", "skills", "definition"].includes(view) ? <DefinitionPage key={view} section={view} />
                   : <RunsOverview
                     visibleJobs={visibleJobs}
                     counts={facetCounts}
@@ -237,7 +236,7 @@ function App() {
                     loaded={statusLoaded}
                     statusError={statusError}
                     submitError={submitError}
-                    synthetic={status.agent === "mock"}
+                    synthetic={(status.harness ?? status.agent) === "mock"}
                     filter={filter}
                     setFilter={setFilter}
                     search={search}
@@ -258,15 +257,17 @@ function PrimaryLinks({ view, count, triggerCount, mobile = false }) {
     <Icon className="size-4" /><span>{label}</span>{badge !== undefined && <span className="nav-count">{badge}</span>}
   </a>;
   return <>
-    {link("#/runs", Activity, "Tasks", view === "runs" || view === "task", count)}
+    {link("#/inbox", Activity, "Inbox", view === "runs" || view === "task", count)}
     {link("#/analytics", BarChart3, "Analytics", view === "analytics")}
-    {link("#/workers", Server, "Workers", view === "workers")}
-    {link("#/triggers", TimerReset, "Triggers", view === "triggers", triggerCount)}
-    {link("#/workflows", Bot, "Workflows", ["commands", "workflows"].includes(view))}
+    {link("#/agents", Bot, "Agents", view === "agents")}
+    {link("#/skills", BookOpen, "Skills", view === "skills")}
+    {link("#/automations", TimerReset, "Automations", view === "automations")}
+    {link("#/definition", Settings2, "Definition", view === "definition")}
+    {link("#/infrastructure", Server, "Infrastructure", view === "infrastructure")}
   </>;
 }
 
-function ProjectContext({ identity, links, compact, loaded, error, showNewTask }) {
+function ProjectContext({ identity, links, compact, loaded, error, showNewTask, onNewTask }) {
   const title = identity?.name || (!loaded && !error ? "Loading configured project…" : "Project identity unavailable");
   const freshness = error ? loaded ? "Status stale" : "Status unavailable" : loaded ? "Status current" : "Loading status";
   return <header aria-label="Configured project" className={cn("project-header", compact && "project-header-compact")}>
@@ -280,7 +281,7 @@ function ProjectContext({ identity, links, compact, loaded, error, showNewTask }
       </div>
       <div className="project-actions">
         {links?.repository && <a className="repo-action" href={links.repository} target="_blank" rel="noreferrer"><Github size={14} />View repo<ExternalLink size={12} /></a>}
-        {showNewTask && links?.new_issue && <a className="repo-action new-issue-action" href={links.new_issue} target="_blank" rel="noreferrer"><Plus size={14} />New issue<ExternalLink size={12} /></a>}
+        {showNewTask && <button className="repo-action new-issue-action" type="button" onClick={onNewTask} disabled={!loaded || Boolean(error)}><Plus size={14} />New task</button>}
 
       </div>
     </div>
@@ -326,8 +327,8 @@ function RunsOverview({ visibleJobs, jobs, workflows, counts, loaded, statusErro
       <TaskFilters jobs={jobs} availableWorkflows={workflows} workflow={workflowFilter} setWorkflow={setWorkflowFilter} model={modelFilter} setModel={setModelFilter} filter={filter} setFilter={setFilter} options={filterOptions} disabled={!loaded} />
       <div className="tasks-tools">
         <div className="view-toggle" role="group" aria-label="Tasks view">
-          <Button variant="ghost" size="sm" className={cn(runsView === "list" && "view-active")} aria-pressed={runsView === "list"} onClick={() => setRunsView("list")} aria-label="List"><Table2 className="size-3.5" /><span className="sr-only">List</span></Button>
-          <Button variant="ghost" size="sm" className={cn(runsView === "board" && "view-active")} aria-pressed={runsView === "board"} onClick={() => setRunsView("board")} aria-label="Board"><LayoutDashboard className="size-3.5" /><span className="sr-only">Board</span></Button>
+          <Button variant="ghost" size="sm" className={cn(runsView === "list" && "view-active")} aria-pressed={runsView === "list"} onClick={() => setRunsView("list")} aria-label="List" title="List view"><List className="size-3.5" /><span className="sr-only">List</span></Button>
+          <Button variant="ghost" size="sm" className={cn(runsView === "board" && "view-active")} aria-pressed={runsView === "board"} onClick={() => setRunsView("board")} aria-label="Board" title="Kanban board"><Columns3 className="size-3.5" /><span className="sr-only">Board</span></Button>
         </div>
         <div className="task-search" role="search">
           <Search className="size-4" aria-hidden="true" />
@@ -337,7 +338,7 @@ function RunsOverview({ visibleJobs, jobs, workflows, counts, loaded, statusErro
       </div>
     </div>
     {synthetic && <p className="synthetic-note">Synthetic installation demo — no model calls.</p>}
-    <div className="active-filters"><span role="status">{loaded ? `${visibleJobs.length} ${filtering ? "matching " : ""}${visibleJobs.length === 1 ? "task" : "tasks"}` : "Loading tasks…"}</span><div className="task-list-actions"><button onClick={clearFilters} disabled={!filtering}>Clear filters<X size={12} /></button><button onClick={openComposer} disabled={!loaded || Boolean(statusError)}><Play size={12} />Start work</button></div></div>
+    <div className="active-filters"><span role="status">{loaded ? filtering ? `Showing ${visibleJobs.length} of ${jobs.length} tasks` : `${jobs.length} ${jobs.length === 1 ? "task" : "tasks"}` : "Loading tasks…"}</span><div className="task-list-actions"><button onClick={clearFilters} disabled={!filtering}>Clear filters<X size={12} /></button></div></div>
 
     {composer}
 
@@ -357,23 +358,17 @@ function RunsOverview({ visibleJobs, jobs, workflows, counts, loaded, statusErro
 }
 
 function TaskFilterRail({ counts, loaded, filter, setFilter }) {
-  const groups = [
-    { id: "in_progress", label: "In progress", count: "active", Icon: Code2, tone: "violet", children: [["queued", "Queued", "queued"], ["running", "Running", "running"], ["cancelling", "Cancelling", "cancelling"]] },
-    { id: "needs_attention", label: "Needs attention", count: "needsAttention", Icon: CircleAlert, tone: "amber", children: [["failed", "Failed", "failed"], ["blocked", "Blocked", "blocked"], ["interrupted", "Interrupted", "interrupted"], ["review_changes", "Review changes available", "reviewChanges"]] },
-    { id: "awaiting_approval", label: "Awaiting acceptance", count: "awaitingApproval", Icon: ShieldCheck, tone: "pink" },
-    { id: "succeeded", label: "Completed", count: "succeeded", Icon: CheckCircle2, tone: "green" },
-    { id: "cancelled", label: "Cancelled", count: "cancelled", Icon: CirclePause, tone: "neutral" },
-  ];
-  if (counts.other) groups.push({ id: "other", label: "Other state", count: "other", Icon: CircleHelp, tone: "neutral" });
+  const icons = { in_progress: Code2, needs_attention: CircleAlert, awaiting_approval: ShieldCheck, succeeded: CheckCircle2, cancelled: CirclePause, other: CircleHelp };
+  const groups = statusGroups.filter(group => group.id !== "other" || counts.other).map(group => ({ ...group, Icon: icons[group.id] }));
   const [expanded, setExpanded] = useState({ in_progress: true, needs_attention: true });
   return <aside className="task-filter-rail" aria-label="Filter tasks by status">
-    <button className="all-tasks-filter" type="button" aria-pressed={filter.length === 0} onClick={() => setFilter("all")} disabled={!loaded}><span>All tasks</span><span>{loaded ? counts.all : "—"}</span></button>
+    <button className="all-tasks-filter" type="button" aria-pressed={filter.length === 0} onClick={() => setFilter("all")} disabled={!loaded}><span>All statuses</span></button>
     {groups.map(({ Icon, ...group }) => <section className={`filter-card tone-${group.tone}`} key={group.id}>
       <button className="filter-card-main" type="button" aria-pressed={filter.includes(group.id)} onClick={() => setFilter(group.id)} disabled={!loaded}>
         <span className="filter-card-heading"><Icon size={14} /><span>{group.label}</span><span className="filter-card-count">{loaded ? counts[group.count] : "—"}</span></span>
       </button>
       {group.children && <>
-        <button className="filter-disclosure" aria-expanded={Boolean(expanded[group.id])} aria-controls={`filter-${group.id}`} onClick={() => setExpanded(value => ({ ...value, [group.id]: !value[group.id] }))}>{group.children.length} statuses<ChevronDown size={12} /></button>
+        <button className="filter-disclosure" aria-expanded={Boolean(expanded[group.id])} aria-controls={`filter-${group.id}`} onClick={() => setExpanded(value => ({ ...value, [group.id]: !value[group.id] }))}>Status details<ChevronDown size={12} /></button>
         <div className="filter-card-children" id={`filter-${group.id}`} hidden={!expanded[group.id]}>
           {group.children.map(([id, label, count]) => <button type="button" className="filter-substate" key={id} aria-pressed={filter.includes(id)} onClick={() => setFilter(id)} disabled={!loaded}><span>{label}</span><span>{formatCount(loaded ? counts : {}, count)}</span></button>)}
         </div>
@@ -393,13 +388,13 @@ function TaskMessage({ kind, title, description, action, onAction }) {
 function RunBoard({ jobs }) {
   const groupedJobs = groupJobsByBoardColumn(jobs);
   return <div className="kanban-scroll" role="region" aria-label="Task board — scroll horizontally" tabIndex={0}><div className="kanban-board">
-    {boardColumns.filter((column) => column.id !== "other" || groupedJobs.other.length > 0).map((column) => <section key={column.id} className="run-column min-w-0 border border-border bg-muted/20" aria-labelledby={`board-${column.id}`}>
+    {boardColumns.filter((column) => column.id !== "other" || groupedJobs.other.length > 0).map((column) => <section key={column.id} className={`run-column tone-${column.tone}`} aria-labelledby={`board-${column.id}`}>
       <header className="flex items-center justify-between gap-3 border-b border-border px-3 py-2.5">
         <div className="min-w-0"><h2 id={`board-${column.id}`} className="text-sm font-semibold">{column.title}</h2><p className="break-words text-xs text-muted-foreground">{column.description}</p></div>
         <Badge className="shrink-0 border-border bg-surface text-muted-foreground" aria-label={`${groupedJobs[column.id].length} visible ${column.title.toLowerCase()} runs`}>{groupedJobs[column.id].length}</Badge>
       </header>
       <div className="grid min-w-0 gap-2 p-2">
-        {groupedJobs[column.id].length ? groupedJobs[column.id].map((job) => <RunCard key={job.id} job={job} />) : <p className="px-2 py-8 text-center text-xs text-muted-foreground">No runs</p>}
+        {groupedJobs[column.id].length ? groupedJobs[column.id].map((job) => <RunCard key={job.id} job={job} />) : <p className="px-2 py-8 text-center text-xs text-muted-foreground">No tasks</p>}
       </div>
     </section>)}
   </div></div>;
@@ -437,7 +432,7 @@ function EmptyRuns({ filtered, clearFilters, openComposer }) {
   return <div className="empty-tasks" role="status">
     <h3>{filtered ? "No matching tasks" : "No tasks yet"}</h3>
     <p>{filtered ? "Try another state or search term." : "Describe the work to start a task in this project."}</p>
-    {filtered ? <Button variant="outline" size="sm" onClick={clearFilters}>Clear filters</Button> : <Button variant="outline" size="sm" onClick={openComposer}><Plus className="size-3.5" />Start work</Button>}
+    {filtered ? <Button variant="outline" size="sm" onClick={clearFilters}>Clear filters</Button> : <Button variant="outline" size="sm" onClick={openComposer}><Plus className="size-3.5" />New task</Button>}
   </div>;
 }
 

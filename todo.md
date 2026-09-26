@@ -64,7 +64,7 @@ These scoped design changes can progress independently of automatic PR handoff.
 - [#6 — real model/application/security qualification](https://github.com/arcitai/software-and-defence-factory/issues/6). Reuse evidence from #25 where applicable; its security case and broader failure evidence remain separate obligations.
 - [#7 — first bounded Defence case](https://github.com/arcitai/software-and-defence-factory/issues/7). Requires an explicitly selected isolated system and response boundary; no production monitoring is implied.
 - [#32 — running-factory observability research](https://github.com/arcitai/software-and-defence-factory/issues/32). Assess the actual telemetry/operations gap before selecting connectors or starting live monitoring.
-- [#22 — external inspiration](https://github.com/arcitai/software-and-defence-factory/issues/22). Research backlog only; extract a concrete accepted requirement before implementation.
+- [#22 — external inspiration](https://github.com/arcitai/software-and-defence-factory/issues/22). Both linked posts and the relevant skill collection are assessed in the issue. Adopted project contracts, feature navigation, review/diagnosis and dependency guidance are delivered with #49; larger runtime work stays in its owning issues.
 - [#39 — optional Coolify/VPS hosting](https://github.com/arcitai/software-and-defence-factory/issues/39). Evaluate a hosting recipe for the optional runtime while keeping the method independently useful. No deployment is implied.
 
 AIOS-app and other application development are separate queues. This Factory
@@ -85,3 +85,15 @@ and the [self-development recipe](docs/development.md) before submitting work.
 
 - [x] [#47 — shared workflows/skills and clearer task intake](https://github.com/arcitai/software-and-defence-factory/issues/47): implementation, 114 automated tests, Node 22/24 CI, independent code review and desktop/narrow light/dark browser acceptance passed. Includes generic worker identity, checkbox filters, horizontal Kanban, GitHub issue chooser and modal issue import. Normal publication and installed readback are recorded in PR #48.
 - Workflow editing and optional issue triggers remain under #37, with common CLI/API policy; issue creation alone must not start execution.
+
+## Definition and foundation alignment
+
+- [ ] [#49 — one vocabulary, foundation ownership and workbench](https://github.com/arcitai/software-and-defence-factory/issues/49): shared catalog; operator skill in Factory; independent project contracts; whole-row filters, shared status groups and local task intake; repository cleanup. Current implementation slice.
+- [ ] [#50 — Defence roles, skills and evidence](https://github.com/arcitai/software-and-defence-factory/issues/50), then the bounded case in #7.
+- [ ] [#51 — scorers, benchmarks and improvement analytics](https://github.com/arcitai/software-and-defence-factory/issues/51). Recorded token coverage is not a quality score.
+- [ ] [#52 — native intake and GitHub identity](https://github.com/arcitai/software-and-defence-factory/issues/52). Explicit repository/credential boundaries precede automations.
+- [ ] [#53 — versioned definitions and role profiles](https://github.com/arcitai/software-and-defence-factory/issues/53). Current roles share one installation profile.
+- [ ] [#54 — scoped MCP over the shared API](https://github.com/arcitai/software-and-defence-factory/issues/54). One controller and authorization policy.
+
+These extend the #37 parity track. Hosting (#39), observability (#32), quality
+measurement (#51) and security investigation (#50) remain distinct scopes.

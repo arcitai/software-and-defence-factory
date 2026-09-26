@@ -1,6 +1,6 @@
 # Runtime quickstart
 
-For a new worker or remote operator, start with the [setup plan](setup.md).
+For a new execution host or remote operator, start with the [setup plan](setup.md).
 
 Install Node 22.13+, Git and Docker Engine/Desktop. Use an unprivileged account with Docker access. Install `software-defence-factory` through npm, or invoke the same package with npx. No factory source checkout is required.
 
@@ -23,14 +23,14 @@ The qualification intentionally creates failed, cancelled and interrupted tasks.
 Commit an intentional, reviewed starting point in the application first. Jobs clone committed code only; uncommitted work stays in the source checkout.
 
 ```sh
-software-defence-factory init --repo /absolute/path/to/app --agent codex --check "npm ci && npm test" --state /private/state/my-app --port 7331
+software-defence-factory init --repo /absolute/path/to/app --harness codex --check "npm ci && npm test" --state /private/state/my-app --port 7331
 software-defence-factory install --state /private/state/my-app
 software-defence-factory doctor --state /private/state/my-app
 ```
 
 Verification commands receive `FACTORY_BASE_REVISION`, the resolved commit recorded as the candidate base. Diff-based checks should compare against this revision; the isolated checkout has no origin remote. The value comes from protected controller metadata, not the task text.
 
-Replace the check with the application's actual verification command. `init` does not edit the app, copy global skills or start work. It creates factory.json, worker.token and model.env with private permissions. Each installation has one repository and a distinct state path/port. `--agent pi` selects Pi; `--agent custom --command-json '["executable","argument"]'` selects an available command in the job image. The bundled image provides Node, Git, Codex and Pi. Other toolchains require an intentionally built compatible image; do not claim Rust/mobile/browser capabilities from this image alone.
+Replace the check with the application's actual verification command. `init` does not edit the app, copy global skills or start work. It creates factory.json, worker.token and model.env with private permissions. Each installation has one repository and a distinct state path/port. `--harness pi` selects Pi; `--harness custom --command-json '["executable","argument"]'` selects an available command in the job image. The bundled image provides Node, Git, Codex and Pi. Other toolchains require an intentionally built compatible image; do not claim Rust/mobile/browser capabilities from this image alone.
 
 Configure inference credentials in the private model.env file. Do not copy the operator's entire account environment or authentication folders. Codex uses its supported API credential environment; Pi uses the selected provider's configuration. Use `--model` with init for a specific model. Task-level model overrides are supported only for Codex/Pi and do not prove that the provider serves that model.
 
@@ -61,7 +61,7 @@ Use `status`, `cancel JOB_ID`, `retry JOB_ID` and `stop`, always with the select
 
 ## Native application builds
 
-Build a compatible application image on the worker, then select its existing
+Build a compatible application image on the execution host, then select its existing
 local tag through the CLI:
 
 ```sh
@@ -103,3 +103,14 @@ link and close (Escape). Closing preserves the list's filters and position.
 
 If the interface looks unexpectedly small, check the browser zoom. The design
 is tested at 100%; changing browser zoom is separate from a project theme.
+
+## Environment
+
+Factory does not load a repository `.env` file. Configure the private
+`factory.json` through `init`; put inference credentials only in its private
+`model.env`. A repository `.env.example` is unnecessary for this CLI. Optional
+process settings are `SDF_AUTO_UPDATE=0` (skip automatic CLI update checks),
+`XDG_STATE_HOME`, `XDG_DATA_HOME` and `XDG_CONFIG_HOME` (user-owned state, release
+and service locations). They must be exported in the process environment.
+Legacy prototype names such as `FACTORY_WORKER_CONFIG`, `FACTORY_MODEL`, `PORT`
+and `FACTORY_DEMO` are not supported. See [concepts](concepts.md).

@@ -139,7 +139,7 @@ export function formatTaskTokenUsage(summary) {
 
 export function runDetails(run) {
   const values = [run.executor];
-  if (run.worker_name) values.push(run.worker_name);
+  if (run.host_name || run.worker_name) values.push(run.host_name || run.worker_name);
   if (run.model) values.push(run.model);
   if (Number.isSafeInteger(run.duration_millis)) values.push(formatDurationMillis(run.duration_millis));
   if (validDate(run.completed_at) && !usageNotApplicable(run)) values.push(validTokenUsage(run.token_usage) ? `${formatRunTokenUsage(run)} tokens` : "Token usage unavailable");

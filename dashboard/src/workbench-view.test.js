@@ -21,7 +21,10 @@ test('modal imports one issue, requires preview before start, and keeps optional
   const button=label=>[...document.querySelectorAll('button')].find(b=>b.textContent.trim()===label);
   const click=async label=>act(()=>button(label).click());
   const input=async(value)=>act(()=>{const field=document.querySelector('.issue-intake input');Object.getOwnPropertyDescriptor(dom.window.HTMLInputElement.prototype,'value').set.call(field,value);field.dispatchEvent(new dom.window.Event('input',{bubbles:true}));});
-  await click('Start work');assert(document.querySelector('dialog').open);assert.equal(document.querySelector('.work-options').open,false);
+  await click('New task');assert(document.querySelector('dialog').open);assert.equal(document.querySelector('.work-options').open,false);
+  assert(document.querySelector('textarea'),'local brief is the default without GitHub login');
+  assert.equal(document.activeElement,document.querySelector('textarea'));
+  assert.equal(reads,0);
   await click('From GitHub issue');assert(button('Start task').disabled);
   await input('https://github.com/example/project/issues/42');await click('Load issue');
   assert.equal(reads,1);assert.equal(document.querySelector('textarea').value,'Issue acceptance criteria');assert.equal(created.length,0);

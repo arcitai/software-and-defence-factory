@@ -7,7 +7,8 @@ import { createServer } from 'node:net';
 import { ROOT, PINS, DEFAULT_STATE, configAt, save, json, run, stream, digest, api, sleep, stopContainers } from '../factory/lib.mjs';
 import { assertInstalledJobImage, installCustomJobImage, installStandardJobImage, inspectImageInstallation } from '../factory/image-install.mjs';
 import { readIssue } from '../factory/issue-intake.mjs';
-import { workflowDefinitions } from '../factory/workflows.mjs';
+import { factoryDefinition, foundationSkill } from '../factory/definition.mjs';
+import { harnessOf } from '../factory/lib.mjs';
 import { admitIncident } from '../factory/incident.mjs';
 import { DEFAULT_DEMO_STATE } from '../factory/paths.mjs';
 import { bootstrap, registerInstallation, VERSION } from '../factory/updates.mjs';
@@ -30,18 +31,18 @@ let state = resolve(flags.state || DEFAULT_STATE);
 if(existsSync(state))state=realpathSync(state);
 const alive = pid => { try { process.kill(pid,0); return true; } catch(error) { if(error.code === 'ESRCH')return false; throw error; } };
 
-function init(repo, agent='codex', check='', port=7331) {
+function init(repo, harness='codex', check='', port=7331) {
   repo=realpathSync(resolve(repo));
   if (existsSync(join(state,'factory.json'))) throw new Error('Already configured; edit the private factory.json explicitly or choose another --state');
   if ([repo,state,ROOT].some(p=>/[,\n\r]/.test(p))) throw new Error('Paths cannot contain commas or line breaks');
   if (run('git',['-C',repo,'rev-parse','--show-toplevel']) !== repo) throw new Error('--repo must be the Git root');
   run('git',['-C',repo,'rev-parse','HEAD']);
   const presets={codex:['codex','exec','--json','--ephemeral','--sandbox','danger-full-access','-'],pi:['pi','--mode','json','--print','--no-session','--no-extensions','--skill','/factory-skills'],mock:['node','/opt/factory/mock.mjs']};
-  const argv=agent==='custom'?JSON.parse(flags['command-json'] || 'null'):presets[agent];
+  const argv=harness==='custom'?JSON.parse(flags['command-json'] || 'null'):presets[harness];
   if (!argv) throw new Error('Select codex, pi, mock or custom with --command-json');
-  if (flags.model && ['codex','pi'].includes(agent)) argv.splice(agent==='codex'?argv.length-1:argv.length,0,'--model',flags.model);
+  if (flags.model && ['codex','pi'].includes(harness)) argv.splice(harness==='codex'?argv.length-1:argv.length,0,'--model',flags.model);
   mkdirSync(state,{recursive:true,mode:0o700});state=realpathSync(state);chmodSync(state,0o700);
-  save(join(state,'factory.json'),{version:1,repo,agent,command:argv,check,port:Number(port),image:PINS.jobImage,network:agent==='mock'?'none':'bridge',timeoutSeconds:1800,memoryMiB:2048,model:flags.model || null,
+  save(join(state,'factory.json'),{version:1,repo,harness,command:argv,check,port:Number(port),image:PINS.jobImage,network:harness==='mock'?'none':'bridge',timeoutSeconds:1800,memoryMiB:2048,model:flags.model || null,
     scope:{project:'pilot',service:'app',environment:'test',owner:'operator'}});
   configAt(state);
   writeFileSync(join(state,'worker.token'),randomBytes(32).toString('hex')+'\n',{mode:0o600});
@@ -121,7 +122,7 @@ async function jobAction(action) {
 }
 
 try {
-  if(command==='init') { if(!flags.repo)throw new Error('init requires --repo /path/to/existing/git/repo');init(flags.repo,flags.agent,flags.check,flags.port); }
+  if(command==='init') { if(!flags.repo)throw new Error('init requires --repo /path/to/existing/git/repo');if(flags.harness && flags.agent && flags.harness !== flags.agent)throw new Error('--harness conflicts with legacy --agent');init(flags.repo,flags.harness || flags.agent,flags.check,flags.port); }
   else if(command==='install')await withServiceOperation('install',install);
   else if(command==='up') { if(hasService(state))await manageService('controller','start',state);else await withServiceOperation('up',up); }
   else if(command==='stop') { if(hasService(state))await manageService('controller','stop',state);else await withServiceOperation('stop',stop); }
@@ -142,11 +143,20 @@ try {
     else await manageService('controller',positional[0],state,flags);
   }
   else if(command==='tunnel')await manageService('tunnel',positional[0],state,flags);
-  else if(command==='workflows')console.log(JSON.stringify(workflowDefinitions(configAt(state)),null,2));
+  else if(command==='foundation')console.log(foundationSkill().content);
+  else if(['definition','workflows','agents','skills'].includes(command)) {
+    const definition=factoryDefinition(configAt(state));
+    const value=command==='agents'?definition.agents:command==='skills'?{agents:definition.skills,operators:definition.operator_skills}:definition;
+    console.log(JSON.stringify(value,null,2));
+  }
+  else if(['infrastructure','automations','inbox'].includes(command)) {
+    const snapshot=await api(state,'/api/v1/status');
+    console.log(JSON.stringify(command==='inbox'?snapshot.jobs:snapshot[command],null,2));
+  }
   else if(command==='status') { const snapshot=await api(state,'/api/v1/status');delete snapshot.csrf_token;console.log(JSON.stringify(snapshot,null,2)); }
   else if(command==='doctor') {
     const config=configAt(state),dockerVersion=run('docker',['info','--format','{{.ServerVersion}}']),imageStatus=inspectImageInstallation(state,config);
-    console.log(JSON.stringify({node:process.version,docker:dockerVersion,engineInstalled:imageStatus.installed,image:imageStatus.image,repo:config.repo,agent:config.agent,checksConfigured:!!config.check?.trim(),inference:'Not called or verified',qualification:{model:'not assessed',toolchain:'not assessed'},dashboard:`http://127.0.0.1:${config.port}`},null,2));
+    console.log(JSON.stringify({node:process.version,docker:dockerVersion,engineInstalled:imageStatus.installed,image:imageStatus.image,repo:config.repo,harness:harnessOf(config),agent:harnessOf(config),checksConfigured:!!config.check?.trim(),inference:'Not called or verified',qualification:{model:'not assessed',toolchain:'not assessed'},dashboard:`http://127.0.0.1:${config.port}`},null,2));
     if(!imageStatus.installed)process.exitCode=1;
   } else if(command==='run') {
     let spec;
@@ -169,7 +179,7 @@ try {
       writeFileSync(join(repo,'value.txt'),'broken\n');run('git',['-C',repo,'add','value.txt']);
       run('git',['-C',repo,'-c','user.name=Factory demo','-c','user.email=demo@localhost','commit','-m','Synthetic fixture']);
       init(repo,'mock',"test \"$(cat value.txt)\" = fixed",Number(flags.port || 7332));
-    } else if(configAt(state).agent!=='mock')throw new Error('Demo requires a mock configuration');
+    } else if(harnessOf(configAt(state))!=='mock')throw new Error('Demo requires a mock configuration');
     await withServiceOperation('demo startup',async()=>{await install();await up();});console.log(JSON.stringify(await submit('software','Synthetic installation qualification: fix value.txt. No inference is used.')));
     console.log('Review the synthetic change in the dashboard and approve its handoff.');
   } else if(['version','--version','-v'].includes(command))console.log(VERSION);
@@ -183,10 +193,14 @@ try {
   kit --output NEW_DIRECTORY               Export the portable method without a runtime
   demo                                    Install and run a synthetic sample (no model key)
   qualify --state PATH                    Exercise recovery and isolation with a stopped demo job
-  init --repo PATH --agent codex|pi|custom --check "npm ci && npm test"
+  init --repo PATH --harness codex|pi|custom --check "npm ci && npm test"
   install [--image LOCAL_REF]             Build the standard image, or select an existing local image
   doctor | up | status | stop              Inspect / operate your private installation
-  workflows                               Inspect actual workflow phases, skills and configuration
+  foundation                              Read the operator setup skill; no installation required
+  definition | agents | skills            Inspect roles, instructions and installation settings
+  inbox | infrastructure | automations    Inspect live tasks, host/worker and automation state
+  workflows                               Compatibility alias for definition
+  --agent                                 Legacy alias for init --harness
   serve                                   Foreground supervisor
   service [print]                         Print a systemd user-service definition
   service install|start|stop|restart       Manage a Linux user service (--state PATH)

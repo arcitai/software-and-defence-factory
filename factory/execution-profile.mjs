@@ -1,3 +1,4 @@
+import { harnessOf } from './lib.mjs';
 import { hostname } from 'node:os';
 import { digest } from './lib.mjs';
 import { VERSION } from './updates.mjs';
@@ -6,11 +7,11 @@ import { usageFields } from './usage.mjs';
 export function withRequestedModel(configuration, requestedModel) {
   const config = structuredClone(configuration);
   if (requestedModel && requestedModel !== config.model) {
-    if (!['codex', 'pi'].includes(config.agent)) throw new Error('Task model overrides require codex or pi');
+    if (!['codex', 'pi'].includes(harnessOf(config))) throw new Error('Task model overrides require codex or pi');
     config.model = requestedModel;
     const index = config.command.indexOf('--model');
     if (index >= 0) config.command[index + 1] = requestedModel;
-    else config.command.splice(config.agent === 'codex' ? config.command.length - 1 : config.command.length, 0, '--model', requestedModel);
+    else config.command.splice(harnessOf(config) === 'codex' ? config.command.length - 1 : config.command.length, 0, '--model', requestedModel);
   }
   return config;
 }
@@ -18,15 +19,15 @@ export function withRequestedModel(configuration, requestedModel) {
 // Public facts only. The complete admitted configuration stays in private state.
 export function executionProfile(config, phase) {
   const deterministic = ['verify', 'handoff'].includes(phase);
-  const applicable = !deterministic && config.agent !== 'mock';
-  const provider = applicable && ['codex', 'pi'].includes(config.agent);
+  const applicable = !deterministic && harnessOf(config) !== 'mock';
+  const provider = applicable && ['codex', 'pi'].includes(harnessOf(config));
   const requestedModel = provider ? config.model || null : null;
   return {
-    version: 1, phase, executor: deterministic ? 'deterministic' : config.agent,
+    version: 1, phase, executor: deterministic ? 'deterministic' : harnessOf(config),
     requestedModel,
     modelSelection: !applicable ? 'not_applicable' : !provider ? 'unknown' : requestedModel ? 'explicit' : 'provider_default',
     runtimeVersion: VERSION, image: phase === 'handoff' ? null : config.image,
-    policyHash: digest(JSON.stringify(config)), workerName: hostname(),
+    policyHash: digest(JSON.stringify(config)), hostName: hostname(),
   };
 }
 
@@ -38,7 +39,8 @@ export function attemptPresentation(attempt, recoveredUsage) {
   return {
     ...attempt, executor: profile?.executor ?? 'unknown',
     ...usage,
-    model: profile?.requestedModel ?? null, worker_name: profile?.workerName ?? null,
+    model: profile?.requestedModel ?? null, host_name: profile?.hostName ?? profile?.workerName ?? null,
+    worker_name: profile?.hostName ?? profile?.workerName ?? null, // v1 presentation alias
     provenance_status: profile ? 'recorded' : attempt.started_at ? 'unknown' : 'not_started',
   };
 }
