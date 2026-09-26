@@ -393,5 +393,10 @@ Project guidance now separates task correctness from standards, uses a maintaine
 feature map and dependency-aware specifications, and routes recurring failures
 to checks or concise guidance. Those instruction changes are not a measured
 claim of better autonomous outcomes. The research disposition is in issue #22.
-Runtime Docker qualification, independent candidate review, protected CI and
-installed-package adoption are separate release evidence.
+An isolated npm installation on Linux x64 passed all 12 Docker qualification
+paths, including candidate/policy guards, scratch isolation/cleanup, cancellation,
+deadline, incident deduplication and restart recovery. The initial fixture used
+the canonical harness setting; existing installations retained legacy agent
+settings. No inference or application work was used for this qualification.
+Independent review, protected CI and installed-package adoption are recorded
+in the release PR.
