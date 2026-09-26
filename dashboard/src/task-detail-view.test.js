@@ -16,7 +16,7 @@ test('failed review offers explicit revision, preserves denied/stale feedback, a
   const {TaskDetail}=await server.ssrLoadModule('/src/task-detail.jsx');
   const runs=[{id:'run_a',command:'build',state:'failed',started_at:'2026-09-25T00:00:00Z',summary:'Old failed build'},
     {id:'run_b',command:'review',state:'failed',outcome:'blocked',review_verdict:'changes',started_at:'2026-09-25T01:00:00Z',summary:'Fix the concern. Claimed PR: https://github.com/example/app/pull/42',executor:'codex',model:'requested-model',worker_name:'fixture',execution:{runtimeVersion:'test-version',image:'sha256:fixture',policyHash:'policy-fixture'}}];
-  const job={id:'job_fixture',state:'failed',repository:'app',task:{title:'Revision fixture'},workflow:{name:'software',steps:['build','verify','review','handoff'],current_step:2},runs,can_request_changes:true};
+  const job={id:'job_fixture',state:'failed',repository:'app',task:{title:'Revision fixture'},source_admission:{status:'retained',requested_ref:'main',resolved_sha:'a'.repeat(40),repository_identity:`sha256:${'b'.repeat(64)}`},workflow:{name:'software',steps:['build','verify','review','handoff'],current_step:2},runs,can_request_changes:true};
   let captured, denied=true;
   const render=async()=>act(()=>root.render(createElement(TaskDetail,{job,loaded:true,csrfToken:'fixture',onWorkflowAction:async(...args)=>{captured=args;/* parent retains job and exposes API error on rejection */if(!denied)job.state='queued';}})));
   await render();
@@ -31,6 +31,7 @@ test('failed review offers explicit revision, preserves denied/stale feedback, a
   await act(()=>document.querySelector('button[aria-label="Copy issue link"]').click());
   assert.match(document.body.textContent,/Unable to copy link/);
   assert(document.querySelector('[aria-label="Issue details"]'));
+  assert.match(document.querySelector('[aria-label="Issue details"]').textContent,/a{40}/);
   const button=name=>[...document.querySelectorAll('button')].find(b=>b.textContent.trim()===name);
   assert.match(document.body.textContent,/Agent-reported text/);
   assert.equal(document.querySelector('a[href="https://github.com/example/app/pull/42"]'),null,'a model summary does not create a verified PR action');
@@ -40,7 +41,8 @@ test('failed review offers explicit revision, preserves denied/stale feedback, a
   const submit=[...document.querySelectorAll('button')].find(b=>b.textContent.includes('Send feedback'));
   assert(submit?.disabled,'empty feedback is rejected in the form');
   await act(()=>{Object.getOwnPropertyDescriptor(dom.window.HTMLTextAreaElement.prototype,'value').set.call(area,'Address exact review concern');area.dispatchEvent(new dom.window.Event('input',{bubbles:true}));});
-  await act(()=>submit.click());assert.equal(captured[1],'request_changes');assert.equal(captured[3],'Address exact review concern');assert.equal(area.value,'Address exact review concern');assert.equal(job.state,'failed');
+  const newBase=document.querySelector('input[placeholder^="Keep "]');assert(newBase);await act(()=>{Object.getOwnPropertyDescriptor(dom.window.HTMLInputElement.prototype,'value').set.call(newBase,'next');newBase.dispatchEvent(new dom.window.Event('input',{bubbles:true}));});
+  await act(()=>submit.click());assert.equal(captured[1],'request_changes');assert.equal(captured[3],'Address exact review concern');assert.equal(captured[4],'next');assert.equal(area.value,'Address exact review concern');assert.equal(job.state,'failed');
   await act(()=>button('Keep reviewing').click());
   await act(()=>document.querySelector('[role="tab"][id$="details"]').click());
   assert.match(document.body.textContent,/requested-model/);assert.match(document.body.textContent,/test-version/);assert.match(document.body.textContent,/policy-fixture/);

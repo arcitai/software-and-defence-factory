@@ -8,7 +8,7 @@ async function composer(t, api, projectLinks={repository:'https://github.com/exa
   const dom=new JSDOM('<div id="root"></div>',{url:'http://localhost/#/runs'}),prior=new Map();
   dom.window.scrollTo=()=>{};dom.window.HTMLDialogElement.prototype.showModal=function(){this.open=true;};
   const created=[];
-  const status={jobs:[],workers:[],commands:[],workflows:['software','defence'],repositories:['app'],repo:'/srv/project',harness:'pi',csrf_token:'fixture',project_links:projectLinks};
+  const status={jobs:[],workers:[],commands:[],workflows:['software','defence'],repositories:['app'],repo:'/srv/project',harness:'pi',csrf_token:'fixture',project_links:projectLinks,source_ref_default:'main'};
   const response=value=>({ok:true,json:async()=>value});
   for(const [key,value] of Object.entries({window:dom.window,document:dom.window.document,navigator:dom.window.navigator,localStorage:dom.window.localStorage,IS_REACT_ACT_ENVIRONMENT:true,fetch:async(url,options)=>{
     if(url==='/api/v1/status')return response(status);
@@ -49,8 +49,8 @@ test('issue picker retries, pages, searches and previews Defence before explicit
   assert.equal(c.created.length,0);assert.equal(c.button('Defence').getAttribute('aria-pressed'),'true');
   assert.equal(document.querySelector('.work-options').open,false);
   assert.match(document.body.textContent,/private draft/);
-  await c.click('Software');await c.click('Defence');await c.click('Start work');
-  assert.equal(c.created.length,1);assert.equal(c.created[0].workflow,'defence');assert.equal(c.created[0].source_url,issue(43).url);assert.equal(c.created[0].title,'Scoped issue 43');assert.equal(document.querySelector('dialog'),null);
+  await c.click('Software');await c.click('Defence');await act(()=>document.querySelector('.work-options summary').click());await c.input('input[placeholder="Configured ref: main"]','release/1.2');await c.click('Start work');
+  assert.equal(c.created.length,1);assert.equal(c.created[0].workflow,'defence');assert.equal(c.created[0].source_url,issue(43).url);assert.equal(c.created[0].source_ref,'release/1.2');assert.equal(c.created[0].title,'Scoped issue 43');assert.equal(document.querySelector('dialog'),null);
 });
 
 test('brief works without GitHub, recommends only on Continue and allows a software override',async t=>{

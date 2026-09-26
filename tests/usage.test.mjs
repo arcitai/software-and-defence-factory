@@ -157,10 +157,11 @@ test('a failed actual attempt keeps completed Codex usage through SQLite restart
   t.after(() => rmSync(state, { recursive: true, force: true }));
   const profile = { executor: 'codex', phase: 'defence', policyHash: 'c'.repeat(64) };
   const usage = { input_tokens: '900719925474099312345', output_tokens: '8', cached_input_tokens: '900719925474099312000', source: 'codex_jsonl', coverage: 'complete' };
+  const sourceAdmission = { admit: jobId => ({ version: 1, status: 'retained', repository_identity: `sha256:${'a'.repeat(64)}`, object_format: 'sha1', requested_ref: 'main', ref_source: 'configured', resolved_sha: 'a'.repeat(40), retained_repo: `sources/retained_${jobId.slice(-24)}.git`, retained_ref: 'refs/heads/factory-source', retained_at: new Date().toISOString() }), validate: () => ({}), release: () => {} };
   const queue = new JobQueue(state, {
     prepare: () => profile,
     execute: async () => ({ outcome: 'blocked', summary: 'Synthetic post-turn failure', usage }),
-    stop: async () => {}, reconcile: async () => {},
+    stop: async () => {}, reconcile: async () => {}, sourceAdmission,
   });
   const { id } = queue.submit({ workflow: 'defence', repository: 'app', spec: 'Fixture' });
   for (let i = 0; i < 200 && (queue.get(id).state !== 'failed' || queue.active); i++) await new Promise(resolve => setTimeout(resolve, 5));

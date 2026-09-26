@@ -1,4 +1,4 @@
-import { existsSync, readFileSync, writeFileSync, mkdirSync, renameSync } from 'node:fs';
+import { readFileSync, writeFileSync, mkdirSync, renameSync } from 'node:fs';
 import { resolve, dirname, join, isAbsolute } from 'node:path';
 import { spawnSync, spawn } from 'node:child_process';
 import { createHash } from 'node:crypto';
@@ -46,8 +46,8 @@ export function configAt(state) {
   if (!['none','bridge'].includes(config.network)) throw new Error('network must be none or bridge; host networking is not supported');
   if (typeof config.image !== 'string' || !/^[a-zA-Z0-9][a-zA-Z0-9_./:@-]*$/.test(config.image)) throw new Error('Invalid container image');
   if (typeof config.repo !== 'string' || !isAbsolute(config.repo) || [config.repo,state,ROOT].some(p=>/[,\n\r]/.test(p))) throw new Error('Expected absolute paths without commas or line breaks');
+  if (config.sourceRef !== undefined && (typeof config.sourceRef !== 'string' || !config.sourceRef || Buffer.byteLength(config.sourceRef) > 256 || /[\u0000-\u001f\u007f]/.test(config.sourceRef))) throw new Error('sourceRef must be a Git ref under 256 bytes');
   if (typeof config.check !== 'string' || !config.scope || !['project','service','environment','owner'].every(k=>typeof config.scope[k]==='string'&&config.scope[k].trim())) throw new Error('Missing check or installation scope');
-  if (!existsSync(config.repo)) throw new Error('Configured repository is missing');
   return config;
 }
 export async function api(state, path, body, method) {

@@ -1,11 +1,12 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { mkdtempSync, rmSync, writeFileSync } from 'node:fs';
+import { mkdtempSync, rmSync, writeFileSync, mkdirSync } from 'node:fs';
 import { join } from 'node:path';
 import { tmpdir } from 'node:os';
 import { createController } from '../factory/server.mjs';
 import { configAt } from '../factory/lib.mjs';
 import { withRequestedModel, executionProfile, attemptPresentation } from '../factory/execution-profile.mjs';
+import { execFileSync } from 'node:child_process';
 
 const image='sha256:'+'a'.repeat(64);
 test('model overrides and public phase facts are isolated from credentials and mutable config',()=>{
@@ -28,7 +29,8 @@ test('model overrides and public phase facts are isolated from credentials and m
 
 test('A-profile failure and B-profile retry remain distinct through controller restart and status',async t=>{
   const state=mkdtempSync(join(tmpdir(),'sdf-provenance-'));t.after(()=>rmSync(state,{recursive:true,force:true}));
-  const initial={version:1,repo:state,agent:'pi',command:['synthetic-fixture','PRIVATE_SENTINEL'],model:'model-a',image,port:7349,timeoutSeconds:10,memoryMiB:256,network:'none',check:'true',scope:{project:'p',service:'s',owner:'test',environment:'test'}};
+  const repo=join(state,'repo');mkdirSync(repo);execFileSync('git',['-C',repo,'init','--quiet','-b','main']);writeFileSync(join(repo,'source.txt'),'fixture\n');execFileSync('git',['-C',repo,'add','source.txt']);execFileSync('git',['-C',repo,'-c','user.name=Fixture','-c','user.email=fixture@localhost','commit','--quiet','-m','Fixture']);
+  const initial={version:1,repo,agent:'pi',command:['synthetic-fixture','PRIVATE_SENTINEL'],model:'model-a',image,port:7349,timeoutSeconds:10,memoryMiB:256,network:'none',check:'true',scope:{project:'p',service:'s',owner:'test',environment:'test'}};
   const save=config=>writeFileSync(join(state,'factory.json'),JSON.stringify(config));save(initial);writeFileSync(join(state,'worker.token'),'fixture-token');
   let failing=true, controller;
   const adapter={prepare:(job,run)=>executionProfile(withRequestedModel(configAt(state),job.model),run.command),execute:async()=>({outcome:failing?'blocked':'complete',summary:'Synthetic adapter'}),stop:async()=>{},reconcile:async()=>{}};

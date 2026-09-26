@@ -1,17 +1,19 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { mkdtempSync,rmSync,writeFileSync } from 'node:fs';
+import { mkdtempSync,rmSync,writeFileSync,mkdirSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { execFile } from 'node:child_process';
 import { promisify } from 'node:util';
 import { createController } from '../factory/server.mjs';
 import { ROOT } from '../factory/lib.mjs';
+import { execFileSync } from 'node:child_process';
 const exec=promisify(execFile);
 
 test('issue CLI requires explicit execution choice and shares the controller record with the dashboard',async t=>{
   const state=mkdtempSync(join(tmpdir(),'sdf-issue-cli-'));t.after(()=>rmSync(state,{recursive:true,force:true}));
-  const config={version:1,repo:state,harness:'mock',command:['mock'],port:7331,check:'true',image:'fixture:1',network:'none',timeoutSeconds:10,memoryMiB:512,scope:{project:'fixture',service:'app',environment:'test',owner:'operator'}};
+  const repo=join(state,'repo');mkdirSync(repo);execFileSync('git',['-C',repo,'init','--quiet','-b','main']);writeFileSync(join(repo,'source.txt'),'fixture\n');execFileSync('git',['-C',repo,'add','source.txt']);execFileSync('git',['-C',repo,'-c','user.name=Fixture','-c','user.email=fixture@localhost','commit','--quiet','-m','Fixture']);
+  const config={version:1,repo,harness:'mock',command:['mock'],port:7331,check:'true',image:'fixture:1',network:'none',timeoutSeconds:10,memoryMiB:512,scope:{project:'fixture',service:'app',environment:'test',owner:'operator'}};
   writeFileSync(join(state,'factory.json'),JSON.stringify(config));writeFileSync(join(state,'worker.token'),'fixture');
   writeFileSync(join(state,'brief.md'),'Investigate supplied suspicious access logs.');
   const controller=createController(state,{execute:async()=>({outcome:'blocked'}),stop:async()=>{},reconcile:async()=>{}});
@@ -21,8 +23,9 @@ test('issue CLI requires explicit execution choice and shares the controller rec
   await assert.rejects(cli('start','--file',join(state,'brief.md'),'--title','Investigate evidence'),/choose --workflow/);
   assert.equal(controller.queue.all().length,0);
   assert.equal((await cli('recommend','--file',join(state,'brief.md'))).workflow,'defence');
-  const created=await cli('start','--file',join(state,'brief.md'),'--title','Investigate evidence','--workflow','defence');
+  const created=await cli('start','--file',join(state,'brief.md'),'--title','Investigate evidence','--workflow','defence','--source-ref','main');
+  assert.equal(created.source_admission.requested_ref,'main');assert.equal(created.source_admission.ref_source,'explicit');assert.match(created.source_admission.resolved_sha,/^[a-f0-9]{40}$/);
   const listed=await cli('list');assert.equal(listed[0].id,created.id);
   assert.equal(listed[0].task.title,'Investigate evidence');assert.equal(listed[0].workflow.name,'defence');
-  const snapshot=await(await fetch(`http://127.0.0.1:${config.port}/api/v1/status`)).json();assert.equal(snapshot.jobs[0].task.title,listed[0].task.title);
+  const snapshot=await(await fetch(`http://127.0.0.1:${config.port}/api/v1/status`)).json();assert.equal(snapshot.jobs[0].task.title,listed[0].task.title);assert.deepEqual(snapshot.jobs[0].source_admission,created.source_admission);assert(!JSON.stringify(snapshot).includes('retained_repo'));
 });

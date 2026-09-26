@@ -25,9 +25,10 @@ function App() {
   const [status, setStatus] = useState({ jobs: [], workers: [], commands: [], repositories: [], triggers: [], csrf_token: "" });
   const [selection, setSelection] = useState("");
   const [repository, setRepository] = useState("");
-  const [prompt, setPrompt] = useState("");
+ const [prompt, setPrompt] = useState("");
  const [title,setTitle]=useState("");
  const [sourceURL,setSourceURL]=useState("");
+ const [sourceRef,setSourceRef]=useState("");
   const [model, setModel] = useState("");
   const [statusError, setStatusError] = useState("");
   const [statusLoaded, setStatusLoaded] = useState(false);
@@ -138,7 +139,7 @@ function App() {
       const response = await fetch("/api/v1/jobs", {
         method: "POST",
         headers: { "Content-Type": "application/json", "X-Factory-Session": status.csrf_token },
-        body: JSON.stringify({ repository, model: model.trim(), ...(selection.startsWith("workflow:") ? { workflow: selection.slice(9),title: title || prompt.trim().split("\n")[0].slice(0,100),source_url:sourceURL,spec:prompt } : { command: selection.slice(8),prompt }) }),
+        body: JSON.stringify({ repository, model: model.trim(), ...(selection.startsWith("workflow:") ? { workflow: selection.slice(9),title: title || prompt.trim().split("\n")[0].slice(0,100),source_url:sourceURL,spec:prompt,...(sourceRef.trim()?{source_ref:sourceRef.trim()}:{}) } : { command: selection.slice(8),prompt }) }),
       });
       if (!response.ok) {
         const body = await response.json().catch(() => ({}));
@@ -146,7 +147,7 @@ function App() {
       }
       localStorage.setItem("factory-workflow",selection); localStorage.setItem("factory-repository",repository);
       const created = await response.json();
-      setPrompt(""); setTitle(""); setSourceURL("");
+      setPrompt(""); setTitle(""); setSourceURL(""); setSourceRef("");
       setComposerOpen(false);
       await statusLoader.current.refresh();
       window.location.hash = `#/runs/${created.id}`;
@@ -157,12 +158,12 @@ function App() {
     }
   }
 
-  async function workflowAction(job, action, stopped = false, feedback = "") {
+  async function workflowAction(job, action, stopped = false, feedback = "", sourceRef = "") {
     setTaskActionError("");
     try {
       const response = await fetch(`/api/v1/jobs/${encodeURIComponent(job.id)}/${action}`, {
         method: "POST", headers: { "Content-Type": "application/json", "X-Factory-Session": status.csrf_token },
-        body: JSON.stringify({ run_id: job.runs.at(-1)?.id, previous_process_stopped: stopped, feedback }),
+        body: JSON.stringify({ run_id: job.runs.at(-1)?.id, previous_process_stopped: stopped, feedback, ...(sourceRef.trim()?{source_ref:sourceRef.trim()}:{}) }),
       });
       if (!response.ok) { const body = await response.json().catch(() => ({})); throw new Error(body.error || "Unable to update job"); }
       await statusLoader.current.refresh();
@@ -247,7 +248,7 @@ function App() {
                     setRunsView={changeRunsView}
                     refresh={() => statusLoader.current.refresh()}
                     openComposer={() => (setSubmitError(""), setComposerOpen(true))}
-                    composer={composerOpen && <RunComposer issueProvider={status.issue_provider} csrfToken={status.csrf_token} projectLinks={status.project_links} error={submitError} title={title} setTitle={setTitle} sourceURL={sourceURL} setSourceURL={setSourceURL} choices={choices} repositories={repositories} identity={identity} selection={selection} setSelection={setSelection} repository={repository} setRepository={setRepository} prompt={prompt} setPrompt={setPrompt} model={model} setModel={setModel} submitting={submitting} submit={submit} close={() => setComposerOpen(false)} />}
+                    composer={composerOpen && <RunComposer issueProvider={status.issue_provider} csrfToken={status.csrf_token} projectLinks={status.project_links} sourceRefDefault={status.source_ref_default || "HEAD"} sourceRef={sourceRef} setSourceRef={setSourceRef} error={submitError} title={title} setTitle={setTitle} sourceURL={sourceURL} setSourceURL={setSourceURL} choices={choices} repositories={repositories} identity={identity} selection={selection} setSelection={setSelection} repository={repository} setRepository={setRepository} prompt={prompt} setPrompt={setPrompt} model={model} setModel={setModel} submitting={submitting} submit={submit} close={() => setComposerOpen(false)} />}
                   />}
       </main>
     </div>

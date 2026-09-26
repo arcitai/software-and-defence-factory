@@ -125,7 +125,8 @@ export function executors(state) {
     mkdirSync(output, { recursive: true, mode: 0o700 });
     const resultPath = join(output, 'result.json'), fd = openSync(join(output, 'executor.log'), 'a', 0o600);
     const child = spawn(process.execPath, [join(ROOT, 'factory/executor.mjs'), state, attempt.command], {
-      detached: true, stdio: ['pipe', fd, fd], env: { ...process.env, SDF_JOB_ID: job.id, SDF_RUN_ID: attempt.id, SDF_OUTPUT_DIR: output, SDF_STEP_RESULT_PATH: resultPath },
+      detached: true, stdio: ['pipe', fd, fd], env: { ...process.env, SDF_JOB_ID: job.id, SDF_RUN_ID: attempt.id, SDF_OUTPUT_DIR: output, SDF_STEP_RESULT_PATH: resultPath,
+        SDF_SOURCE_ADMISSION: JSON.stringify(job.source_admission || null) },
     }); closeSync(fd);
     let finish;
     const done = new Promise(resolve => { finish = resolve; });

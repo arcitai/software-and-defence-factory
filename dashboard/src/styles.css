@@ -317,6 +317,7 @@ body { font-size: 14px; }
 .task-metadata dl { display: grid; gap: 22px; }
 .task-metadata dt { display: flex; align-items: center; gap: 5px; color: var(--muted-foreground); font-size: 12px; margin-bottom: 7px; }
 .task-metadata dd { margin: 0; overflow-wrap: anywhere; font-size: 13px; }
+.source-revision-sha { display: block; overflow-wrap: anywhere; word-break: break-all; font-size: 11px; line-height: 17px; }
 .task-metadata .metadata-hint { font-size: 11px; line-height: 17px; color: var(--muted-foreground); margin-top: 5px; }
 .metadata-link { display: inline-flex; align-items: center; gap: 6px; border: 1px solid var(--border); border-radius: 5px; padding: 3px 6px; text-decoration: none; }
 .metadata-link:hover { background: var(--muted); }
