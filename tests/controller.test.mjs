@@ -11,7 +11,14 @@ import { createController } from '../factory/server.mjs';
 function temp(t) { const root = mkdtempSync(join(tmpdir(), 'sdf-controller-')); t.after(() => rmSync(root, { recursive: true, force: true })); return root; }
 async function until(condition) { for (let i = 0; i < 200; i++) { if (condition()) return; await new Promise(resolve => setTimeout(resolve, 5)); } throw new Error('Expected queue state was not reached'); }
 const task = { workflow: 'software', repository: 'app', spec: 'Synthetic bounded change', title: 'Fixture' };
-function adapter(execute = async () => ({ outcome: 'complete', summary: 'fixture' })) { return { execute, stop: async () => {}, reconcile: async () => {} }; }
+const sourceAdmission = {
+  admit: (jobId, requestedRef, expectedRepositoryIdentity) => ({ version: 1, status: 'retained', repository_identity: expectedRepositoryIdentity || `sha256:${'a'.repeat(64)}`, repository_path: '/fixture/repository',
+    repository_common_dir: '/fixture/repository/.git', object_format: 'sha1', requested_ref: requestedRef ?? 'main', ref_source: requestedRef === undefined ? 'configured' : 'explicit',
+    resolved_sha: requestedRef === 'next' ? 'b'.repeat(40) : 'a'.repeat(40), retained_repo: `sources/retained_${jobId.slice(-24)}.git`, retained_ref: 'refs/heads/factory-source', retained_at: new Date().toISOString() }),
+  validate: () => ({ path: '/fixture/retained.git', sha: 'a'.repeat(40) }),
+  release: () => {},
+};
+function adapter(execute = async () => ({ outcome: 'complete', summary: 'fixture' })) { return { execute, stop: async () => {}, reconcile: async () => {}, sourceAdmission }; }
 test('one execution owner advances checks and review, then waits for a current approval', async t => {
   const phases = []; let concurrent = 0, maximum = 0;
   const queue = new JobQueue(temp(t), adapter(async (job, run) => { maximum = Math.max(maximum, ++concurrent); phases.push(run.command); await new Promise(resolve => setTimeout(resolve, 2)); concurrent--; return { outcome: 'complete' }; }));
@@ -37,7 +44,7 @@ test('failed checks cannot advance to review and retry creates a new attempt', a
 });
 test('cancel waits for stop and a late successful result cannot accept a cancelled job', async t => {
   let finish, stopped = false;
-  const queue = new JobQueue(temp(t), { execute: () => new Promise(resolve => { finish = resolve; }), stop: async () => { stopped = true; finish({ outcome: 'complete' }); }, reconcile: async () => {} });
+  const queue = new JobQueue(temp(t), { execute: () => new Promise(resolve => { finish = resolve; }), stop: async () => { stopped = true; finish({ outcome: 'complete' }); }, reconcile: async () => {}, sourceAdmission });
   t.after(() => queue.close()); const { id } = queue.submit(task);
   await until(() => !!finish);
   await queue.action(id, 'cancel', { run_id: queue.get(id).runs.at(-1).id });
@@ -45,7 +52,7 @@ test('cancel waits for stop and a late successful result cannot accept a cancell
 });
 test('restart marks an unconfirmed running attempt interrupted and requires reconciliation', async t => {
   const state = temp(t), first = new JobQueue(state, adapter());
-  const job = { id: 'job_fixture', state: 'running', workflow: { name: 'software', steps: ['build'], current_step: 0 }, runs: [{ id: 'run_fixture', state: 'running', command: 'build' }] };
+  const job = { id: 'job_fixture', state: 'running', source_admission: sourceAdmission.admit('job_fixture'), workflow: { name: 'software', steps: ['build'], current_step: 0 }, runs: [{ id: 'run_fixture', state: 'running', command: 'build' }] };
   first.save(job); await first.close();
   const next = new JobQueue(state, { ...adapter(), reconcile: async () => { throw new Error('Old process is still live'); } });
   t.after(() => next.close()); assert.equal(next.get(job.id).state, 'interrupted');
@@ -77,6 +84,9 @@ test('controller enforces host/origin/session checks and persists only bounded j
   writeFileSync(join(state, 'factory.json'), JSON.stringify({ version: 1, repo: state, agent: 'mock', command: ['mock'], port: 7332, timeoutSeconds: 10, memoryMiB: 256, image: 'fixture:1', network: 'none', check: 'true', scope: { project: 'p', service: 's', environment: 'test', owner: 'fixture' } }));
   writeFileSync(join(state, 'worker.token'), 'synthetic-private-token');
   execFileSync('git', ['init', state], {stdio:'ignore'});
+  writeFileSync(join(state, 'source.txt'), 'synthetic source\n');
+  execFileSync('git', ['-C', state, 'add', 'source.txt']);
+  execFileSync('git', ['-C', state, '-c', 'user.name=Fixture', '-c', 'user.email=fixture@localhost', 'commit', '-m', 'Synthetic source'], {stdio:'ignore'});
   execFileSync('git', ['-C',state,'remote','add','origin','git@github.com:example/actual-project.git']);
   const controller = createController(state, adapter());
   await new Promise(resolve => controller.server.listen(0, '127.0.0.1', resolve)); t.after(() => controller.close());
@@ -161,6 +171,6 @@ test('revision is not offered for active, crashed, non-review or defence attempt
     const job = { id: 'job_fixture', state, prompt: 'Fixture', workflow: { name: workflow, steps: [phase], current_step: 0 },
       runs: [{ id: 'run_fixture', state, command: phase, review_verdict: verdict }] };
     queue.save(job);
-    await assert.rejects(queue.action(job.id,'request_changes',{run_id:'run_fixture',feedback:'Fix it'}), /reviewed/);
+    await assert.rejects(queue.action(job.id,'request_changes',{run_id:'run_fixture',feedback:'Fix it'}), /reviewed|legacy/);
   }
 });

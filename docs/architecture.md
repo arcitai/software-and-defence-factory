@@ -11,7 +11,7 @@ repository preparation, controller/host boundaries, software delivery and
 Defence. Dashed planned capabilities are not installed behavior.
 
 
-`factory/queue.mjs` owns state transitions and persists every attempt before execution. `server.mjs` adapts the queue and private artifacts to the dashboard. `processes.mjs` owns process groups, deadlines and reconciliation. `executor.mjs` creates the checkout, runs roles through the selected harness and application checks, records review and validates handoff.
+`factory/queue.mjs` owns state transitions and persists every attempt before execution. At admission, `source-admission.mjs` resolves the configured or explicit ref and retains its commit objects in a private per-job bare repository. The protected job record binds that repository identity, requested ref and resolved SHA; retries and revisions restore from those retained objects. `server.mjs` adapts the queue and private artifacts to the dashboard. `processes.mjs` owns process groups, deadlines and reconciliation. `executor.mjs` creates the checkout, runs roles through the selected harness and application checks, records review and validates handoff.
 
 Software phases are build → verify → review → approved handoff. An implementation receives a writable job checkout; verification and review cannot modify that candidate. Both must cover the candidate commit and current policy hash. A requested revision preserves old work and starts a fresh implementation/check/review sequence. Retry resumes a stopped phase only after process/container reconciliation.
 
@@ -44,6 +44,7 @@ Earlier experimental runtime and evaluation dashboards are retained in Git histo
 | Agent roles, skills and phase order | `factory/definition.mjs` | Queue, definitions API, CLI and UI |
 | Instance settings | Private `factory.json` | Controller and immutable admitted attempt config |
 | Job state, attempts and external write receipts | Private SQLite queue | CLI/API and dashboard |
+| Admission-time repository identity, requested ref and commit | Protected job record plus per-job retained Git objects | Queue, executor, retry/revision, status and evidence |
 | Remote issue metadata | Selected provider (GitHub adapter first) | Live adapter reads, CLI/API and dashboard |
 | Automation schedule | Selected harness | Explicit calls into Factory CLI/API |
 | List/board status groups | `dashboard/src/runs-board.js` | Both task views and their filters |

@@ -1,10 +1,13 @@
 import { harnessOf } from '../factory/lib.mjs';
 // Explicit, opt-in integration qualification. Uses Docker and the native controller, never inference.
 import assert from 'node:assert/strict';
-import { readFileSync, writeFileSync, existsSync, mkdtempSync } from 'node:fs';
+import { readFileSync, writeFileSync, existsSync, mkdirSync, mkdtempSync } from 'node:fs';
 import { resolve, join } from 'node:path';
 import { api, configAt, save, json, containers, sleep, stream, run, ROOT } from '../factory/lib.mjs';
 import { admitIncident } from '../factory/incident.mjs';
+import { createController } from '../factory/server.mjs';
+import { advanceAndPruneSourceFixture, createRetainedSourceFixture, sourceFixtureOperatorState } from './retained-source-fixture.mjs';
+import { runHostGit } from '../factory/git-environment.mjs';
 
 const state=resolve(process.argv[2] || '.factory/demo-platform'),original=configAt(state);
 assert.equal(harnessOf(original),'mock','Qualification is restricted to a synthetic installation');
@@ -23,6 +26,58 @@ const submit=(workflow,spec)=>api(state,'/api/v1/jobs',{workflow,repository:'app
 const work=spec=>submit('software',spec);
 const record=name=>{results.push({name,passed:true});console.log(`PASS ${name}`);};
 const setConfig=changes=>save(join(state,'factory.json'),{...original,...changes});
+async function qualifyRetainedSource() {
+  const proofState=mkdtempSync(join(state,'source-admission-')),{repo,sourceA}=createRetainedSourceFixture(proofState),runtime=join(proofState,'runtime');mkdirSync(runtime,{mode:0o700});
+  const config={...original,repo,sourceRef:'main',command:['node','-e','process.exit(7)'],check:'test "$(cat value.txt)" = fixed && test "$(cat base-id.txt)" = A && sleep 2',timeoutSeconds:original.timeoutSeconds};
+  save(join(runtime,'factory.json'),config);writeFileSync(join(runtime,'worker.token'),'synthetic-source-qualification\n',{mode:0o600});
+  writeFileSync(join(runtime,'model.env'),'# Synthetic mock profile; no inference credentials.\n',{mode:0o600});
+  let controller,jobId;
+  const start=async()=>{controller=createController(runtime);await new Promise(resolve=>controller.server.listen(0,'127.0.0.1',resolve));return controller;};
+  const wait=async predicate=>until(async()=>{const job=controller.queue.get(jobId);return predicate(job)?job:undefined;});
+  try {
+    await start();
+    const submitted=controller.queue.submit({workflow:'software',repository:'app',title:'Source admission A-to-B fixture',spec:'Synthetic retry proves admission-time source retention.'});
+    jobId=submitted.id;
+    assert.equal(submitted.source_admission.resolved_sha,sourceA);
+    assert.equal(submitted.source_admission.ref_source,'configured');
+
+    const operator=advanceAndPruneSourceFixture({repo,sourceA});
+
+    const failed=await wait(job=>job.state==='failed');
+    assert.match(failed.runs.at(-1).error,/build exited 7/);
+    const folder=join(runtime,'jobs',submitted.id),firstCandidate=json(join(folder,'candidate.json'));
+    assert.equal(firstCandidate.base,sourceA);assert.equal(firstCandidate.source_admission.resolved_sha,sourceA);
+    assert.equal(readFileSync(join(folder,'checkout/base-id.txt'),'utf8'),'A\n');
+    await controller.close();controller=null;
+
+    save(join(runtime,'factory.json'),{...config,command:['node','/opt/factory/mock.mjs']});
+    await start();
+    await controller.queue.action(submitted.id,'retry',{run_id:failed.runs.at(-1).id});
+    const verifyContainer=await until(()=>containers(runtime).find(item=>item.Config.Labels['sdf.job']===submitted.id&&item.State.Running&&item.Config.Env.includes('FACTORY_PHASE=verify')));
+    assert(verifyContainer.Config.Env.includes(`FACTORY_BASE_REVISION=${sourceA}`));
+    assert(verifyContainer.Mounts.some(mount=>mount.Destination==='/workspace'&&!mount.RW));
+    let admitted=await wait(job=>job.state==='awaiting_approval');
+    const candidate=json(join(folder,'candidate.json'));
+    assert.equal(candidate.base,sourceA);assert.equal(candidate.source_admission.resolved_sha,sourceA);
+    assert.equal(readFileSync(join(folder,'checkout/base-id.txt'),'utf8'),'A\n');
+    assert.equal(runHostGit(['-C',join(folder,'checkout'),'rev-parse','HEAD^']),sourceA);
+    const status=await(await fetch(`http://127.0.0.1:${controller.server.address().port}/api/v1/status`)).json();
+    const view=status.jobs.find(item=>item.id===submitted.id);
+    assert.equal(view.source_admission.resolved_sha,sourceA);assert(!JSON.stringify(view).includes('retained_repo'));
+    await controller.queue.action(submitted.id,'approve',{run_id:admitted.runs.at(-1).id});
+    admitted=await wait(job=>job.state==='succeeded');
+    const accepted=json(join(folder,'accepted.json'));
+    assert.equal(accepted.source_admission.resolved_sha,sourceA);
+    const handoffRun=admitted.runs.find(run=>run.command==='handoff');
+    assert(handoffRun,'Expected a native handoff run after approval');
+    assert.equal(handoffRun.state,'succeeded');
+    assert.equal(handoffRun.outcome,'complete');
+    assert.match(readFileSync(join(folder,'artifacts',handoffRun.id,'handoff.md'),'utf8'),new RegExp(sourceA));
+    assert.deepEqual(sourceFixtureOperatorState(repo),operator);
+    assert.equal(readFileSync(join(repo,'base-id.txt'),'utf8'),'B\n');
+    record('source admission: real Docker build retry after restart, ref deletion and GC uses retained A; evidence and operator checkout agree');
+  } finally { if(controller) await controller.close(); }
+}
 
 try {
   const pass=await work('Synthetic complete vertical slice');await waitState(pass.id,'awaiting_approval');
@@ -32,6 +87,8 @@ try {
   assert.equal(readFileSync(join(original.repo,'value.txt'),'utf8'),'broken\n');
   await cli('approve',pass.id);await waitState(pass.id,'succeeded');
   assert.equal(json(join(folder,'accepted.json')).head,candidate.head);record('software: exact revision, isolated checkout, checks, review, approval, handoff');
+
+  await qualifyRetainedSource();
 
   setConfig({cpus:4,pidsLimit:1024,check:"test \"$(cat value.txt)\" = fixed && dd if=/dev/zero of=large-build-fixture bs=1M count=1100 status=none && sleep 2"});
   const native=await work('Synthetic disk-backed build verification');

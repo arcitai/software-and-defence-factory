@@ -23,12 +23,14 @@ The qualification intentionally creates failed, cancelled and interrupted tasks.
 Commit an intentional, reviewed starting point in the application first. Jobs clone committed code only; uncommitted work stays in the source checkout.
 
 ```sh
-software-defence-factory init --repo /absolute/path/to/app --harness codex --check "npm ci && npm test" --state /private/state/my-app --port 7331
+software-defence-factory init --repo /absolute/path/to/app --harness codex --check "npm ci && npm test" --source-ref main --state /private/state/my-app --port 7331
 software-defence-factory install --state /private/state/my-app
 software-defence-factory doctor --state /private/state/my-app
 ```
 
-Verification commands receive `FACTORY_BASE_REVISION`, the resolved commit recorded as the candidate base. Diff-based checks should compare against this revision; the isolated checkout has no origin remote. The value comes from protected controller metadata, not the task text.
+`init --source-ref` selects the configured default ref (`HEAD` when omitted). Each job resolves that ref, or an explicit `--source-ref` on `run`/`issue start`, in the configured repository and durably retains its commit before acknowledging admission. The CLI and dashboard show the requested ref and resolved SHA. Task text and reference links do not select a repository or ref.
+
+Verification commands receive `FACTORY_BASE_REVISION`, the resolved admission commit recorded as the candidate base. Diff-based checks should compare against this revision; the isolated checkout has no origin remote. The value comes from protected controller metadata, not the task text.
 
 Replace the check with the application's actual verification command. `init` does not edit the app, copy global skills or start work. It creates factory.json, worker.token and model.env with private permissions. Each installation has one repository and a distinct state path/port. `--harness pi` selects Pi; `--harness custom --command-json '["executable","argument"]'` selects an available command in the job image. The bundled image provides Node, Git, Codex and Pi. Other toolchains require an intentionally built compatible image; do not claim Rust/mobile/browser capabilities from this image alone.
 
@@ -38,14 +40,14 @@ A local model endpoint must be reachable from inside the job container. Host loo
 
 ```sh
 software-defence-factory up --state /private/state/my-app
-software-defence-factory run --file task.md --state /private/state/my-app
+software-defence-factory run --file task.md --source-ref main --state /private/state/my-app
 ```
 
 A task should describe the accepted outcome, allowed scope and observable checks. The CLI also accepts `--issue https://github.com/owner/repo/issues/123` for an issue belonging to the configured origin; it uses the operator's existing gh access outside the job. The dashboard supports the same task workflow. Source text and links do not grant additional authority.
 
 ## Review and handoff
 
-Inspect the task's Result, Files and History tabs. Build evidence includes candidate.json, change.patch and the implementation report. Checks and review identify their exact commit and policy hash. Approval revalidates both before writing accepted.json. Request changes creates a new implementation sequence while preserving earlier attempts.
+Inspect the task's Result, Files and History tabs. Task details show the requested source ref, resolved admission SHA and previous source commits when a new base was selected. Build evidence includes candidate.json, change.patch and the implementation report; handoff records its source SHA. Checks and review identify their exact candidate commit and policy hash. Approval revalidates both before writing accepted.json. Request changes preserves the recorded source by default and starts fresh checks/review; an explicit new source ref is retained as a deliberate base change.
 
 The source application is not changed and no branch, PR, merge or deployment is published automatically. A reviewed change.patch can be checked and applied with `git apply --check` and `git apply` on an appropriate branch at its recorded base revision; then follow the application's normal integrated checks and delivery policy.
 

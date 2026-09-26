@@ -26,10 +26,11 @@ Shared navigation, state meanings, evidence and approvals remain Factory-owned.
 
 Follow the [contributor setup](../CONTRIBUTING.md), then verify the exact source
 revision and a clean checkout. Preserve unfinished work in its existing branch
-or worktree. Until #28 provides admission-time source pinning, hold a dedicated
-committed source checkout at the selected SHA while submitting/executing jobs.
-Task text naming a SHA does not pin it. Compare each recorded candidate base
-with the intended SHA before acceptance.
+or worktree. Job admission resolves the configured ref, a CLI `--source-ref` or
+the dashboard source-ref field, and retains that commit before acknowledging
+the job. Use a full SHA when Factory development must use one exact candidate base; task text naming
+a SHA does not pin it. Compare each recorded candidate base with the intended
+SHA before acceptance.
 
 For this repository, the configured full check is:
 
@@ -51,7 +52,7 @@ Establish host access, inference and resource limits using the existing
 replaced with user-owned locations and an unused port:
 
 ```sh
-software-defence-factory init --repo /absolute/path/to/factory-source --harness pi --check "npm ci --ignore-scripts && npm run build:dashboard && npm run check" --state /private/state/factory-development --port 7343
+software-defence-factory init --repo /absolute/path/to/factory-source --harness pi --check "npm ci --ignore-scripts && npm run build:dashboard && npm run check" --source-ref main --state /private/state/factory-development --port 7343
 software-defence-factory install --image FACTORY_DEV_IMAGE --state /private/state/factory-development
 software-defence-factory doctor --state /private/state/factory-development
 ```

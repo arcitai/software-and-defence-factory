@@ -4,9 +4,10 @@ Use `status --state PATH` and the private supervisor.log to identify the active 
 
 - A normal `stop` signals the controller, waits for the executor process group, removes its labelled containers and retains the database and artifacts.
 - An unconfirmed running attempt becomes `interrupted` on controller restart. It is never silently considered successful.
-- `retry JOB_ID` reconciles the previous process group and containers. A live or unknown writer blocks retry. For a new build/defence attempt, the prior checkout is retained as previous-checkout-*.
+- Admission resolves the configured source ref or an explicit `--source-ref` in the configured repository, records its identity/ref/SHA in private job metadata and retains its Git objects under that job. Build and retry restore from this retained revision; moving or deleting the source ref does not select a new commit.
+- `retry JOB_ID` verifies retained objects and reconciles the previous process group and containers. A missing/corrupt retained source, live writer or unknown process blocks retry. For a new build/defence attempt, the prior checkout is retained as previous-checkout-*.
 - A failed verification can retry the same unchanged candidate after the check environment is repaired. A changed candidate needs a fresh verification/review sequence.
-- A requested revision retains previous evidence and starts a new build from the source repository with the accumulated feedback. It does not reuse earlier approval.
+- A requested revision keeps the recorded source by default, retains previous evidence and starts a new build with accumulated feedback. Supplying a deliberate new `--source-ref` resolves and retains that base before the action; prior source metadata stays in history, and the new build gets fresh checks and review.
 - Removing a stopped task from the dashboard hides its queue record. Private artifacts and its deleted_at record remain on disk; this is not secure erasure.
 
 Do not remove active.json merely to unblock a job. Establish that its PID, process group and labelled containers are stopped. PID reuse or missing process identity requires operator investigation. Preserve logs and work before cleanup.
@@ -34,11 +35,14 @@ software-defence-factory revise JOB_ID --file /private/revision.md --state /priv
 
 Feedback must be nonempty and at most 4,000 characters. It is accumulated in the
 bounded job prompt. The controller checks the latest attempt and reconciles its
-processes before starting a new build from the configured source with that
+processes before starting a new build from the retained source commit with that
 feedback. The old checkout moves to `previous-checkout-*`; the old failed review
 and reports remain intact. Verification, review and operator approval are all
 required again. A stale or duplicate request cannot approve or restart a newer
-attempt. **Retry** only repeats the stopped phase and is suitable for a repaired
+attempt. To deliberately change the base, pass `--source-ref REF`; the controller
+resolves and retains it from the same configured repository before changing the
+job record. If the request cannot reconcile, its unlinked source copy is removed.
+**Retry** only repeats the stopped phase and is suitable for a repaired
 execution environment; retrying review cannot change the candidate.
 
 A crashed review without a validated verdict cannot request implementation
@@ -90,6 +94,22 @@ and any contemporaneous private configuration backup. Record only corroborated
 facts in a separate private incident note with evidence paths and unknowns; leave
 the original queue/evidence unchanged. Without that evidence, model/image facts
 cannot be reconstructed reliably.
+
+### Legacy source records
+
+Jobs admitted before source retention keep their historical candidate and review
+evidence without an invented admission-time SHA. A complete existing candidate
+can still pass the normal current candidate, policy, review and approval guards;
+the handoff labels its source **Not recorded (legacy/unknown)**. An unpinned
+queued job is blocked on controller restart, and an unpinned job cannot retry or
+request implementation changes. Submit a replacement job to capture the
+configured or explicit source ref before execution. Do not reconstruct proof
+from the current checkout, issue text or a later ref value.
+
+If a retained store is missing or corrupt, retry and revision stop with an
+explicit source error. Restore the private state backup containing that job's
+retained Git objects, or submit a replacement from a source ref that still
+resolves. The controller never substitutes the mutable configured checkout.
 
 ### Interrupted image selection or controller startup
 

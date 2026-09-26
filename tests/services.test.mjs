@@ -9,7 +9,8 @@ import { JobQueue } from '../factory/queue.mjs';
 import { createController } from '../factory/server.mjs';
 
 const task = { workflow: 'software', repository: 'app', spec: 'Synthetic service fixture' };
-const adapter = { execute: async () => ({ outcome: 'blocked', summary: 'synthetic' }), stop: async () => {}, reconcile: async () => {} };
+const sourceAdmission = { admit: (jobId, requestedRef, expectedRepositoryIdentity) => ({ version: 1, status: 'retained', repository_identity: expectedRepositoryIdentity || `sha256:${'a'.repeat(64)}`, object_format: 'sha1', requested_ref: requestedRef ?? 'main', ref_source: requestedRef === undefined ? 'configured' : 'explicit', resolved_sha: 'a'.repeat(40), retained_repo: `sources/retained_${jobId.slice(-24)}.git`, retained_ref: 'refs/heads/factory-source', retained_at: new Date().toISOString() }), validate: () => ({}), release: () => {} };
+const adapter = { execute: async () => ({ outcome: 'blocked', summary: 'synthetic' }), stop: async () => {}, reconcile: async () => {}, sourceAdmission };
 function temp(t) { const path = mkdtempSync(join(tmpdir(), 'sdf-service-')); t.after(() => rmSync(path, { recursive: true, force: true })); return path; }
 test('service definitions preserve argument boundaries and private restart behavior', t => {
   const spec = { id: serviceId('tunnel', 'host:7331'), description: 'Factory fixture', argv: ['/usr/bin/node', '/tmp/sp ace/$file%name.mjs', 'serve'], directory: '/tmp/sp ace', environment: { PATH: '/usr/bin:/bin' }, log: '/tmp/private<&.log' };

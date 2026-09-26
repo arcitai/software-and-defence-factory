@@ -14,6 +14,8 @@ import { admitIncident } from '../factory/incident.mjs';
 import { DEFAULT_DEMO_STATE } from '../factory/paths.mjs';
 import { bootstrap, registerInstallation, VERSION } from '../factory/updates.mjs';
 import { hasService, manageService, serviceDefinition, withServiceOperation, isManagedLaunch } from '../factory/services.mjs';
+import { runCandidateGit } from '../factory/git-environment.mjs';
+import { initializeDemoRepository } from '../factory/demo-fixture.mjs';
 
 try {
   const handled = await bootstrap(process.argv.slice(2));
@@ -32,18 +34,18 @@ let state = resolve(flags.state || DEFAULT_STATE);
 if(existsSync(state))state=realpathSync(state);
 const alive = pid => { try { process.kill(pid,0); return true; } catch(error) { if(error.code === 'ESRCH')return false; throw error; } };
 
-function init(repo, harness='codex', check='', port=7331) {
+function init(repo, harness='codex', check='', port=7331, sourceRef='HEAD') {
   repo=realpathSync(resolve(repo));
   if (existsSync(join(state,'factory.json'))) throw new Error('Already configured; edit the private factory.json explicitly or choose another --state');
   if ([repo,state,ROOT].some(p=>/[,\n\r]/.test(p))) throw new Error('Paths cannot contain commas or line breaks');
-  if (run('git',['-C',repo,'rev-parse','--show-toplevel']) !== repo) throw new Error('--repo must be the Git root');
-  run('git',['-C',repo,'rev-parse','HEAD']);
+  if (runCandidateGit(repo,'rev-parse','--show-toplevel') !== repo) throw new Error('--repo must be the Git root');
+  runCandidateGit(repo,'rev-parse','HEAD');
   const presets={codex:['codex','exec','--json','--ephemeral','--sandbox','danger-full-access','-'],pi:['pi','--mode','json','--print','--no-session','--no-extensions','--skill','/factory-skills'],mock:['node','/opt/factory/mock.mjs']};
   const argv=harness==='custom'?JSON.parse(flags['command-json'] || 'null'):presets[harness];
   if (!argv) throw new Error('Select codex, pi, mock or custom with --command-json');
   if (flags.model && ['codex','pi'].includes(harness)) argv.splice(harness==='codex'?argv.length-1:argv.length,0,'--model',flags.model);
   mkdirSync(state,{recursive:true,mode:0o700});state=realpathSync(state);chmodSync(state,0o700);
-  save(join(state,'factory.json'),{version:1,repo,harness,command:argv,check,port:Number(port),image:PINS.jobImage,network:harness==='mock'?'none':'bridge',timeoutSeconds:1800,memoryMiB:2048,model:flags.model || null,
+  save(join(state,'factory.json'),{version:1,repo,sourceRef,harness,command:argv,check,port:Number(port),image:PINS.jobImage,network:harness==='mock'?'none':'bridge',timeoutSeconds:1800,memoryMiB:2048,model:flags.model || null,
     scope:{project:'pilot',service:'app',environment:'test',owner:'operator'}});
   configAt(state);
   writeFileSync(join(state,'worker.token'),randomBytes(32).toString('hex')+'\n',{mode:0o600});
@@ -98,10 +100,10 @@ async function stop() {
   }
   stopContainers(state);console.log('Controller and its labelled containers stopped.');
 }
-async function submit(workflow,spec) {
+async function submit(workflow,spec,sourceRef=flags['source-ref']) {
   if(Buffer.byteLength(spec)>240000)throw new Error('Task exceeds 240 KB');
   const title=workflow==='defence'?'Private incident triage':spec.split('\n').find(s=>s.trim())?.replace(/^#+\s*/, '').slice(0,100)||'Software task';
-  return api(state,'/api/v1/jobs',{workflow,repository:'app',spec,title});
+  return api(state,'/api/v1/jobs',{workflow,repository:'app',spec,title,...(sourceRef===undefined?{}:{source_ref:sourceRef})});
 }
 async function jobAction(action) {
   const id=positional[0];if(!/^job_[a-z0-9]+$/.test(id || ''))throw new Error('A job ID is required');
@@ -118,12 +120,12 @@ async function jobAction(action) {
   }
   // The controller validates the current run and owns reconciliation atomically.
   // A CLI-side stop after a stale snapshot could terminate a newer attempt.
-  await api(state,`/api/v1/jobs/${id}/${action}`,{run_id:current?.id,...(feedback===undefined?{}:{feedback})});
+  await api(state,`/api/v1/jobs/${id}/${action}`,{run_id:current?.id,...(feedback===undefined?{}:{feedback}),...(flags['source-ref']===undefined?{}:{source_ref:flags['source-ref']})});
   console.log(`${action}: ${id}`);
 }
 
 try {
-  if(command==='init') { if(!flags.repo)throw new Error('init requires --repo /path/to/existing/git/repo');if(flags.harness && flags.agent && flags.harness !== flags.agent)throw new Error('--harness conflicts with legacy --agent');init(flags.repo,flags.harness || flags.agent,flags.check,flags.port); }
+  if(command==='init') { if(!flags.repo)throw new Error('init requires --repo /path/to/existing/git/repo');if(flags.harness && flags.agent && flags.harness !== flags.agent)throw new Error('--harness conflicts with legacy --agent');init(flags.repo,flags.harness || flags.agent,flags.check,flags.port,flags['source-ref'] || 'HEAD'); }
   else if(command==='install')await withServiceOperation('install',install);
   else if(command==='up') { if(hasService(state))await manageService('controller','start',state);else await withServiceOperation('up',up); }
   else if(command==='stop') { if(hasService(state))await manageService('controller','stop',state);else await withServiceOperation('stop',stop); }
@@ -198,7 +200,7 @@ try {
       input.title=flags.title || input.title;
       if(typeof input.title!=='string'||!input.title.trim()||input.title.length>160)throw new Error('Provide a title of 1–160 characters (use --title for a blank issue)');
       if(flags.workflow==='software'&&!configAt(state).check?.trim())throw new Error('Configure an app check before submitting software work');
-      console.log(JSON.stringify(await api(state,'/api/v1/jobs',{...input,workflow:flags.workflow,repository:'app',model:flags.model || ''}),null,2));
+      console.log(JSON.stringify(await api(state,'/api/v1/jobs',{...input,workflow:flags.workflow,repository:'app',model:flags.model || '',...(flags['source-ref']===undefined?{}:{source_ref:flags['source-ref']})}),null,2));
     } else throw new Error('Use issue list|connection|templates|preview|recommend|draft|create|start|submissions|recover; see help');
   } else if(command==='issues') {
     console.log(JSON.stringify(await listIssues(configAt(state).repo,Number(flags.page || 1)),null,2));
@@ -225,9 +227,7 @@ try {
     state=resolve(flags.state || DEFAULT_DEMO_STATE);
     const repo=join(state,'sample-app');
     if(!existsSync(join(state,'factory.json'))) {
-      mkdirSync(repo,{recursive:true,mode:0o700});run('git',['init','-b','main',repo]);
-      writeFileSync(join(repo,'value.txt'),'broken\n');run('git',['-C',repo,'add','value.txt']);
-      run('git',['-C',repo,'-c','user.name=Factory demo','-c','user.email=demo@localhost','commit','-m','Synthetic fixture']);
+      initializeDemoRepository(repo);
       init(repo,'mock',"test \"$(cat value.txt)\" = fixed",Number(flags.port || 7332));
     } else if(harnessOf(configAt(state))!=='mock')throw new Error('Demo requires a mock configuration');
     await withServiceOperation('demo startup',async()=>{await install();await up();});console.log(JSON.stringify(await submit('software','Synthetic installation qualification: fix value.txt. No inference is used.')));
@@ -243,7 +243,7 @@ try {
   kit --output NEW_DIRECTORY               Export the portable method without a runtime
   demo                                    Install and run a synthetic sample (no model key)
   qualify --state PATH                    Exercise recovery and isolation with a stopped demo job
-  init --repo PATH --harness codex|pi|custom --check "npm ci && npm test"
+  init --repo PATH --harness codex|pi|custom --check "npm ci && npm test" [--source-ref REF]
   install [--image LOCAL_REF]             Build the standard image, or select an existing local image
   doctor | up | status | stop              Inspect / operate your private installation
   foundation                              Read the operator setup skill; no installation required
@@ -272,15 +272,17 @@ try {
   issue connection | submissions          Inspect provider identity or durable creation receipts
   issue recover --key REQUEST_ID           Reconcile an uncertain creation without another write
   issue start --draft draft.json | --url URL | --file brief.md --title TITLE
-               --workflow software|defence [--model MODEL]
+               --workflow software|defence [--source-ref REF] [--model MODEL]
                                           Create a local issue and start work; no GitHub write
   issues [--page N]                       Browse open project issues, with next_page for more
   recommend --file task.md | --issue URL  Suggest a work type without starting work
   run --file task.md | --issue URL         Submit software (default), or --workflow defence
+       [--source-ref REF]                 Pin a configured-repository ref before admission
   incident --file incident.json            Submit a private, read-only incident draft
   approve JOB_ID | cancel JOB_ID           Review gate / stop this attempt
   retry JOB_ID                            Prove stop; retain old checkout and retry
-  revise JOB_ID --file feedback.md         New build/check/review after a stopped review
+  revise JOB_ID --file feedback.md [--source-ref REF]
+                                          New build/check/review; source stays pinned unless a new ref is explicit
   version                                 Show the active CLI version
   update | update --check                 Update the npm CLI / inspect the latest release
   update --auto on|off                    Control automatic daily CLI updates

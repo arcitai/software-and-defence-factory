@@ -56,6 +56,7 @@ export function TaskDetail({
   const terminal = ["succeeded", "failed", "cancelled"].includes(job.state);
   const latest = job.runs.at(-1);
   const lastCompleted = job.runs.findLast((run) => run.outcome === "complete");
+  const sourceAdmission = job.source_admission || { status: "legacy_unknown", note: "Admission-time source revision was not recorded for this job." };
   const { result, history, stages } = taskPresentation(job);
   const reviewing = job.state === "awaiting_approval";
   return (
@@ -309,6 +310,10 @@ export function TaskDetail({
           <div className="task-usage"><dt><Coins size={13} />Reported tokens</dt><dd>{formatTaskTokenUsage(usage)}</dd><dd className="metadata-hint">{formatReportingCoverage(usage)}</dd></div>
           {usage.input !== undefined && <div><dt>Token breakdown</dt><dd>{formatTokenUsage(usage.input)} input<br />{formatTokenUsage(usage.output)} output<br />{formatTokenUsage(usage.cached)} cached input</dd><dd className="metadata-hint">Cached input is a subset of input.</dd></div>}
           <div><dt>Monetary cost</dt><dd>Not reported</dd><dd className="metadata-hint">Token counts are usage, not a charge.</dd></div>
+          <div className="task-source-revision"><dt>Source ref</dt><dd>{sourceAdmission.status === "retained" ? sourceAdmission.requested_ref : "Not recorded (legacy/unknown)"}</dd></div>
+          <div className="task-source-revision"><dt>Resolved source commit</dt><dd>{sourceAdmission.status === "retained" ? <code className="source-revision-sha" title={sourceAdmission.resolved_sha}>{sourceAdmission.resolved_sha}</code> : sourceAdmission.note}</dd></div>
+          {sourceAdmission.status === "retained" && <div className="task-source-revision"><dt>Repository identity</dt><dd><code className="source-revision-sha" title={sourceAdmission.repository_identity}>{sourceAdmission.repository_identity}</code></dd></div>}
+          {(job.source_history || []).length > 0 && <div><dt>Previous source commits</dt><dd>{job.source_history.map((source, index) => <code className="source-revision-sha" key={`${source.resolved_sha}-${index}`} title={source.resolved_sha}>{source.resolved_sha}</code>)}</dd></div>}
           {links?.repository && <div><dt>Repository</dt><dd><a className="metadata-link" href={links.repository} target="_blank" rel="noreferrer"><GitBranch size={13} />View repo</a></dd></div>}
           {job.task?.source_url && /^https?:\/\//.test(job.task.source_url) && <div><dt>Source</dt><dd><a className="metadata-link" href={job.task.source_url} target="_blank" rel="noreferrer"><Link2 size={13} />Open source</a></dd></div>}
         </dl>
@@ -381,6 +386,7 @@ function TaskActions({ job, result, onAction }) {
   const [stopped, setStopped] = useState(false);
   const [requesting, setRequesting] = useState(false);
   const [feedback, setFeedback] = useState("");
+  const [revisionSourceRef, setRevisionSourceRef] = useState("");
   const [busy, setBusy] = useState(false);
   const latest = job.runs.at(-1);
   const action = async (name) => {
@@ -391,14 +397,15 @@ function TaskActions({ job, result, onAction }) {
         name,
         stopped,
         name === "request_changes" ? feedback : "",
+        name === "request_changes" ? revisionSourceRef : "",
       );
     } finally {
       setBusy(false);
     }
   };
-  const retry = ["failed", "interrupted", "cancelled"].includes(
-    job.state,
-  );
+  const hasRetainedSource = job.source_admission?.status === "retained";
+  const retry = hasRetainedSource && ["failed", "interrupted", "cancelled"].includes(job.state);
+  const legacyRecovery = !hasRetainedSource && ["blocked", "failed", "interrupted", "cancelled"].includes(job.state);
   const canRevise = job.can_request_changes ?? (job.state === "awaiting_approval" && job.workflow?.name === "software");
   return (
     <div className="space-y-3">
@@ -433,8 +440,12 @@ function TaskActions({ job, result, onAction }) {
                   placeholder="Explain what to revise in the previous stage’s result."
                 />
               </label>
+              <label className="block">
+                <span className="field-label">New base ref · optional</span>
+                <input className="field-control" value={revisionSourceRef} onChange={(event) => setRevisionSourceRef(event.target.value)} maxLength={256} placeholder={`Keep ${job.source_admission?.resolved_sha || "the pinned source"}`} />
+              </label>
               <p className="text-xs text-muted-foreground">
-                Starts a new build with your feedback, followed by new checks and review. Previous attempts are retained.
+                Blank keeps the recorded source commit. A ref here is resolved and retained as a deliberate new base; it starts a fresh build, checks and review. Previous evidence stays in history.
               </p>
               <div className="flex flex-wrap gap-2">
                 <Button
@@ -455,13 +466,14 @@ function TaskActions({ job, result, onAction }) {
           )}
         </div>
       )}
-      {job.state === "blocked" && (
+      {job.state === "blocked" && hasRetainedSource && (
         <p className="text-sm text-muted-foreground">
           Resolve the blocker, then cancel this work to reconcile the worker before retrying.
         </p>
       )}
+      {legacyRecovery && <p className="text-sm text-muted-foreground">This legacy job has no admission-time source record and cannot be retried or revised. Submit a replacement to capture the configured source before work starts.</p>}
       {job.state === "timed_out" && <p className="text-sm text-muted-foreground">Inspect the timeout evidence and recovery options. This state cannot be retried directly.</p>}
-      {["interrupted", "cancelled"].includes(job.state) && (
+      {hasRetainedSource && ["interrupted", "cancelled"].includes(job.state) && (
         <label className="flex items-start gap-2 text-sm">
           <input
             type="checkbox"

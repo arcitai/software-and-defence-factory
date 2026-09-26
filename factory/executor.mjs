@@ -6,6 +6,8 @@ import { ROOT, run, save, json, digest, instanceLabel, stopContainers } from './
 import { incidentFor, validateReport } from './incident.mjs';
 import { BoundedLog } from './bounded-log.mjs';
 import { CodexUsageParser, emptyUsage, usageFields } from './usage.mjs';
+import { assertRetainedSource, publicSourceAdmission, restoreRetainedCheckout } from './source-admission.mjs';
+import { runCandidateGit } from './git-environment.mjs';
 
 const [state, phase] = process.argv.slice(2);
 if(process.getuid()===0)throw new Error('Agent jobs require a non-root controller account');
@@ -15,6 +17,9 @@ if (!['build','verify','review','handoff','defence'].includes(phase)) throw new 
 const folder = join(state, 'jobs', job), workspace = join(folder, 'checkout');
 const config = json(join(folder, attempt, 'execution-config.json'));
 const execution = json(join(folder, 'artifacts', attempt, 'execution.json'));
+let sourceAdmission;
+try { sourceAdmission = JSON.parse(process.env.SDF_SOURCE_ADMISSION || 'null'); }
+catch { throw new Error('Protected source admission metadata is malformed'); }
 const policyHash = digest(JSON.stringify(config));
 if (execution.policyHash !== policyHash || execution.phase !== phase) throw new Error('Admitted execution profile does not match this attempt');
 const output = process.env.SDF_OUTPUT_DIR, result = process.env.SDF_STEP_RESULT_PATH;
@@ -29,12 +34,13 @@ for await (const part of process.stdin) {
   prompt += part;
   if (Buffer.byteLength(prompt) > 256000) throw new Error('Task brief too large');
 }
-const gitEnv = { ...process.env, GIT_CONFIG_NOSYSTEM: '1', GIT_CONFIG_GLOBAL: '/dev/null' };
-const git = (...args) => run('git', ['-c','core.hooksPath=/dev/null','-c','core.fsmonitor=false','-C',workspace,...args], { env: gitEnv });
+const git = (...args) => runCandidateGit(workspace, ...args);
 const metadata = () => json(join(folder, 'candidate.json'));
 function candidate() {
   const meta = metadata();
   if (git('rev-parse','HEAD') !== meta.head || git('status','--porcelain')) throw new Error('Candidate changed; create a new task and rerun verification');
+  if (sourceAdmission?.status === 'retained' && (meta.base !== sourceAdmission.resolved_sha || meta.source_admission?.resolved_sha !== sourceAdmission.resolved_sha))
+    throw new Error('Candidate does not use this job’s retained source revision; previous evidence is invalid for the current base');
   return meta;
 }
 function safeRead(path) {
@@ -108,9 +114,12 @@ try {
   if(incident)prompt=JSON.stringify(incident.input);
   if (phase === 'build' || phase === 'defence') {
     if (existsSync(workspace)) throw new Error('Workspace already exists; preserve evidence and create a new task for a fresh build');
-    run('git',['-c','core.hooksPath=/dev/null','-c','core.fsmonitor=false','clone','--no-hardlinks','--',config.repo,workspace], { env: gitEnv });
-    git('remote','remove','origin');
-    save(join(folder,'candidate.json'), { base: git('rev-parse','HEAD'), head: git('rev-parse','HEAD'), synthetic: harnessOf(config) === 'mock' });
+    if (sourceAdmission?.status !== 'retained') throw new Error('Legacy job has no admission-time source revision and cannot build from the current checkout. Submit a replacement job to pin its source.');
+    const retained = assertRetainedSource(state, job, sourceAdmission);
+    restoreRetainedCheckout(state, job, sourceAdmission, workspace);
+    const head = git('rev-parse','HEAD');
+    if (head !== retained.sha) throw new Error('Build checkout differs from its admission-time source revision');
+    save(join(folder,'candidate.json'), { base: sourceAdmission.resolved_sha, head, source_admission: publicSourceAdmission(sourceAdmission), synthetic: harnessOf(config) === 'mock' });
   }
   if (phase === 'build') {
     const reports = await container('build', brief('Implement the requested bounded change. Save /output/agent-report.md with actual changes and remaining uncertainty.'), config.command, true, true);
@@ -118,7 +127,7 @@ try {
     if (git('diff','--cached','--stat')) git('-c','user.name=Arcitai Factory','-c','user.email=factory@localhost','commit','--no-verify','-m','Factory candidate');
     // Checks must cover the committed tree, not ignored build products supplied by the agent.
     git('clean','-fdx');
-    const meta = { ...metadata(), head: git('rev-parse','HEAD') };
+    const meta = { ...metadata(), head: git('rev-parse','HEAD'), source_admission: publicSourceAdmission(sourceAdmission) };
     save(join(folder,'candidate.json'),meta);
     save(join(output,'candidate.json'),meta);
     writeFileSync(join(output,'change.patch'), git('diff','--binary',meta.base,meta.head) + '\n');
@@ -146,8 +155,9 @@ try {
   } else if (phase === 'handoff') {
     const meta = candidate(), review = json(join(folder,'review.json')), checks = json(join(folder,'checks.json'));
     if (review.verdict !== 'pass' || review.head !== meta.head || !checks.passed || checks.head !== meta.head || checks.policyHash!==policyHash || review.policyHash!==policyHash) throw new Error('Review/checks do not cover candidate and current policy');
-    writeFileSync(join(output,'handoff.md'), `Ready for manual handoff at ${meta.head}.\nNo PR, merge or deployment performed.\nSee docs/quickstart.md for applying the reviewed change.patch to your own branch.\n`);
-    save(join(folder,'accepted.json'), { head: meta.head, acceptedAt: new Date().toISOString() });
+    const sourceSha = meta.source_admission?.resolved_sha || 'Not recorded (legacy/unknown)';
+    writeFileSync(join(output,'handoff.md'), `Ready for manual handoff at ${meta.head}, based on source ${sourceSha}.\nNo PR, merge or deployment performed.\nSee docs/quickstart.md for applying the reviewed change.patch to your own branch.\n`);
+    save(join(folder,'accepted.json'), { head: meta.head, source_admission: meta.source_admission || publicSourceAdmission(null), acceptedAt: new Date().toISOString() });
   } else if (phase === 'defence') {
     const reports = await container('defence', brief('Read-only incident triage. Use supplied evidence only; distinguish observations, hypotheses and unknowns. No live production access is configured. A 500 error is not inherently a security incident. Missing or stale telemetry remains unknown. Write /output/incident-report.json with status needs_review or insufficient_evidence, summary, hypotheses array, recommended_actions array, unknowns array and production_action_taken:false. Write /output/agent-report.md. Never claim root cause or recovery without supporting evidence.'), config.command,false,true);
     const report = JSON.parse(safeRead(join(reports,'incident-report.json')));

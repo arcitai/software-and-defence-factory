@@ -32,7 +32,7 @@ shell endpoint or a second scheduler.
 | SSH tunnels | `tunnel` | No tunnel endpoint | None | Client-host ownership; distinguish operator machine from worker |
 | Method export | `kit --output` | No export endpoint | None | Equivalent download/export preserving staging-only adoption |
 | Synthetic qualification | `demo`, `qualify` | No qualification endpoint | Synthetic disclosure only | Explicit separate state; never target an application accidentally |
-| Immutable source admission | Controlled-checkout workaround | Not implemented | Not implemented | #28, same recorded source in both interfaces |
+| Immutable source admission | `init --source-ref`, `run --source-ref`, `issue start --source-ref`; status and build evidence carry the resolved SHA | `POST /api/v1/jobs` resolves/retains before acknowledgement; shared source metadata in status | New issue and revision forms accept a ref; task detail shows requested ref, resolved SHA and prior source commits | Build/retry use retained objects; revisions keep the recorded source unless a new ref is explicit; legacy source remains unknown |
 | Trusted PR handoff | Operator applies accepted patch | Not implemented | Not implemented | #29; credentials remain outside jobs |
 
 The current generic task form can name the Defence workflow; that is not a
