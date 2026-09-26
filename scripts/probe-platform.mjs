@@ -6,6 +6,8 @@ import { resolve, join } from 'node:path';
 import { api, configAt, save, json, containers, sleep, stream, run, ROOT } from '../factory/lib.mjs';
 import { admitIncident } from '../factory/incident.mjs';
 import { createController } from '../factory/server.mjs';
+import { advanceAndPruneSourceFixture, createRetainedSourceFixture, sourceFixtureOperatorState } from './retained-source-fixture.mjs';
+import { runHostGit } from '../factory/git-environment.mjs';
 
 const state=resolve(process.argv[2] || '.factory/demo-platform'),original=configAt(state);
 assert.equal(harnessOf(original),'mock','Qualification is restricted to a synthetic installation');
@@ -25,11 +27,7 @@ const work=spec=>submit('software',spec);
 const record=name=>{results.push({name,passed:true});console.log(`PASS ${name}`);};
 const setConfig=changes=>save(join(state,'factory.json'),{...original,...changes});
 async function qualifyRetainedSource() {
-  const proofState=mkdtempSync(join(state,'source-admission-')),repo=join(proofState,'source-app');mkdirSync(repo);
-  run('git',['-C',repo,'init','--quiet','-b','main']);
-  writeFileSync(join(repo,'value.txt'),'broken\n');writeFileSync(join(repo,'base-id.txt'),'A\n');
-  run('git',['-C',repo,'add','-A']);run('git',['-C',repo,'-c','user.name=Factory fixture','-c','user.email=fixture@localhost','commit','--quiet','-m','Source A']);
-  const sourceA=run('git',['-C',repo,'rev-parse','HEAD']),runtime=join(proofState,'runtime');mkdirSync(runtime,{mode:0o700});
+  const proofState=mkdtempSync(join(state,'source-admission-')),{repo,sourceA}=createRetainedSourceFixture(proofState),runtime=join(proofState,'runtime');mkdirSync(runtime,{mode:0o700});
   const config={...original,repo,sourceRef:'main',command:['node','-e','process.exit(7)'],check:'test "$(cat value.txt)" = fixed && test "$(cat base-id.txt)" = A && sleep 2',timeoutSeconds:original.timeoutSeconds};
   save(join(runtime,'factory.json'),config);writeFileSync(join(runtime,'worker.token'),'synthetic-source-qualification\n',{mode:0o600});
   writeFileSync(join(runtime,'model.env'),'# Synthetic mock profile; no inference credentials.\n',{mode:0o600});
@@ -43,15 +41,7 @@ async function qualifyRetainedSource() {
     assert.equal(submitted.source_admission.resolved_sha,sourceA);
     assert.equal(submitted.source_admission.ref_source,'configured');
 
-    writeFileSync(join(repo,'value.txt'),'later\n');writeFileSync(join(repo,'base-id.txt'),'B\n');
-    run('git',['-C',repo,'add','-A']);run('git',['-C',repo,'-c','user.name=Factory fixture','-c','user.email=fixture@localhost','commit','--quiet','-m','Source B']);
-    run('git',['-C',repo,'switch','--quiet','--orphan','operator-b']);
-    writeFileSync(join(repo,'value.txt'),'later\n');writeFileSync(join(repo,'base-id.txt'),'B\n');writeFileSync(join(repo,'operator-checkout.txt'),'B\n');run('git',['-C',repo,'add','-A']);
-    run('git',['-C',repo,'-c','user.name=Factory fixture','-c','user.email=fixture@localhost','commit','--quiet','-m','Unrelated operator checkout B']);
-    const operatorHead=run('git',['-C',repo,'rev-parse','HEAD']),operatorStatus=run('git',['-C',repo,'status','--porcelain']);
-    run('git',['-C',repo,'branch','-D','main']);run('git',['-C',repo,'reflog','expire','--expire=now','--all']);run('git',['-C',repo,'gc','--prune=now']);
-    assert.throws(()=>run('git',['-C',repo,'rev-parse','--verify','refs/heads/main']));
-    assert.throws(()=>run('git',['-C',repo,'cat-file','-e',`${sourceA}^{commit}`]));
+    const operator=advanceAndPruneSourceFixture({repo,sourceA});
 
     const failed=await wait(job=>job.state==='failed');
     assert.match(failed.runs.at(-1).error,/build exited 7/);
@@ -70,7 +60,7 @@ async function qualifyRetainedSource() {
     const candidate=json(join(folder,'candidate.json'));
     assert.equal(candidate.base,sourceA);assert.equal(candidate.source_admission.resolved_sha,sourceA);
     assert.equal(readFileSync(join(folder,'checkout/base-id.txt'),'utf8'),'A\n');
-    assert.equal(run('git',['-C',join(folder,'checkout'),'rev-parse','HEAD^']),sourceA);
+    assert.equal(runHostGit(['-C',join(folder,'checkout'),'rev-parse','HEAD^']),sourceA);
     const status=await(await fetch(`http://127.0.0.1:${controller.server.address().port}/api/v1/status`)).json();
     const view=status.jobs.find(item=>item.id===submitted.id);
     assert.equal(view.source_admission.resolved_sha,sourceA);assert(!JSON.stringify(view).includes('retained_repo'));
@@ -79,8 +69,7 @@ async function qualifyRetainedSource() {
     const accepted=json(join(folder,'accepted.json'));
     assert.equal(accepted.source_admission.resolved_sha,sourceA);
     assert.match(readFileSync(join(folder,'handoff.md'),'utf8'),new RegExp(sourceA));
-    assert.equal(run('git',['-C',repo,'rev-parse','HEAD']),operatorHead);
-    assert.equal(run('git',['-C',repo,'status','--porcelain']),operatorStatus);
+    assert.deepEqual(sourceFixtureOperatorState(repo),operator);
     assert.equal(readFileSync(join(repo,'base-id.txt'),'utf8'),'B\n');
     record('source admission: real Docker build retry after restart, ref deletion and GC uses retained A; evidence and operator checkout agree');
   } finally { if(controller) await controller.close(); }

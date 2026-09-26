@@ -489,10 +489,15 @@ regression runs the production admission, checkout and candidate Git helpers
 with repository, worktree, index, object and config overrides aimed at a second
 disposable checkout. It verifies the second checkout's tracked/untracked files,
 HEAD, index and status remain unchanged through candidate staging, commit, diff
-and cleanup. `node --test tests/git-environment.test.mjs` passed this focused
-regression. `npm ci --ignore-scripts`, `npm run build:dashboard` and
-`npm run check` passed after the R1 repair; the full check reported 84
-runtime/package tests and 51 dashboard tests.
+and cleanup. A second hostile-Git regression runs the exact retained-source
+qualification fixture setup with real Git: it admits A, moves and prunes A from
+that source repository, restores A from the retained store, and verifies a
+separate operator checkout's branch, HEAD, index, tracked/untracked files, refs
+and object IDs remain unchanged. `node --test tests/git-environment.test.mjs`
+passed both regressions. `npm ci --ignore-scripts`, `npm run build:dashboard`
+and `npm run check` passed after this repair; the full check reported 85
+runtime/package tests and 51 dashboard tests. The npm artifact test also checks
+that the factored qualification fixture ships with the CLI package.
 
 The real Docker qualification recipe is included in
 `scripts/probe-platform.mjs`, reached through `software-defence-factory qualify
@@ -511,6 +516,13 @@ SDF_BOOTSTRAPPED=1 node bin/software-defence-factory.mjs demo --state /private/s
 # Complete and approve the initial synthetic sample task in the dashboard.
 SDF_BOOTSTRAPPED=1 node bin/software-defence-factory.mjs qualify --state /private/state/sdf-0.7.0-proof
 ```
+
+For the hosted qualification, repeat the `qualify` command with inherited Git
+repository, worktree, index, object-directory and configuration overrides aimed
+at a separate disposable checkout. Record that checkout's branch, HEAD, index,
+tracked/untracked files, refs and object IDs before and after; all must match.
+The fixture must also show that source A is absent from its intended source repo
+after pruning while the admitted job still builds from A.
 
 The lead should retain `qualification.json` and the nested
 `source-admission-*` fixture evidence. Rendered UI inspection is also pending:
