@@ -36,6 +36,7 @@ export function parseTemplate(name, source, sha) {
       if (typeof id !== 'string' || !/^[a-zA-Z0-9_-]{1,80}$/.test(id) || ['__proto__','constructor','prototype'].includes(id)) throw new Error('Invalid form field identifier.');
       if (!text(attrs.label).trim()) throw new Error('Template field label is missing.');
       const value = {id,type:field.type,label:attrs.label,description:text(attrs.description),placeholder:text(attrs.placeholder),value:text(attrs.value),required:field.validations?.required === true,render:text(attrs.render)};
+      if (value.render && !/^[A-Za-z0-9_+.-]{1,32}$/.test(value.render)) throw new Error('Unsupported code language in template.');
       if (field.type === 'dropdown' || field.type === 'checkboxes') {
         if (!Array.isArray(attrs.options) || !attrs.options.length || attrs.options.length > 100) throw new Error('Invalid form choices.');
         value.options = attrs.options.map(option => {
@@ -115,6 +116,11 @@ export function compileTemplate(template, { title, answers }) {
       if(field.required&&!answer.trim()) throw new Error(`${field.label} is required.`);
       if(field.type==='dropdown' && answer && !field.options.some(option=>option.label===answer)) throw new Error(`Choose a valid option for ${field.label}.`);
       rendered=answer.trim();
+    }
+    if (rendered && field.type==='textarea' && field.render) {
+      const longest=(rendered.match(/`+/g)||[]).reduce((max,run)=>Math.max(max,run.length),0);
+      const fence='`'.repeat(Math.max(3,longest+1));
+      rendered=`${fence}${field.render}\n${rendered}\n${fence}`;
     }
     if(rendered) sections.push(`### ${field.label}\n\n${rendered}`);
   }

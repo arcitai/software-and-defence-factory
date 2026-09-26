@@ -6,7 +6,7 @@ import { issueLabelTone } from './issue-labels.js';
 import { repositoryLabel } from './project-identity.js';
 
 export function RunComposer({ title, setTitle, sourceURL, setSourceURL, choices, identity, selection, setSelection, repository, prompt, setPrompt, model, setModel, submitting, submit, close, csrfToken, projectLinks, error }) {
-  const dialog = useRef(null), mounted = useRef(true), pending = useRef(null);
+  const dialog = useRef(null), mounted = useRef(true), pending = useRef(null), selectionOverride = useRef(false);
   const [mode, setMode] = useState('brief'), [step, setStep] = useState('source');
   const [loading, setLoading] = useState(false), [intakeError, setIntakeError] = useState('');
   const [issues, setIssues] = useState([]), [nextPage, setNextPage] = useState(null), [failedPage, setFailedPage] = useState(null), [listLoaded, setListLoaded] = useState(false), [search, setSearch] = useState('');
@@ -38,13 +38,13 @@ export function RunComposer({ title, setTitle, sourceURL, setSourceURL, choices,
     finally { if (mounted.current && !controller.signal.aborted) setLoading(false); }
   }
   function review(recommendation) {
-    setSuggestion(recommendation); setSuggestionStale(false); setSelection(`workflow:${recommendation.workflow}`); setStep('review');
+    setSuggestion(recommendation); setSuggestionStale(false); if (!selectionOverride.current) setSelection(`workflow:${recommendation.workflow}`); setStep('review');
   }
   function loadTemplates() {
     return request('/api/v1/issue-templates', undefined, setCatalog);
   }
   function chooseTemplate(value) {
-    pending.current?.abort(); setLoading(false); setIntakeError(''); setTemplate(value); setAnswers({});
+    pending.current?.abort(); setLoading(false); setIntakeError(''); setTemplate(value); setAnswers({}); selectionOverride.current = false;
     setTitle(value?.title || ''); setPrompt(''); setSourceURL(''); setLabels(value?.labels || []); setSuggestion(null); setStep('fields');
   }
   function loadIssues(page = 1) {
@@ -57,11 +57,12 @@ export function RunComposer({ title, setTitle, sourceURL, setSourceURL, choices,
   function switchMode(next) {
     if (next === mode) return;
     pending.current?.abort(); setLoading(false); setIntakeError(''); setMode(next);
-    setPrompt(''); setTitle(''); setSourceURL(''); setLabels([]); setSuggestion(null);
+    setPrompt(''); setTitle(''); setSourceURL(''); setLabels([]); setSuggestion(null); selectionOverride.current = false;
     if (next === 'issue' && projectLinks?.repository && !listLoaded) loadIssues();
     if (next === 'brief' && projectLinks?.repository && !catalog) loadTemplates();
   }
   function selectIssue(issue) {
+    selectionOverride.current = false;
     return request('/api/v1/issues/preview', {url:issue.url}, result => {
       setPrompt(result.spec); setTitle(result.title); setSourceURL(result.url); setLabels(result.labels.map(label => label.name)); review(result.recommendation);
     });
@@ -100,11 +101,11 @@ export function RunComposer({ title, setTitle, sourceURL, setSourceURL, choices,
             </>}
           </section>}
         </>}
-        {(step === 'fields' || step === 'review') && <label><span className="field-label">Title *</span><input name="issue-title" className="field-control" value={title} onChange={event => setTitle(event.target.value)} required maxLength={160} placeholder="A short, clear title" /></label>}
+        {(step === 'fields' || step === 'review') && <label><span className="field-label">Title *</span><input name="issue-title" readOnly={step === 'review'} className="field-control" value={title} onChange={event => setTitle(event.target.value)} required maxLength={160} placeholder="A short, clear title" /></label>}
         {step === 'fields' && template && <><h3 className="template-form-name">{template.name}</h3><IssueFields template={template} answers={answers} setAnswers={setAnswers} /></>}
         {(step === 'fields' && !template || step === 'review') && <label><span className="field-label">{step === 'review' ? 'Instructions and acceptance criteria' : 'Description and acceptance criteria'}</span><textarea className="field-control work-brief" value={prompt} onChange={event => { pending.current?.abort(); setLoading(false); setPrompt(event.target.value); if (step === 'review') setSuggestionStale(true); }} placeholder="Describe the work, its boundaries and how we will know it is done…" required /></label>}
         {step === 'review' && <>
-          <section className="work-recommendation"><h3 tabIndex={-1} data-review-heading>Suggested: {suggestion.workflow === 'defence' ? 'Defence' : 'Software'}</h3><p className="work-help">{suggestionStale ? "Instructions changed. Keep your chosen type or refresh the suggestion." : suggestion.reason}</p>{suggestionStale && <Button type="button" variant="outline" size="sm" disabled={loading || !prompt.trim()} onClick={() => request("/api/v1/intake/recommend", {spec:[title,prompt].join('\n'),labels}, review)}>Refresh suggestion</Button>}<div className="workflow-choices" role="group" aria-label="Work type">{choices.map(choice => <button type="button" key={choice.value} aria-pressed={selection === choice.value} onClick={() => setSelection(choice.value)}>{choice.label}</button>)}</div><p className="work-help">{isDefence ? 'Investigates supplied, non-sensitive evidence and produces a private draft. For validated incident intake, use incident --file in the CLI.' : 'Implements the change, runs checks and requests an independent review.'}</p></section>
+          <section className="work-recommendation"><h3 tabIndex={-1} data-review-heading>Suggested: {suggestion.workflow === 'defence' ? 'Defence' : 'Software'}</h3><p className="work-help">{suggestionStale ? "Instructions changed. Keep your chosen type or refresh the suggestion." : suggestion.reason}</p>{suggestionStale && <Button type="button" variant="outline" size="sm" disabled={loading || !prompt.trim()} onClick={() => request("/api/v1/intake/recommend", {spec:[title,prompt].join('\n'),labels}, review)}>Refresh suggestion</Button>}<div className="workflow-choices" role="group" aria-label="Work type">{choices.map(choice => <button type="button" key={choice.value} aria-pressed={selection === choice.value} onClick={() => { selectionOverride.current = true; setSelection(choice.value); }}>{choice.label}</button>)}</div><p className="work-help">{isDefence ? 'Investigates supplied, non-sensitive evidence and produces a private draft. For validated incident intake, use incident --file in the CLI.' : 'Implements the change, runs checks and requests an independent review.'}</p></section>
           {sourceURL && mode === 'issue' && <a className="work-help" href={sourceURL} target="_blank" rel="noreferrer">View selected issue on GitHub ↗</a>}
           <details className="work-options"><summary>Additional options</summary><div className="work-options-fields">{mode === 'brief' && <label><span className="field-label">Reference link · optional</span><input type="url" className="field-control" value={sourceURL} onChange={event => setSourceURL(event.target.value)} placeholder="Context only; does not import instructions" /></label>}<label><span className="field-label">Model override · optional</span><input className="field-control" value={model} onChange={event => setModel(event.target.value)} maxLength={128} placeholder="Use the configured model" /></label></div></details>
         </>}

@@ -4,7 +4,7 @@ import { act } from 'react';
 import { JSDOM } from 'jsdom';
 import { createServer } from 'vite';
 
-async function composer(t, api, projectLinks={repository:'https://github.com/example/project'}) {
+async function composer(t, api, projectLinks={repository:'https://github.com/example/project'}, templates=[template]) {
   const dom=new JSDOM('<div id="root"></div>',{url:'http://localhost/#/runs'}),prior=new Map();
   dom.window.scrollTo=()=>{};dom.window.HTMLDialogElement.prototype.showModal=function(){this.open=true;};
   const created=[];
@@ -13,7 +13,7 @@ async function composer(t, api, projectLinks={repository:'https://github.com/exa
   for(const [key,value] of Object.entries({window:dom.window,document:dom.window.document,navigator:dom.window.navigator,localStorage:dom.window.localStorage,IS_REACT_ACT_ENVIRONMENT:true,fetch:async(url,options)=>{
     if(url==='/api/v1/status')return response(status);
     assert.equal(options.headers['X-Factory-Session'],'fixture');
-    if(url==='/api/v1/issue-templates')return response({templates:[template],contacts:[],warnings:[]});
+    if(url==='/api/v1/issue-templates')return response({templates,contacts:[],warnings:[]});
     if(url==='/api/v1/jobs'){created.push(JSON.parse(options.body));return response({id:'job_new'});}
     return api(url,options,response);
   }})){prior.set(key,Object.getOwnPropertyDescriptor(globalThis,key));Object.defineProperty(globalThis,key,{value,writable:true,configurable:true});}
@@ -60,7 +60,7 @@ test('brief works without GitHub, recommends only on Continue and allows a softw
   await act(()=>document.querySelector('[data-blank-issue]').click());await c.input('input[name="issue-title"]','Investigate supplied logs');
   await c.input('textarea','Investigate an incident using supplied logs.');await c.click('Continue');
   assert.equal(recommendations,1);assert.equal(c.created.length,0);assert.equal(document.activeElement,document.querySelector('[data-review-heading]'));
-  await c.click('Software');await c.click('Create & start');assert.equal(c.created[0].workflow,'software');assert.equal(c.created[0].source_url,'');
+  await c.click('Software');await c.input('textarea','Investigate another incident from supplied logs.');await c.click('Refresh suggestion');assert.equal(c.button('Software').getAttribute('aria-pressed'),'true');assert.equal(document.querySelector('input[name="issue-title"]').readOnly,true);await c.click('Create & start');assert.equal(c.created[0].workflow,'software');assert.equal(c.created[0].source_url,'');
 });
 
 test('a late issue preview cannot replace a brief after switching source',async t=>{
@@ -87,4 +87,14 @@ test('template chooser preserves required fields and compiles answers before rev
   await c.click('Continue');assert.equal(drafts,0,'native required fields prevent an empty form');
   await c.input('input[name="issue-title"]','Fix board');await c.input('textarea','The board fails to open.');await c.click('Continue');
   assert.equal(drafts,1);assert.equal(c.created.length,0);await c.click('Create & start');assert.equal(c.created[0].title,'Fix board');assert.match(c.created[0].spec,/What happened/);
+});
+
+
+test('a required multi-choice group reports its field error before requesting a draft',async t=>{
+  let calls=0;
+  const required={...template,fields:[{id:'scope',type:'checkboxes',label:'Scope',multiple:true,value:[],required:true,options:[{label:'Supplied logs',required:false}]}]};
+  const c=await composer(t,async(url,options,response)=>{calls++;return response({title:'Investigate',spec:'Supplied logs',labels:[],recommendation:suggestion});},undefined,[required]);
+  await act(()=>document.querySelector('.template-choice button').click());await c.click('Continue');
+  assert.equal(calls,0);assert.match(document.querySelector('[role="alert"]').textContent,/Select at least one option for Scope/);
+  await act(()=>document.querySelector('input[type="checkbox"]').click());await c.click('Continue');assert.equal(calls,1);
 });

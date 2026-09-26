@@ -400,3 +400,39 @@ the canonical harness setting; existing installations retained legacy agent
 settings. No inference or application work was used for this qualification.
 Independent review, protected CI and installed-package adoption are recorded
 in the release PR.
+
+## 0.5.1 — repository forms and local issues (#56 / PR #57)
+
+Initial candidate `f6cc24744bc1c5bcad63d36489fc27de5d749525` passed 70
+runtime/package and 47 dashboard tests. Independent review found an overridden
+work-type choice on suggestion refresh, missing code fences for render fields,
+missing native group-required checkbox feedback and editable title/spec drift.
+The follow-up preserves explicit choices, safely fences code, validates groups
+in the form and locks the reviewed title; corrections add regressions. The final
+checks pass 71 runtime/package and 48 dashboard tests. Review results and exact
+final revisions are recorded in PR #57.
+
+Safari inspection exercised the actual built candidate at desktop, 390px and
+320px, with light/dark coverage: repository template chooser, required-field
+feedback, real Bug report answers and draft compilation, explicit review,
+Software/Defence override, repository issue labels/search, security-labelled
+issue preview, bounded scrolling, and Definition in desktop/mobile settings.
+The controlled preview rejected creation visibly without submitting a job. An
+explicit simulated GitHub error exercised Retry and recovery. The temporary
+Safari developer-menu setting was restored. These are rendering/interaction
+checks, not an actual application execution or GitHub-write qualification.
+
+Live read-only GitHub probes returned this repository's three templates and
+open issues, preserved its private security contact link and compiled a selected
+form at its actual blob SHA. Unit/integration checks separately cover pagination,
+pull-request exclusion, stale template SHA, Markdown/YAML semantics, unsupported
+fields, origin/session boundaries, late responses and shared CLI/controller
+records. Template code is data; raw HTML is not rendered. YAML uses the pinned
+parser with alias and input limits. Uploaded attachments, persistent unstarted
+drafts, GitHub creation/identity setup and automatic intake remain unsupported.
+CLI `issue create` requires an explicit work type; legacy `run` remains compatible.
+
+No executor/isolation code changed. The 0.5.0 Docker qualification remains the
+existing execution proof; this slice does not claim new live-model qualification.
+Release CI, npm byte comparison and idle managed installation readback remain
+delivery checks recorded in the PR.

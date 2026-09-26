@@ -86,3 +86,9 @@ test('template reads are repository scoped, preserve contact links and refuse ch
   assert.equal(reads,2);assert.deepEqual(missing.templates,[]);
   await assert.rejects(readTemplates(repo,async()=>{throw Object.assign(new Error('No access'),{status:404});}),/No access/);
 });
+
+test('render textareas use safe code fences so embedded Markdown retains literal formatting',()=>{
+  const template=parseTemplate('logs.yml','name: Logs\nbody:\n  - type: textarea\n    id: logs\n    attributes:\n      label: Logs\n      render: shell\n',sha);
+  const draft=compileTemplate(template,{title:'Inspect logs',answers:{logs:'```\n# not a heading\n```'}});
+  assert.equal(draft.spec,'# Inspect logs\n\n### Logs\n\n````shell\n```\n# not a heading\n```\n````');
+});
