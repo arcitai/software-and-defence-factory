@@ -3,7 +3,8 @@ import { harnessOf } from '../factory/lib.mjs';
 import assert from 'node:assert/strict';
 import { readFileSync, writeFileSync, readdirSync, existsSync } from 'node:fs';
 import { resolve, join } from 'node:path';
-import { configAt, api, save, json, run, stream, sleep, ROOT } from '../factory/lib.mjs';
+import { configAt, api, save, json, stream, sleep, ROOT } from '../factory/lib.mjs';
+import { runHostGit } from '../factory/git-environment.mjs';
 
 const state=resolve(process.argv[2] || ''), original=configAt(state);
 assert.equal(harnessOf(original),'mock','Use a separate synthetic installation');
@@ -36,7 +37,7 @@ try {
     assert.notEqual(next.head,first.head);assert.equal(readFileSync(proofPath,'utf8'),priorProof);
     const prior=job.runs.find(r=>r.id===failed.id);assert.equal(prior.state,'failed');assert.equal(prior.summary,failed.summary);assert.equal(prior.review_verdict,verdict);
     const archived=readdirSync(folder).find(n=>n.startsWith('previous-checkout-'));
-    assert.equal(run('git',['-C',join(folder,archived),'rev-parse','HEAD']),first.head);
+    assert.equal(runHostGit(['-C',join(folder,archived),'rev-parse','HEAD']),first.head);
     assert.equal(json(join(folder,'checks.json')).head,next.head);assert.equal(json(join(folder,'review.json')).head,next.head);
     assert(!existsSync(join(folder,'accepted.json')));
     await assert.rejects(api(state,`/api/v1/jobs/${id}/approve`,{run_id:failed.id}),/changed/);

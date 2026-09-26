@@ -499,6 +499,18 @@ and `npm run check` passed after this repair; the full check reported 85
 runtime/package tests and 51 dashboard tests. The npm artifact test also checks
 that the factored qualification fixture ships with the CLI package.
 
+The host Git boundary follow-up starts at the uncommitted repair base
+`f5513763b42de65c3c82241d983c74fc76f29647`. CLI `init`, the demo fixture's
+init/add/commit, project link/provider origin lookup, and the review probe's
+local checkout assertion now use the shared bounded Git environment. Two new
+real-Git regressions run init and provider/demo operations with repository,
+worktree, index, object and config overrides aimed at a second disposable
+checkout. They verify explicit-root selection, invalid-root rejection, and
+unchanged tracked/untracked files, HEAD/branch, index, refs and object IDs.
+`npm ci --ignore-scripts`, `npm run build:dashboard`, and `npm run check` passed
+on this working tree: 87 runtime/package tests and 51 dashboard tests passed.
+These are worker checks, not the separate full-range review or host qualification.
+
 The real Docker qualification recipe is included in
 `scripts/probe-platform.mjs`, reached through `software-defence-factory qualify
 --state PATH`. It adds an isolated synthetic source repository, intentionally

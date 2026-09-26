@@ -1,4 +1,4 @@
-import { execFileSync } from 'node:child_process';
+import { runHostGit } from './git-environment.mjs';
 
 // Only a canonical public web URL is exposed. Git transports may contain
 // credentials; never return the original remote or derive an owner from a path.
@@ -11,9 +11,8 @@ export function githubProjectLinks(remote) {
 }
 export function readProjectLinks(repo) {
   try {
-    const remote = execFileSync('git', ['-c', 'core.fsmonitor=false', '-C', repo, 'config', '--local', '--get', 'remote.origin.url'], {
-      encoding: 'utf8', timeout: 2000, maxBuffer: 4096, stdio: ['ignore', 'pipe', 'ignore'],
-      env: { ...process.env, GIT_CONFIG_NOSYSTEM: '1', GIT_CONFIG_GLOBAL: '/dev/null' },
+    const remote = runHostGit(['-c', 'core.fsmonitor=false', '-C', repo, 'config', '--local', '--get', 'remote.origin.url'], {
+      timeout: 2000, maxBuffer: 4096, stdio: ['ignore', 'pipe', 'ignore'],
     });
     return githubProjectLinks(remote);
   } catch { return undefined; }

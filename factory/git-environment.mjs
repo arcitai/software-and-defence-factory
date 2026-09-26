@@ -12,8 +12,8 @@ export function hostGitEnvironment(inherited = process.env) {
   return env;
 }
 
-export function runHostGit(args) {
-  return run('git', args, { env: hostGitEnvironment() });
+export function runHostGit(args, options = {}) {
+  return run('git', args, { ...options, env: hostGitEnvironment() });
 }
 
 export function runCandidateGit(workspace, ...args) {

@@ -14,6 +14,8 @@ import { admitIncident } from '../factory/incident.mjs';
 import { DEFAULT_DEMO_STATE } from '../factory/paths.mjs';
 import { bootstrap, registerInstallation, VERSION } from '../factory/updates.mjs';
 import { hasService, manageService, serviceDefinition, withServiceOperation, isManagedLaunch } from '../factory/services.mjs';
+import { runCandidateGit } from '../factory/git-environment.mjs';
+import { initializeDemoRepository } from '../factory/demo-fixture.mjs';
 
 try {
   const handled = await bootstrap(process.argv.slice(2));
@@ -36,8 +38,8 @@ function init(repo, harness='codex', check='', port=7331, sourceRef='HEAD') {
   repo=realpathSync(resolve(repo));
   if (existsSync(join(state,'factory.json'))) throw new Error('Already configured; edit the private factory.json explicitly or choose another --state');
   if ([repo,state,ROOT].some(p=>/[,\n\r]/.test(p))) throw new Error('Paths cannot contain commas or line breaks');
-  if (run('git',['-C',repo,'rev-parse','--show-toplevel']) !== repo) throw new Error('--repo must be the Git root');
-  run('git',['-C',repo,'rev-parse','HEAD']);
+  if (runCandidateGit(repo,'rev-parse','--show-toplevel') !== repo) throw new Error('--repo must be the Git root');
+  runCandidateGit(repo,'rev-parse','HEAD');
   const presets={codex:['codex','exec','--json','--ephemeral','--sandbox','danger-full-access','-'],pi:['pi','--mode','json','--print','--no-session','--no-extensions','--skill','/factory-skills'],mock:['node','/opt/factory/mock.mjs']};
   const argv=harness==='custom'?JSON.parse(flags['command-json'] || 'null'):presets[harness];
   if (!argv) throw new Error('Select codex, pi, mock or custom with --command-json');
@@ -225,9 +227,7 @@ try {
     state=resolve(flags.state || DEFAULT_DEMO_STATE);
     const repo=join(state,'sample-app');
     if(!existsSync(join(state,'factory.json'))) {
-      mkdirSync(repo,{recursive:true,mode:0o700});run('git',['init','-b','main',repo]);
-      writeFileSync(join(repo,'value.txt'),'broken\n');run('git',['-C',repo,'add','value.txt']);
-      run('git',['-C',repo,'-c','user.name=Factory demo','-c','user.email=demo@localhost','commit','-m','Synthetic fixture']);
+      initializeDemoRepository(repo);
       init(repo,'mock',"test \"$(cat value.txt)\" = fixed",Number(flags.port || 7332));
     } else if(harnessOf(configAt(state))!=='mock')throw new Error('Demo requires a mock configuration');
     await withServiceOperation('demo startup',async()=>{await install();await up();});console.log(JSON.stringify(await submit('software','Synthetic installation qualification: fix value.txt. No inference is used.')));
