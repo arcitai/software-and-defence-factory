@@ -460,8 +460,9 @@ Start, issue selection, scrolling, simulated provider failure and explicit start
 failure. The architecture canvas was inspected and exported with editable source.
 Independent review found a lost browser response could lose its request key on
 composer reopen. The follow-up uses a stable content/identity key, recovers saved
-created receipts and adds two browser regressions. Final review and exact
-release/adoption revisions are recorded in the delivery PR.
+created receipts and adds two browser regressions. Final code revision `ed7c5e3778a9872b1aea9c0a27cd19279caf82f8` passed
+independent follow-up review with no findings. Later commits only record proof
+and todo status. Release/adoption revisions are recorded in PR #59.
 
 This release does not qualify another live issue provider, external schedule
 discovery, hosted authentication or live model execution. Executor/isolation code
