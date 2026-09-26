@@ -28,6 +28,18 @@ async function composer(t, api, projectLinks={repository:'https://github.com/exa
   await click('New issue');
   return {created,button,click,input};
 }
+async function waitFor(condition, description) {
+  const deadline=Date.now()+2000;
+  while(Date.now()<deadline) {
+    let matched=false;
+    await act(async()=>{
+      matched=condition();
+      if(!matched)await new Promise(resolve=>setImmediate(resolve));
+    });
+    if(matched || condition())return;
+  }
+  assert.fail(`Timed out waiting for ${description}`);
+}
 const template={id:'bug.yml',sha:'a'.repeat(40),name:'Bug report',description:'Report a problem',title:'[Bug] ',labels:[],fields:[{id:'problem',type:'textarea',label:'What happened?',value:'',required:true}]};
 const suggestion={workflow:'defence',basis:'label',reason:'Labelled for security investigation.'};
 const issue=number=>({number,title:`Scoped issue ${number}`,url:`https://github.com/example/project/issues/${number}`,labels:[{name:'track:security',color:'e0caca'}]});
@@ -111,31 +123,33 @@ test('repository creation shows identity and creates no execution until a separa
   });
   await act(()=>document.querySelector('[data-blank-issue]').click());await c.input('input[name="issue-title"]','Improve intake');await c.input('textarea','Implement the issue bridge.');await c.click('Continue');
   assert.match(document.body.textContent,/as operator/);assert.equal(c.button('Start work'),undefined);
-  await c.click('Create issue on GitHub');assert.equal(writes,1);assert.equal(c.created.length,0);assert.match(document.body.textContent,/Issue #91 created/);
+  await c.click('Create issue on GitHub');await waitFor(()=>writes===1 && /Issue #91 created/.test(document.body.textContent),'repository issue creation receipt');assert.equal(writes,1);assert.equal(c.created.length,0);assert.match(document.body.textContent,/Issue #91 created/);
   await c.click('Start work');assert.equal(c.created.length,1);assert.equal(c.created[0].source_url,'https://github.com/example/project/issues/91');
 });
 
 
 test('lost browser responses reuse the same submission after closing and reopening the composer',async t=>{
-  const receipts=new Map();let writes=0,posts=0,readsFail=false;
+  const receipts=new Map();let writes=0,posts=0,readsFail=false;const requestIds=[];
   const c=await composer(t,async(url,options,response)=>{
     if(url==='/api/v1/intake/recommend')return response({workflow:'software',reason:'Project change',basis:'default'});
-    assert.equal(url,'/api/v1/issues');const body=JSON.parse(options.body);posts++;
+    assert.equal(url,'/api/v1/issues');const body=JSON.parse(options.body);posts++;requestIds.push(body.request_id);
     if(!receipts.has(body.request_id)){writes++;receipts.set(body.request_id,{request_id:body.request_id,state:'created',issue:{number:92,url:'https://github.com/example/project/issues/92',missing_labels:[]}});readsFail=true;throw Error('Response lost');}
     return response(receipts.get(body.request_id));
   },undefined,undefined,{submissions:()=>{if(readsFail)throw Error('Still offline');return [...receipts.values()];}});
   const fill=async()=>{await act(()=>document.querySelector('[data-blank-issue]').click());await c.input('input[name="issue-title"]','Retain issue identity');await c.input('textarea','Do not publish another copy after a lost response.');await c.click('Continue');};
-  await fill();await c.click('Create issue on GitHub');assert.match(document.body.textContent,/Response lost/);assert.equal(writes,1);
+  await fill();await c.click('Create issue on GitHub');await waitFor(()=>posts===1 && writes===1 && document.querySelector('[role="alert"]')?.textContent.includes('Response lost') && c.button('Create issue on GitHub')?.disabled===false,'first lost response and receipt lookup');assert.match(document.body.textContent,/Response lost/);assert.equal(writes,1);
   await act(()=>document.querySelector('[aria-label="Close start work form"]').click());readsFail=false;await c.click('New issue');await fill();await c.click('Create issue on GitHub');
-  assert.equal(posts,2);assert.equal(writes,1);assert.match(document.body.textContent,/Issue #92 created/);assert.equal(c.created.length,0);assert.equal(c.button('Done').disabled,false);
+  await waitFor(()=>posts===2 && document.body.textContent.includes('Issue #92 created') && c.button('Done')?.disabled===false,'reused issue submission receipt');
+  assert.equal(posts,2);assert.equal(requestIds.length,2);assert.equal(requestIds[1],requestIds[0]);assert.match(requestIds[0],/^browser_[a-f0-9]{64}$/);assert.equal(writes,1);assert.match(document.body.textContent,/Issue #92 created/);assert.equal(c.created.length,0);assert.equal(c.button('Done').disabled,false);
 });
 
 test('a lost publication response immediately recovers its created receipt',async t=>{
-  let saved=null;
+  let saved=null,posts=0;
   const c=await composer(t,async(url,options,response)=>{
     if(url==='/api/v1/intake/recommend')return response({workflow:'software',reason:'Project change',basis:'default'});
-    const body=JSON.parse(options.body);saved={request_id:body.request_id,state:'created',issue:{number:93,url:'https://github.com/example/project/issues/93',missing_labels:[]}};throw Error('Response lost');
+    const body=JSON.parse(options.body);posts++;saved={request_id:body.request_id,state:'created',issue:{number:93,url:'https://github.com/example/project/issues/93',missing_labels:[]}};throw Error('Response lost');
   },undefined,undefined,{submissions:()=>saved?[saved]:[]});
-  await act(()=>document.querySelector('[data-blank-issue]').click());await c.input('input[name="issue-title"]','Recover created receipt');await c.input('textarea','Retain this identity.');await c.click('Continue');await c.click('Create issue on GitHub');
+  await act(()=>document.querySelector('[data-blank-issue]').click());await c.input('input[name="issue-title"]','Recover created receipt');await c.input('textarea','Retain this identity.');await c.click('Continue');await c.click('Create issue on GitHub');await waitFor(()=>posts===1 && document.body.textContent.includes('Issue #93 created') && c.button('Done')?.disabled===false,'immediate lost response receipt recovery');
+  assert.equal(posts,1);
   assert.match(document.body.textContent,/Issue #93 created/);assert.equal(c.created.length,0);assert.equal(c.button('Done').disabled,false);
 });
