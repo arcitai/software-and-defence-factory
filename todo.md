@@ -88,7 +88,7 @@ and the [self-development recipe](docs/development.md) before submitting work.
 
 ## Definition and foundation alignment
 
-- [ ] [#49 — one vocabulary, foundation ownership and workbench](https://github.com/arcitai/software-and-defence-factory/issues/49): shared catalog; operator skill in Factory; independent project contracts; whole-row filters, shared status groups and local task intake; repository cleanup. Current implementation slice.
+- [x] [#49 — one vocabulary, foundation ownership and workbench](https://github.com/arcitai/software-and-defence-factory/issues/49): shared catalog; operator skill in Factory; independent project contracts; whole-row filters, shared status groups and local task intake; repository cleanup. Verified in [PR #55](https://github.com/arcitai/software-and-defence-factory/pull/55); release/adoption evidence is recorded there.
 - [ ] [#50 — Defence roles, skills and evidence](https://github.com/arcitai/software-and-defence-factory/issues/50), then the bounded case in #7.
 - [ ] [#51 — scorers, benchmarks and improvement analytics](https://github.com/arcitai/software-and-defence-factory/issues/51). Recorded token coverage is not a quality score.
 - [ ] [#52 — native intake and GitHub identity](https://github.com/arcitai/software-and-defence-factory/issues/52). Explicit repository/credential boundaries precede automations.
