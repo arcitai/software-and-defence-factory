@@ -5,6 +5,7 @@
 - [Development queue](../todo.md): ordered, issue-backed work and dependencies.
 - [Repository readiness](../kit/repository.md): GitHub labels/forms, explicit issue admission and reviewed delivery.
 - [Dashboard design](../DESIGN.md): accepted project-focused visual direction and interface boundaries.
+- [Factory concepts](concepts.md): host, controller, worker, harness, agent and compatibility.
 - [Workflows, skills and intake](workflows.md): one method/catalog, explicit execution and customization boundaries.
 - [CLI/dashboard capabilities](interfaces.md): current shared operations, gaps and parity work.
 
@@ -20,3 +21,22 @@
 - [Ownership](ownership.md): original code, adapted interface and licensing.
 
 For the portable method, start with [the adoption guide](../kit/README.md).
+
+## Feature map
+
+Start here when a report describes behavior rather than a filename. These rows
+cover implemented capabilities. Update the owning row with a behavior change;
+use the linked guides for details rather than copying their specifications.
+
+| Operator outcome | Behavior and boundary | Implementation / proof entrypoint |
+| --- | --- | --- |
+| Prepare a repository | Staged method, preserved project contracts, explicit setup | [Foundation](setup.md), [kit export](../scripts/export-kit.mjs), [package tests](../tests/npm.test.mjs) |
+| Admit a task | Brief or selected issue; no background backlog polling | [Intake](workflows.md), [server](../factory/server.mjs), [issue tests](../tests/issue-intake.test.mjs) |
+| Execute Software or Defence | One queue; isolated roles/checks; Defence produces a private draft | [Architecture](architecture.md), [executor](../factory/executor.mjs), [controller tests](../tests/controller.test.mjs) |
+| Review, revise and accept | Evidence belongs to candidate and policy; acceptance does not publish | [Recovery](recovery.md), [queue](../factory/queue.mjs), [review tests](../tests/review-evidence.test.mjs) |
+| Inspect project work | Shared list/board filters, task details, real usage and unknown costs | [Design](../DESIGN.md), [dashboard](../dashboard/src/main.jsx), [dashboard tests](../dashboard/package.json) |
+| Inspect configuration and compute | Catalog roles/skills/settings; host distinct from execution worker | [Concepts](concepts.md), [definition](../factory/definition.mjs), [catalog tests](../tests/workflows.test.mjs) |
+| Keep a private installation running | Services/tunnels, idle-only update activation, preserved state | [Operation](services.md), [updates](../factory/updates.mjs), [service tests](../tests/services.test.mjs) |
+
+Roadmap features remain in [issues](https://github.com/arcitai/software-and-defence-factory/issues)
+and the [interface gaps](interfaces.md), separate from this implemented map.

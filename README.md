@@ -29,22 +29,19 @@ Choose the part you need:
 
 The runtime supplies policy and six focused skills to its isolated jobs. `init` configures a private installation; it does not modify the application or start work. Model access and the application's real check command must be configured before using it for delivery.
 
-## How work moves
+## How the factory works
 
-```mermaid
-flowchart LR
-    A[Accepted task] --> B[Isolated implementation]
-    B --> C[Application checks]
-    C --> D[Independent review]
-    D --> E[Operator approval]
-    E --> F[Verified handoff]
-```
+[![Factory setup, execution and delivery](https://raw.githubusercontent.com/arcitai/software-and-defence-factory/main/docs/architecture.svg)](https://github.com/arcitai/software-and-defence-factory/blob/main/docs/architecture.excalidraw)
+
+[Architecture and boundaries](docs/architecture.md) · [Editable Excalidraw source](https://github.com/arcitai/software-and-defence-factory/blob/main/docs/architecture.excalidraw)
 
 Each result belongs to a specific candidate commit and policy. A failed check blocks delivery. Changing the candidate or check policy invalidates earlier evidence. Approval records a handoff; publishing, merging and deployment follow the application's separate authority.
 
-The per-project dashboard keeps Software and Defence in one searchable task list, with workflow/model/status filters, a board, task details, files and history. Analytics separates workflows and shows recorded duration and token usage with explicit coverage; missing billing amounts stay unknown. View repo and New issue use the configured GitHub origin. Start work opens a modal to import/review an issue or write a scoped brief; it never automatically starts work from a new issue. See [workflows and skills](docs/workflows.md). Workers show detected host identity and capacity. Workflows show the actual phases, six packaged skills and selected configuration, shared with the `workflows` CLI command. It binds to localhost and can be reached remotely through SSH. One controller executes one job phase at a time; each job has its own checkout and bounded Docker containers.
+The project dashboard has an **Inbox**, measured **Analytics**, **Agents**, **Skills**, **Automations**, **Definition** and **Infrastructure**. New task opens a local brief; importing a GitHub issue is optional. The CLI reads the same definition and controller state. Agent roles use a selected harness such as Codex or Pi; a worker executes their isolated jobs on a host. See [concepts](docs/concepts.md) and [supported interfaces](docs/interfaces.md). Automations are not implemented yet; work starts manually.
 
 The optional **defence** workflow accepts scoped incident evidence and produces a private, read-only draft. It does not monitor production or claim verified recovery. See [defence integration](docs/defence-integration.md).
+
+Start setup with `software-defence-factory foundation` and the [Factory Foundation plan](docs/setup.md). No AIOS installation is required.
 
 ## Repository map
 
@@ -53,13 +50,14 @@ The optional **defence** workflow accepts scoped incident evidence and produces 
 | `bin/` | CLI entry point |
 | `factory/` | Queue, HTTP API, isolation, evidence, updates and bundled dashboard assets |
 | `dashboard/` | Dashboard source and UI tests |
-| `kit/`, `.agents/skills/` | Portable method, adoption records and six skills |
+| `kit/`, `.agents/skills/` | Portable method, adoption records and six job skills |
+| `operator-skills/` | Factory Foundation setup guidance; never mounted into jobs |
 | `scripts/`, `tests/` | Packaging, qualification, release checks and behavioral tests |
 | `docs/` | Setup, architecture, recovery, proof and ownership |
 
 The current runtime replaces earlier prototypes. Their source and research remain in Git history; they are not part of the installed package.
 
-## Contribute
+## Contributing
 
 Requires Node 22.13+, npm and Git. Docker is needed only for integration qualification.
 
@@ -75,8 +73,6 @@ Managed Linux services can also opt into daily updates that reserve idle control
 This is a test release. Synthetic qualification demonstrates control flow and isolation, not model quality, application correctness or production readiness. Follow [AGENTS.md](AGENTS.md) for contributions and [SECURITY.md](SECURITY.md) for the trust boundaries.
 
 MIT for original code and method. Included dashboard components and fonts retain their licenses in [third-party notices](THIRD_PARTY_NOTICES.md).
-
-## Contributing
 
 See [CONTRIBUTING.md](CONTRIBUTING.md) for source setup and checks, the
 [self-development recipe](docs/development.md) for running project work through

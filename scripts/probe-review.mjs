@@ -1,3 +1,4 @@
+import { harnessOf } from '../factory/lib.mjs';
 // Opt-in Docker proof, restricted to the documented synthetic fixture.
 import assert from 'node:assert/strict';
 import { readFileSync, writeFileSync, readdirSync, existsSync } from 'node:fs';
@@ -5,7 +6,7 @@ import { resolve, join } from 'node:path';
 import { configAt, api, save, json, run, stream, sleep, ROOT } from '../factory/lib.mjs';
 
 const state=resolve(process.argv[2] || ''), original=configAt(state);
-assert.equal(original.agent,'mock','Use a separate synthetic installation');
+assert.equal(harnessOf(original),'mock','Use a separate synthetic installation');
 assert.equal(readFileSync(join(original.repo,'value.txt'),'utf8'),'broken\n');
 assert(!(await api(state,'/api/v1/status')).jobs.some(j=>['queued','running','awaiting_approval'].includes(j.state)),'Finish active fixture jobs first');
 const agent=`import {writeFileSync} from 'node:fs';

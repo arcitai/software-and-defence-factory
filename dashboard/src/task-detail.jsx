@@ -341,7 +341,7 @@ function ExecutionDetails({ run }) {
         />
         <RunMetric label="Run ID" value={run.id} mono />
         <RunMetric label="Executor" value={run.execution ? run.executor : run.started_at ? "Not recorded (legacy/unknown)" : "Not started"} />
-        <RunMetric label="Worker" value={run.worker_name || (run.started_at ? "Not recorded" : "Not assigned yet")} />
+        <RunMetric label="Host" value={run.host_name || run.worker_name || (run.started_at ? "Not recorded" : "Not assigned yet")} />
         <RunMetric
           label="Duration"
           value={

@@ -104,7 +104,7 @@ test("project identity stays visible, app keeps its submission key, and stale or
   assert.equal(projectContext().querySelector('[role="tooltip"]').textContent.includes(repo), true, "full configured path remains available as detail");
   assert.match(document.body.textContent, /Synthetic installation demo — no model calls\./);
 
-  button("Start work").click();
+  button("New task").click();
   await eventually(() => assert.ok(document.querySelector("form")));
   const repositoryOption = document.querySelector('#start-work-description');
   assert.ok(repositoryOption, "the configured repository option is present");
@@ -123,11 +123,11 @@ test("project identity stays visible, app keeps its submission key, and stale or
   assert.equal(projectName().textContent, "customer-portal");
 
   window.location.hash = "#/workers";
-  await eventually(() => assert.match(document.body.textContent, /Workers/));
+  await eventually(() => assert.match(document.body.textContent, /Infrastructure/));
   assert.equal(projectName().textContent, "customer-portal");
 
   window.location.hash = "#/workflows";
-  await eventually(() => assert.match(document.body.textContent, /Workflows/));
+  await eventually(() => assert.match(document.body.textContent, /Agents/));
   assert.equal(projectName().textContent, "customer-portal");
 
   await runNextPoll();
@@ -135,7 +135,7 @@ test("project identity stays visible, app keeps its submission key, and stale or
   assert.match(projectContext().textContent, /Status current/);
   window.location.hash = "#/runs";
   await eventually(() => assert.ok([...document.querySelectorAll("h2")].some((heading) => heading.textContent === "Tasks")));
-  button("Start work").click();
+  button("New task").click();
   await eventually(() => assert.match(document.querySelector('#start-work-description').textContent, /Project identity unavailable/));
   document.querySelector('button[aria-label="Close start work form"]').click();
 

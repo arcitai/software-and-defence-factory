@@ -36,6 +36,27 @@ Runtime isolation/recovery changes need relevant synthetic Docker qualification
 as described in [proof](docs/proof.md) and [recovery](docs/recovery.md). Never run
 `demo` or `qualify` against an application installation.
 
+## Project code standards
+
+This section owns Factory's coding standards; DESIGN.md owns dashboard visuals.
+Keep domain names aligned with `factory/terminology.json`. Add behavior at the
+module that owns its state/policy, with CLI and UI consuming the same contract.
+Prefer a small shared interface over parallel implementations or speculative
+extension layers. Document supported compatibility aliases and their removal
+conditions; never silently rewrite admitted attempt configuration or evidence.
+
+Tests exercise observable outcomes, including relevant failure/recovery paths.
+Use fixed expected results independent of the implementation. A refactor should
+not require replacing assertions solely because private helpers moved. Preserve
+precise user-visible errors, stale-action guards and unknown measurements.
+
+When a failure reveals a reusable lesson, first fix or wire the executable check
+that can catch it. Record judgment-dependent guidance here or in DESIGN.md only
+when it changes future decisions, with its rationale. Correct weak navigation at
+the owning entrypoint, and remove obsolete/duplicate rules. Keep a specific
+incident in its issue/evidence rather than growing a permanent rule for every
+mistake. Review requirement coverage and standard conformance independently.
+
 ## Issue, candidate and PR
 
 Use a short task branch from `main`, one writer per checkout and a PR back to

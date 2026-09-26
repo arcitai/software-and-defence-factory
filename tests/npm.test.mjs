@@ -18,7 +18,7 @@ test('npm artifact installs without a checkout, keeps state outside the package,
   const environment = { ...process.env, XDG_STATE_HOME: join(dir, 'state'), XDG_DATA_HOME: join(dir, 'data'), SDF_AUTO_UPDATE: '0' };
   const packed = JSON.parse(command('npm', ['pack', '--ignore-scripts', '--json', '--pack-destination', dir]))[0];
   const names = packed.files.map(file => file.path);
-  for (const required of ['bin/software-defence-factory.mjs', 'factory/updates.mjs', 'factory/paths.mjs', 'factory/image/Dockerfile', 'kit/policy.md', 'docs/setup.md', 'docs/services.md', '.agents/skills/factory-implement/SKILL.md', 'scripts/export-kit.mjs', 'LICENSE']) assert.ok(names.includes(required), required);
+  for (const required of ['bin/software-defence-factory.mjs', 'factory/updates.mjs', 'factory/definition.mjs', 'factory/terminology.json', 'operator-skills/factory-foundation/SKILL.md', 'docs/concepts.md', 'factory/paths.mjs', 'factory/image/Dockerfile', 'kit/policy.md', 'docs/setup.md', 'docs/services.md', '.agents/skills/factory-implement/SKILL.md', 'scripts/export-kit.mjs', 'LICENSE']) assert.ok(names.includes(required), required);
   assert.ok(names.every(path => !/^(?:\.factory|\.git\/|tests\/|experiments\/|evals\/|node_modules\/)|(?:^|\/)\.env(?:\.|$)/.test(path)));
   command('npm', ['install', '--prefix', prefix, '--ignore-scripts', '--no-audit', '--no-fund', join(dir, packed.filename)], { env: environment });
   const packageRoot = join(prefix, 'node_modules/software-defence-factory');
@@ -30,6 +30,7 @@ test('npm artifact installs without a checkout, keeps state outside the package,
   assert.ok(names.includes('THIRD_PARTY_NOTICES.md'));
   assert.match(run(['help']), /state\/software-defence-factory\/platform/);
   assert.ok(run(['help']).includes(join(packageRoot, 'docs/setup.md')));
+  assert.match(run(['foundation']), /# Factory Foundation/);
   assert.equal(run(['--help']), run(['help']));
   assert.equal(run(['-h']), run(['help']));
   const repo = join(dir, 'app'); mkdirSync(repo);
@@ -37,7 +38,13 @@ test('npm artifact installs without a checkout, keeps state outside the package,
   command('git', ['-C', repo, '-c', 'user.name=Fixture', '-c', 'user.email=fixture@localhost', 'commit', '--allow-empty', '-qm', 'fixture']);
   run(['init', '--repo', repo, '--agent', 'mock', '--check', 'true']);
   const state = join(environment.XDG_STATE_HOME, 'software-defence-factory/platform');
-  assert.equal(JSON.parse(readFileSync(join(state, 'factory.json'))).repo, realpathSync(repo));
+  const configured=JSON.parse(readFileSync(join(state, 'factory.json')));
+  assert.equal(configured.repo,realpathSync(repo));assert.equal(configured.harness,'mock');assert.equal(configured.agent,undefined);
+  assert.equal(JSON.parse(run(['definition'])).configuration.harness,'mock');
+  const secondState=join(dir,'second-state');
+  run(['init','--repo',repo,'--harness','pi','--state',secondState]);
+  assert.equal(JSON.parse(readFileSync(join(secondState,'factory.json'))).harness,'pi');
+  assert.equal(spawnSync(process.execPath,[cli,'init','--repo',repo,'--state',join(dir,'conflict'),'--harness','pi','--agent','codex'],{env:environment}).status,1);
   assert.equal(command('git', ['-C', repo, 'status', '--porcelain']), '');
   assert.equal(existsSync(join(packageRoot, '.factory')), false);
   assert.equal(spawnSync(process.execPath, [cli, 'init', '--repo', repo], { env: environment }).status, 1);

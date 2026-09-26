@@ -372,3 +372,31 @@ Rendered acceptance was completed on the same source through native Zen browser 
 The loopback preview served the candidate's compiled assets and read the existing real project queue. Importing public issue #47 exercised the actual issue reader. A preview-only rejected start exercised the visible submission error without creating a job. Explicit synthetic HTTP 503 responses exercised stale status, initial failure and recovery. No application work was started. Preview status used the prior controller's repository links; the new issue-chooser URL is covered by the API regression and must be read back from the released controller.
 
 Code review and rendered acceptance now pass. Protected CI, public npm artifact matching and idle managed activation remain delivery checks recorded in PR #48; these UI checks do not claim live execution qualification or complete CLI/dashboard parity.
+
+## 0.5.0 — shared definition and project foundations
+
+The candidate passes 64 runtime/package tests and 44 dashboard tests. New checks
+cover canonical harness settings with unchanged legacy config/policy identity,
+CLI/API catalog parity, packaged operator guidance, shared status groups and
+whole-row filters whose Reset and window focus changes keep the menu usable.
+The former trigger renderer and obsolete source-text assertions were removed.
+
+The built candidate was inspected in Safari at 1440px, 390px and 320px, with
+light/dark coverage: roles and deterministic gates, actual skills, definition,
+host/worker separation, horizontal Kanban scrolling, default brief modal and
+textarea focus. Filter row selection and non-closing Reset were exercised in
+the browser. A read-only preview used the existing installation's status; it did
+not submit application work. The editable architecture scene was visually
+checked after correcting text alignment, then exported with its SVG companion.
+
+Project guidance now separates task correctness from standards, uses a maintained
+feature map and dependency-aware specifications, and routes recurring failures
+to checks or concise guidance. Those instruction changes are not a measured
+claim of better autonomous outcomes. The research disposition is in issue #22.
+An isolated npm installation on Linux x64 passed all 12 Docker qualification
+paths, including candidate/policy guards, scratch isolation/cleanup, cancellation,
+deadline, incident deduplication and restart recovery. The initial fixture used
+the canonical harness setting; existing installations retained legacy agent
+settings. No inference or application work was used for this qualification.
+Independent review, protected CI and installed-package adoption are recorded
+in the release PR.

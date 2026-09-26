@@ -26,9 +26,17 @@ export function stream(command, args, options = {}) {
 }
 export const digest = value => createHash('sha256').update(value).digest('hex');
 export const sleep = ms => new Promise(resolve => setTimeout(resolve, ms));
+export function harnessOf(config) {
+  if (config.harness !== undefined && config.agent !== undefined && config.harness !== config.agent)
+    throw new Error('harness conflicts with legacy agent; keep one harness setting');
+  const harness = config.harness ?? config.agent;
+  if (!['mock', 'codex', 'pi', 'custom'].includes(harness)) throw new Error('Unsupported harness');
+  return harness;
+}
 export function configAt(state) {
   const config = json(join(state, 'factory.json'));
-  if (config.version !== 1 || !['mock','codex','pi','custom'].includes(config.agent)) throw new Error('Unsupported configuration');
+  if (config.version !== 1) throw new Error('Unsupported configuration');
+  harnessOf(config);
   if (!Array.isArray(config.command) || !config.command.length || !config.command.every(v => typeof v === 'string' && v && !v.includes('\0'))) throw new Error('command must be an argument array');
   if (!Number.isInteger(config.port) || config.port < 1024 || config.port > 65535) throw new Error('Invalid port');
   if (!Number.isInteger(config.timeoutSeconds) || config.timeoutSeconds < 1 || config.timeoutSeconds > 7200) throw new Error('timeoutSeconds must be 1–7200');

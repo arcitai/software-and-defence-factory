@@ -1,3 +1,4 @@
+import { harnessOf } from './lib.mjs';
 import { existsSync, mkdirSync, readFileSync, writeFileSync, rmSync, lstatSync, chmodSync, readdirSync } from 'node:fs';
 import { join } from 'node:path';
 import { spawn } from 'node:child_process';
@@ -73,7 +74,7 @@ async function container(mode, input, command, writable = false, credentials = f
   if (mode === 'verify') args.push('--env',`FACTORY_BASE_REVISION=${git('rev-parse',`${metadata().base}^{commit}`)}`);
   if (credentials) args.push('--env-file', join(state,'model.env'));
   args.push('-i',config.image,'timeout','--signal=KILL',`${config.timeoutSeconds}s`,'sh','-c','mkdir -p "$HOME" && exec "$@"','factory',...command);
-  console.log(JSON.stringify({ phase: mode, event: 'started', synthetic: config.agent === 'mock' }));
+  console.log(JSON.stringify({ phase: mode, event: 'started', synthetic: harnessOf(config) === 'mock' }));
   const logPath = join(folder, attempt, `${mode}.log`);
   const log = new BoundedLog(), usageParser = execution.executor === 'codex' ? new CodexUsageParser() : null; let exitSignal;
   const code = await new Promise((ok, fail) => {
@@ -109,7 +110,7 @@ try {
     if (existsSync(workspace)) throw new Error('Workspace already exists; preserve evidence and create a new task for a fresh build');
     run('git',['-c','core.hooksPath=/dev/null','-c','core.fsmonitor=false','clone','--no-hardlinks','--',config.repo,workspace], { env: gitEnv });
     git('remote','remove','origin');
-    save(join(folder,'candidate.json'), { base: git('rev-parse','HEAD'), head: git('rev-parse','HEAD'), synthetic: config.agent === 'mock' });
+    save(join(folder,'candidate.json'), { base: git('rev-parse','HEAD'), head: git('rev-parse','HEAD'), synthetic: harnessOf(config) === 'mock' });
   }
   if (phase === 'build') {
     const reports = await container('build', brief('Implement the requested bounded change. Save /output/agent-report.md with actual changes and remaining uncertainty.'), config.command, true, true);
@@ -155,13 +156,13 @@ try {
     save(incident.path,{...incident.entry,report:validated});candidate();
   }
   completed=true;
-  save(result,{ outcome:'complete', ...usageFields(observedUsage, execution, phase), ...(reviewVerdict ? {review_verdict:reviewVerdict} : {}), summary: phase === 'defence' ? 'Unverified private incident draft ready; recovery has not been verified.' : `${phase} complete; ${config.agent === 'mock' ? 'synthetic fixture' : 'see revision and evidence'}.` });
+  save(result,{ outcome:'complete', ...usageFields(observedUsage, execution, phase), ...(reviewVerdict ? {review_verdict:reviewVerdict} : {}), summary: phase === 'defence' ? 'Unverified private incident draft ready; recovery has not been verified.' : `${phase} complete; ${harnessOf(config) === 'mock' ? 'synthetic fixture' : 'see revision and evidence'}.` });
 } catch (error) {
   console.error(error.message);
   save(result,{outcome:'blocked', ...usageFields(observedUsage, execution, phase), ...(reviewVerdict ? {review_verdict:reviewVerdict} : {}), summary:error.message});
   process.exitCode=1;
 } finally {
-  const measurement = { job, attempt, phase, policyHash, execution, ...usageFields(observedUsage, execution, phase), completed, durationMs: Date.now()-started, requestedModel: execution.requestedModel, directCost: null, humanTime: null, synthetic: config.agent === 'mock' };
+  const measurement = { job, attempt, phase, policyHash, execution, ...usageFields(observedUsage, execution, phase), completed, durationMs: Date.now()-started, requestedModel: execution.requestedModel, directCost: null, humanTime: null, synthetic: harnessOf(config) === 'mock' };
   save(join(folder,`measurement-${attempt}.json`),measurement);save(join(output,`measurement-${attempt}.json`),measurement);
   // If cleanup cannot be confirmed, retain the lock and require explicit recovery.
   stopContainers(state,job);

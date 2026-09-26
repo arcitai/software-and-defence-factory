@@ -1,6 +1,7 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 import {
+  statusGroups,
   boardColumnForState,
   filterJobs,
   githubIssueReference,
@@ -14,27 +15,15 @@ import {
   taskPhase,
 } from "./runs-board.js";
 
-test("board columns preserve real attention, completion, cancellation, and unknown states", () => {
-  assert.equal(boardColumnForState("queued"), "queued");
-  assert.equal(boardColumnForState("running"), "running");
-  assert.equal(boardColumnForState("cancelling"), "running");
-  for (const state of ["failed", "timed_out", "blocked", "interrupted", "awaiting_approval"]) {
-    assert.equal(boardColumnForState(state), "attention");
-    assert.equal(needsAttention(state), true);
-  }
-  assert.equal(boardColumnForState("succeeded"), "finished");
-  assert.equal(boardColumnForState("cancelled"), "finished");
+test("list and Kanban use one exhaustive status partition without merging approvals or cancellations", () => {
+  const jobs = ["queued", "running", "cancelling", "failed", "timed_out", "blocked", "interrupted", "awaiting_approval", "succeeded", "cancelled", "new_runtime_state"].map(state => ({ id: state, state }));
+  const groups = groupJobsByBoardColumn(jobs);
+  for (const group of statusGroups) assert.deepEqual(groups[group.id], filterJobs(jobs, group.id));
+  assert.equal(Object.values(groups).flat().length, jobs.length);
+  assert.equal(boardColumnForState("awaiting_approval"), "awaiting_approval");
+  assert.equal(boardColumnForState("cancelled"), "cancelled");
   assert.equal(needsAttention("cancelled"), false);
-  assert.equal(boardColumnForState("unexpected_state"), "other");
-
-  const jobs = ["queued", "running", "succeeded", "failed", "timed_out", "cancelled", "unexpected_state"]
-    .map((state) => ({ id: state, state }));
-  const grouped = groupJobsByBoardColumn(jobs);
-  assert.deepEqual(grouped.queued.map(({ id }) => id), ["queued"]);
-  assert.deepEqual(grouped.running.map(({ id }) => id), ["running"]);
-  assert.deepEqual(grouped.attention.map(({ id }) => id), ["failed", "timed_out"]);
-  assert.deepEqual(grouped.finished.map(({ id }) => id), ["succeeded", "cancelled"]);
-  assert.deepEqual(grouped.other.map(({ id }) => id), ["unexpected_state"]);
+  assert.equal(needsAttention("awaiting_approval"), true);
 });
 
 test("filters and counts use runtime state groups and expose failed review revision flows", () => {

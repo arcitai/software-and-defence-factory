@@ -51,7 +51,7 @@ Establish host access, inference and resource limits using the existing
 replaced with user-owned locations and an unused port:
 
 ```sh
-software-defence-factory init --repo /absolute/path/to/factory-source --agent pi --check "npm ci --ignore-scripts && npm run build:dashboard && npm run check" --state /private/state/factory-development --port 7343
+software-defence-factory init --repo /absolute/path/to/factory-source --harness pi --check "npm ci --ignore-scripts && npm run build:dashboard && npm run check" --state /private/state/factory-development --port 7343
 software-defence-factory install --image FACTORY_DEV_IMAGE --state /private/state/factory-development
 software-defence-factory doctor --state /private/state/factory-development
 ```

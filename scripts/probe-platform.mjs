@@ -1,3 +1,4 @@
+import { harnessOf } from '../factory/lib.mjs';
 // Explicit, opt-in integration qualification. Uses Docker and the native controller, never inference.
 import assert from 'node:assert/strict';
 import { readFileSync, writeFileSync, existsSync, mkdtempSync } from 'node:fs';
@@ -6,7 +7,7 @@ import { api, configAt, save, json, containers, sleep, stream, run, ROOT } from 
 import { admitIncident } from '../factory/incident.mjs';
 
 const state=resolve(process.argv[2] || '.factory/demo-platform'),original=configAt(state);
-assert.equal(original.agent,'mock','Qualification is restricted to a synthetic installation');
+assert.equal(harnessOf(original),'mock','Qualification is restricted to a synthetic installation');
 assert.equal(readFileSync(join(original.repo,'value.txt'),'utf8'),'broken\n');
 assert(!(await api(state,'/api/v1/status')).jobs.some(j=>['queued','running','awaiting_approval'].includes(j.state)),'Finish/cancel active demo jobs before qualification');
 const results=[];
