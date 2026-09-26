@@ -7,6 +7,7 @@ import { incidentFor, validateReport } from './incident.mjs';
 import { BoundedLog } from './bounded-log.mjs';
 import { CodexUsageParser, emptyUsage, usageFields } from './usage.mjs';
 import { assertRetainedSource, publicSourceAdmission, restoreRetainedCheckout } from './source-admission.mjs';
+import { runCandidateGit } from './git-environment.mjs';
 
 const [state, phase] = process.argv.slice(2);
 if(process.getuid()===0)throw new Error('Agent jobs require a non-root controller account');
@@ -33,8 +34,7 @@ for await (const part of process.stdin) {
   prompt += part;
   if (Buffer.byteLength(prompt) > 256000) throw new Error('Task brief too large');
 }
-const gitEnv = { ...process.env, GIT_CONFIG_NOSYSTEM: '1', GIT_CONFIG_GLOBAL: '/dev/null' };
-const git = (...args) => run('git', ['-c','core.hooksPath=/dev/null','-c','core.fsmonitor=false','-C',workspace,...args], { env: gitEnv });
+const git = (...args) => runCandidateGit(workspace, ...args);
 const metadata = () => json(join(folder, 'candidate.json'));
 function candidate() {
   const meta = metadata();

@@ -484,8 +484,14 @@ changes without a replacement admission.
 regressions, including admission at A before the execution pump, B movement,
 source-ref deletion and garbage collection, SQLite restart/build retry, missing
 objects, repository isolation, revision with a new base, same-revision repair of
-a missing retained copy, and unchanged operator checkout. `npm ci --ignore-scripts`,
-`npm run build:dashboard` and `npm run check` passed on this candidate. The full check reported 83
+a missing retained copy, and unchanged operator checkout. The R1 hostile-Git
+regression runs the production admission, checkout and candidate Git helpers
+with repository, worktree, index, object and config overrides aimed at a second
+disposable checkout. It verifies the second checkout's tracked/untracked files,
+HEAD, index and status remain unchanged through candidate staging, commit, diff
+and cleanup. `node --test tests/git-environment.test.mjs` passed this focused
+regression. `npm ci --ignore-scripts`, `npm run build:dashboard` and
+`npm run check` passed after the R1 repair; the full check reported 84
 runtime/package tests and 51 dashboard tests.
 
 The real Docker qualification recipe is included in

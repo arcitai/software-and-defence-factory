@@ -1,21 +1,16 @@
 import { randomBytes, createHash } from 'node:crypto';
 import { chmodSync, lstatSync, mkdirSync, realpathSync, renameSync, rmSync } from 'node:fs';
 import { join, relative, resolve, sep } from 'node:path';
-import { run } from './lib.mjs';
+import { runCandidateGit, runHostGit } from './git-environment.mjs';
 
 const REF_NAME = 'refs/heads/factory-source';
-const GIT_ENV = { ...process.env, GIT_CONFIG_NOSYSTEM: '1', GIT_CONFIG_GLOBAL: '/dev/null', GIT_TERMINAL_PROMPT: '0' };
-for (const key of Object.keys(GIT_ENV)) {
-  if (['GIT_DIR', 'GIT_WORK_TREE', 'GIT_INDEX_FILE', 'GIT_COMMON_DIR', 'GIT_OBJECT_DIRECTORY', 'GIT_ALTERNATE_OBJECT_DIRECTORIES', 'GIT_NAMESPACE', 'GIT_CONFIG_PARAMETERS'].includes(key)
-    || /^GIT_CONFIG_(?:COUNT|KEY_\d+|VALUE_\d+)$/.test(key)) delete GIT_ENV[key];
-}
 
 export class SourceAdmissionError extends Error {
   constructor(message, status = 409) { super(message); this.status = status; }
 }
 
 function git(repo, ...args) {
-  return run('git', ['-c', 'core.hooksPath=/dev/null', '-c', 'core.fsmonitor=false', '-C', repo, ...args], { env: GIT_ENV });
+  return runCandidateGit(repo, ...args);
 }
 
 function privateDirectory(path) {
@@ -143,7 +138,7 @@ export class SourceAdmissionStore {
     const retained = join(sources, `retained_${nonce}.git`);
     const retainedRelative = relative(jobDir, retained).split(sep).join('/');
     try {
-      run('git', ['init', '--quiet', '--bare', `--object-format=${identity.object_format}`, temporary], { env: GIT_ENV });
+      runHostGit(['init', '--quiet', '--bare', `--object-format=${identity.object_format}`, temporary]);
       git(temporary, 'config', 'gc.auto', '0');
       git(temporary, 'fetch', '--no-tags', '--', repository, `${sha}:${REF_NAME}`);
       if (git(temporary, 'rev-parse', '--verify', `${REF_NAME}^{commit}`).toLowerCase() !== sha)
@@ -206,7 +201,7 @@ export function assertRetainedSource(state, jobId, record) {
 export function restoreRetainedCheckout(state, jobId, record, workspace) {
   const retained = assertRetainedSource(state, jobId, record);
   try {
-    run('git', ['-c', 'core.hooksPath=/dev/null', '-c', 'core.fsmonitor=false', 'clone', '--no-hardlinks', '--no-checkout', '--', retained.path, workspace], { env: GIT_ENV });
+    runHostGit(['-c', 'core.hooksPath=/dev/null', '-c', 'core.fsmonitor=false', 'clone', '--no-hardlinks', '--no-checkout', '--', retained.path, workspace]);
     git(workspace, 'checkout', '--detach', retained.sha);
     if (git(workspace, 'rev-parse', 'HEAD').toLowerCase() !== retained.sha) throw new Error('checkout head mismatch');
     git(workspace, 'remote', 'remove', 'origin');
