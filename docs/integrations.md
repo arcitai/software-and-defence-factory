@@ -58,3 +58,10 @@ merge, deployment or production access. External harness automations use the sam
 explicit admission API and remain responsible for their own schedule/deduplication.
 
 The managed updater’s OS timer maintains installed software; it is not a work-admission scheduler.
+
+The dashboard derives its request key from the reviewed destination, identity,
+title, body and labels. Reopening or reloading the same submission therefore
+reuses its receipt, including a successful result whose browser response was
+lost. No unsent draft is persisted by this mechanism. Identical browser content
+returns the existing issue in that controller state; an intentional separate
+copy requires a distinct CLI request key.
