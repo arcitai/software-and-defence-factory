@@ -51,8 +51,8 @@ export function DefinitionPage({ section = "definition" }) {
   </Page>;
 }
 function SkillLibrary({ skills }) { return <div className="skill-library">{skills.map(skill => <details key={skill.id} className="skill-card"><summary><BookOpen size={16} /><span><strong>{skill.id}</strong><small>{skill.purpose}</small></span></summary><div className="skill-instructions"><p>{skill.path}</p><pre tabIndex={0} aria-label={`${skill.id} instructions`}>{skill.content}</pre><small>Installed file SHA-256: {skill.sha256}</small></div></details>)}</div>; }
-export function AutomationsPage({ loaded, error }) {
-  return <Page title="Automations" description="Triggers, filters and targets for incoming work.">{error && <Failure value={error} />}{!loaded && !error ? <Loading /> : loaded && <Card><QuietState title="Work starts manually" description="Issue polling, event triggers and schedules are not supported in this release. Create a task in Inbox or use the CLI to admit work." /></Card>}</Page>;
+export function AutomationsPage({ loaded, error, control }) {
+  return <Page title="Automations" description="Scheduled work belongs to your agent harness.">{error && <Failure value={error} />}{!loaded && !error ? <Loading /> : loaded && <Card><QuietState title="Managed in your harness" description={`Configure schedules in ${control?.harness || "your selected harness"}, where supported, and call the Factory CLI/API. Factory owns execution and review; it runs no cron scheduler. External schedules are not discovered or listed here.`} /></Card>}</Page>;
 }
 function Page({ title, description, children }) { return <div className="secondary-page space-y-6"><PageHeading title={title} description={description} />{children}</div>; }
 function Loading() { return <Card><QuietState title="Loading" description="Reading the current installation." role="status" /></Card>; }

@@ -98,8 +98,7 @@ Defence form is not that typed intake path.
 
 The header names the configured project. View repo opens a validated GitHub
 origin. New issue opens Factory’s local chooser: repository templates, a blank
-form or existing GitHub issues. It does not publish a GitHub issue; Create &
-start queues local work. See [intake and CLI examples](workflows.md). The task detail provides previous/next within the filtered list, copy
+form or existing GitHub issues. Create issue saves to the supported repository provider without execution. Start work queues local work. See [intake and CLI examples](workflows.md). The task detail provides previous/next within the filtered list, copy
 link and close (Escape). Closing preserves the list's filters and position.
 
 If the interface looks unexpectedly small, check the browser zoom. The design

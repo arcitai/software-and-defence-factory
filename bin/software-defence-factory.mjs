@@ -7,7 +7,6 @@ import { createServer } from 'node:net';
 import { ROOT, PINS, DEFAULT_STATE, configAt, save, json, run, stream, digest, api, sleep, stopContainers } from '../factory/lib.mjs';
 import { assertInstalledJobImage, installCustomJobImage, installStandardJobImage, inspectImageInstallation } from '../factory/image-install.mjs';
 import { listIssues, readIssue } from '../factory/issue-intake.mjs';
-import { readTemplates, draftFromTemplate } from '../factory/issue-templates.mjs';
 import { recommendWork } from '../factory/intake.mjs';
 import { factoryDefinition, foundationSkill } from '../factory/definition.mjs';
 import { harnessOf } from '../factory/lib.mjs';
@@ -153,7 +152,7 @@ try {
   }
   else if(['infrastructure','automations','inbox'].includes(command)) {
     const snapshot=await api(state,'/api/v1/status');
-    console.log(JSON.stringify(command==='inbox'?snapshot.jobs:snapshot[command],null,2));
+    console.log(JSON.stringify(command==='inbox'?snapshot.jobs:command==='automations'?snapshot.automation_control:snapshot[command],null,2));
   }
   else if(command==='status') { const snapshot=await api(state,'/api/v1/status');delete snapshot.csrf_token;console.log(JSON.stringify(snapshot,null,2)); }
   else if(command==='doctor') {
@@ -161,32 +160,46 @@ try {
     console.log(JSON.stringify({node:process.version,docker:dockerVersion,engineInstalled:imageStatus.installed,image:imageStatus.image,repo:config.repo,harness:harnessOf(config),agent:harnessOf(config),checksConfigured:!!config.check?.trim(),inference:'Not called or verified',qualification:{model:'not assessed',toolchain:'not assessed'},dashboard:`http://127.0.0.1:${config.port}`},null,2));
     if(!imageStatus.installed)process.exitCode=1;
   } else if(command==='issue') {
-    const action=positional[0];
+    const action=positional[0], sourceURL=flags.url || flags.github;
     if(action==='list') {
-      if(flags.source && !['factory','github'].includes(flags.source))throw new Error('Choose --source factory or github');
-      console.log(JSON.stringify(flags.source==='github' ? await listIssues(configAt(state).repo,Number(flags.page || 1)) : (await api(state,'/api/v1/status')).jobs,null,2));
-    } else if(action==='templates') console.log(JSON.stringify(await readTemplates(configAt(state).repo),null,2));
+      if(flags.source && !['factory','remote','github'].includes(flags.source))throw new Error('Choose --source factory or remote');
+      console.log(JSON.stringify(['github','remote'].includes(flags.source) ? await api(state,`/api/v1/issues?page=${encodeURIComponent(flags.page || 1)}`) : (await api(state,'/api/v1/status')).jobs,null,2));
+    } else if(action==='templates') console.log(JSON.stringify(await api(state,'/api/v1/issue-templates'),null,2));
+    else if(action==='connection') console.log(JSON.stringify(await api(state,'/api/v1/issue-connection'),null,2));
+    else if(action==='submissions') console.log(JSON.stringify(await api(state,'/api/v1/issue-submissions'),null,2));
+    else if(action==='recover') {
+      if(!/^[A-Za-z0-9_-]{16,100}$/.test(flags.key || ''))throw new Error('Use --key with the saved request ID');
+      console.log(JSON.stringify(await api(state,`/api/v1/issue-submissions/${flags.key}/recover`,{}),null,2));
+    }
     else if(action==='preview') {
-      if(!flags.github)throw new Error('Use --github ISSUE_URL');
-      console.log(JSON.stringify(await readIssue(configAt(state).repo,flags.github),null,2));
+      if(!sourceURL)throw new Error('Use --url ISSUE_URL');
+      console.log(JSON.stringify(await api(state,'/api/v1/issues/preview',{url:sourceURL}),null,2));
     } else if(action==='recommend') {
-      if(Boolean(flags.github)===Boolean(flags.file))throw new Error('Choose --file brief.md or --github ISSUE_URL');
-      console.log(JSON.stringify(flags.github ? (await readIssue(configAt(state).repo,flags.github)).recommendation : recommendWork({spec:readFileSync(resolve(flags.file),'utf8')}),null,2));
+      if(Boolean(sourceURL)===Boolean(flags.file))throw new Error('Choose --file brief.md or --url ISSUE_URL');
+      console.log(JSON.stringify(sourceURL ? (await api(state,'/api/v1/issues/preview',{url:sourceURL})).recommendation : recommendWork({spec:readFileSync(resolve(flags.file),'utf8')}),null,2));
     } else if(action==='draft') {
       if(!flags.file||!flags.template||!flags.sha)throw new Error('Use --template NAME --sha SHA --file answers.json with {title, answers}');
-      console.log(JSON.stringify(await draftFromTemplate(configAt(state).repo,{...json(resolve(flags.file)),template:flags.template,sha:flags.sha}),null,2));
+      console.log(JSON.stringify(await api(state,'/api/v1/issue-templates/draft',{...json(resolve(flags.file)),template:flags.template,sha:flags.sha}),null,2));
     } else if(action==='create') {
+      if(flags.workflow||sourceURL)throw new Error('issue create publishes a new repository issue. Use issue start for execution.');
+      if(!flags.key)throw new Error('Provide a stable --key for safe retry and recovery.');
+      if(Boolean(flags.draft)===Boolean(flags.file))throw new Error('Choose --draft draft.json or --file brief.md --title TITLE');
+      const draft=flags.draft ? json(resolve(flags.draft)) : {title:flags.title,spec:readFileSync(resolve(flags.file),'utf8'),labels:[]};
+      const connection=await api(state,'/api/v1/issue-connection');
+      if(!connection.supported)throw new Error('No issue provider is available. Use issue start for a local brief.');
+      console.log(JSON.stringify(await api(state,'/api/v1/issues',{title:flags.title || draft.title,spec:draft.spec,labels:draft.labels || [],request_id:flags.key,repository:connection.repository,actor:connection.actor}),null,2));
+    } else if(action==='start') {
       if(!['software','defence'].includes(flags.workflow))throw new Error('Review the issue and choose --workflow software or defence');
-      if([flags.file,flags.github,flags.draft].filter(Boolean).length!==1)throw new Error('Choose --file brief.md, --draft draft.json or --github ISSUE_URL');
+      if([flags.file,sourceURL,flags.draft].filter(Boolean).length!==1)throw new Error('Choose --file brief.md, --draft draft.json or --url ISSUE_URL');
       let input;
-      if(flags.github) { const issue=await readIssue(configAt(state).repo,flags.github);input={title:issue.title,spec:issue.spec,source_url:issue.url}; }
+      if(sourceURL) { const issue=await api(state,'/api/v1/issues/preview',{url:sourceURL});input={title:issue.title,spec:issue.spec,source_url:issue.url}; }
       else if(flags.draft) { const draft=json(resolve(flags.draft));input={title:draft.title,spec:draft.spec}; }
       else input={title:flags.title,spec:readFileSync(resolve(flags.file),'utf8')};
       input.title=flags.title || input.title;
       if(typeof input.title!=='string'||!input.title.trim()||input.title.length>160)throw new Error('Provide a title of 1–160 characters (use --title for a blank issue)');
       if(flags.workflow==='software'&&!configAt(state).check?.trim())throw new Error('Configure an app check before submitting software work');
       console.log(JSON.stringify(await api(state,'/api/v1/jobs',{...input,workflow:flags.workflow,repository:'app',model:flags.model || ''}),null,2));
-    } else throw new Error('Use issue list|templates|preview|recommend|draft|create; see help');
+    } else throw new Error('Use issue list|connection|templates|preview|recommend|draft|create|start|submissions|recover; see help');
   } else if(command==='issues') {
     console.log(JSON.stringify(await listIssues(configAt(state).repo,Number(flags.page || 1)),null,2));
   } else if(command==='recommend') {
@@ -248,13 +261,17 @@ try {
   service resume                          Release a reconciled maintenance reservation
   tunnel install|start|stop|status|logs|uninstall --host SSH_ALIAS --port PORT
                                           Persistent loopback SSH tunnel (macOS/Linux)
-  issue list [--source github] [--page N]  List local Factory issues or open GitHub issues
+  issue list [--source remote] [--page N]  List local executions or open repository issues
   issue templates                         Read this repository's issue forms and contact links
-  issue preview --github URL              Preview one GitHub issue without starting work
-  issue recommend --file brief.md | --github URL
+  issue preview --url URL              Preview one repository issue without starting work
+  issue recommend --file brief.md | --url URL
   issue draft --template NAME --sha SHA --file answers.json
                                           Validate {title,answers}; output a local draft JSON
-  issue create --draft draft.json | --github URL | --file brief.md --title TITLE
+  issue create --draft draft.json | --file brief.md --title TITLE --key REQUEST_ID
+                                          Create a repository issue; does not execute work
+  issue connection | submissions          Inspect provider identity or durable creation receipts
+  issue recover --key REQUEST_ID           Reconcile an uncertain creation without another write
+  issue start --draft draft.json | --url URL | --file brief.md --title TITLE
                --workflow software|defence [--model MODEL]
                                           Create a local issue and start work; no GitHub write
   issues [--page N]                       Browse open project issues, with next_page for more

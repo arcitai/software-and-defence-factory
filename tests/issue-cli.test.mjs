@@ -18,10 +18,10 @@ test('issue CLI requires explicit execution choice and shares the controller rec
   await new Promise(resolve=>controller.server.listen(0,'127.0.0.1',resolve));t.after(()=>controller.close());
   config.port=controller.server.address().port;writeFileSync(join(state,'factory.json'),JSON.stringify(config));
   const cli=async(...args)=>JSON.parse((await exec(process.execPath,[join(ROOT,'bin/software-defence-factory.mjs'),'issue',...args,'--state',state],{env:{...process.env,SDF_AUTO_UPDATE:'0'}})).stdout);
-  await assert.rejects(cli('create','--file',join(state,'brief.md'),'--title','Investigate evidence'),/choose --workflow/);
+  await assert.rejects(cli('start','--file',join(state,'brief.md'),'--title','Investigate evidence'),/choose --workflow/);
   assert.equal(controller.queue.all().length,0);
   assert.equal((await cli('recommend','--file',join(state,'brief.md'))).workflow,'defence');
-  const created=await cli('create','--file',join(state,'brief.md'),'--title','Investigate evidence','--workflow','defence');
+  const created=await cli('start','--file',join(state,'brief.md'),'--title','Investigate evidence','--workflow','defence');
   const listed=await cli('list');assert.equal(listed[0].id,created.id);
   assert.equal(listed[0].task.title,'Investigate evidence');assert.equal(listed[0].workflow.name,'defence');
   const snapshot=await(await fetch(`http://127.0.0.1:${config.port}/api/v1/status`)).json();assert.equal(snapshot.jobs[0].task.title,listed[0].task.title);

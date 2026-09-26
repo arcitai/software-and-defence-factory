@@ -99,3 +99,10 @@ can run. If an operation is interrupted, preserve the lock and inspect its PID
 and action. Remove it only after confirming that process and its image build or
 startup have stopped, then run `doctor` and reconcile image metadata before
 starting again. The CLI does not automatically clear an unknown lock.
+
+## Unconfirmed repository issue creation
+
+Use `issue submissions` and `issue recover --key REQUEST_ID` against the same
+controller state. Recovery reads the original provider using the original
+identity; it does not publish again. Do not use a new request key to retry an
+uncertain write. See [provider ownership and recovery limits](integrations.md).

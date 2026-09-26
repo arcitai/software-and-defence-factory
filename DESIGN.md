@@ -59,8 +59,8 @@ reference's clipped narrow view is not part of the target.
   Filter tasks and analytics by workflow; a source issue link does not choose
   the execution type. Defence remains scoped investigation, distinct from
   software delivery and from production recovery authority.
-- New issue opens a repository template chooser or a blank local form; selecting an existing GitHub issue is a separate mode. Project/model defaults are inherited and advanced options stay secondary. Submission explicitly starts work.
-- Agents distinguish roles from deterministic checks and operator gates. Skills expose actual instructions; Definition exposes shared settings. Automations show their unimplemented state honestly. Both interfaces inspect the same installed catalog.
+- New issue opens a repository template chooser or blank form; selecting an existing provider issue is a separate mode. Review the destination and acting identity before publishing. Creation saves the remote issue without execution; Start work is a separate action. Local execution is explicitly labelled. Project/model defaults are inherited and advanced options stay secondary.
+- Agents distinguish roles from deterministic checks and operator gates. Skills expose actual instructions; Definition exposes shared settings. Automations explain harness-owned scheduling and show when schedule discovery is unavailable. Both interfaces inspect the same installed catalog.
 - One project/controller per dashboard. There is no global project hub.
 
 ## Typography, color and spacing
@@ -121,13 +121,19 @@ controller mid-attempt.
 
 ## Task intake
 
-New issue starts with repository templates, a blank local form or a selectable GitHub issue list. Keep work type
+New issue starts with repository templates, a blank form or a selectable provider issue list. GitHub is the first supported adapter. Unknown providers retain an explicitly local brief. Keep work type
 out of the first step; review the shared, editable suggestion before execution.
 Issue rows show open-state icon, title, number and wrapping label pills. Map
-GitHub label colors into the accessible light/dark palette, without interpreting
+Provider label colors into the accessible light/dark palette, without interpreting
 remote strings as CSS. Search names the loaded-result boundary; pagination,
 loading, errors and retry remain visible.
 
 Definition is infrequent setup: put its existing route in the sidebar footer
 above the theme control, separated from primary work navigation. Keep it in a
 separate section of the narrow-screen menu. The name matches CLI `definition`.
+
+The publication step names the repository and host-side acting account, exposes
+requested labels and any missing-label result, and keeps an ambiguous submission
+recoverable through its saved receipt. Freeze the published content; a successful
+issue link is not proof that work started. Do not claim browser GitHub sign-in or
+background synchronization.

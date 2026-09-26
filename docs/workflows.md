@@ -31,7 +31,7 @@ The list excludes pull requests, loads 50 GitHub records per page and offers
 **Load more**; search filters the loaded issues by title, number or label. GitHub
 reads use the controller's existing access, with retry on failure.
 
-Review the instructions and suggested work type before **Create & start**. The shared,
+Review the instructions and suggested work type before explicitly starting work. The shared,
 deterministic suggestion prioritizes `track:software` and `track:security` (also
 `track:defence`/`track:defense`) labels. Without a track label, explicit incident
 investigation wording suggests Defence; otherwise Software is the default.
@@ -48,40 +48,56 @@ visible with a GitHub link instead of silently dropping fields. Contact links
 preserve the project's private security reporting route. Template Markdown is
 shown as literal text, never executed or rendered as raw HTML.
 
-This creates a **local Factory issue**, not a GitHub issue. GitHub assignees,
-projects and write permissions are not applied. Blank local issues remain
-available without GitHub access; `blank_issues_enabled` governs GitHub's chooser,
-not Factory's local admission. Drafts are not saved as a persistent backlog.
-The reader bounds each template to 100 KB and each chooser to 20 templates;
-failures are explicit. Labels color the issue list and inform suggestions;
-they cannot grant authority or enable automatic execution.
+On a supported repository, **Create issue on GitHub** writes the title, description
+and template labels to that repository using the displayed host identity. It
+returns the real issue number/link and **does not start execution**. Select
+**Start work** separately, or choose the issue later from the repository list.
+Choose **Local execution only** to submit a brief without publishing it. A local
+brief is an execution request; an unfinished form is not a persistent backlog.
+Use the private security contact route for sensitive reports, never a public issue.
 
-CLI equivalents:
+The controller records a durable creation receipt before calling the provider.
+After a timeout, **Check submission** or `issue recover` looks for the original
+result; it never blindly repeats a write. Reuse the same request key on CLI retries.
+Changed content/identity with that key is rejected. An unresolved result stays
+unconfirmed rather than risking a duplicate. Confirmed missing labels are shown;
+GitHub projects, assignees and arbitrary issue form extensions are not applied.
+
+CLI equivalents (the selected controller must be running):
 
 ```sh
-software-defence-factory issue list --state PATH
-software-defence-factory issue list --source github --state PATH --page 1
-software-defence-factory issue preview --github URL --state PATH
+software-defence-factory issue connection --state PATH
+software-defence-factory issue list --source remote --state PATH --page 1
 software-defence-factory issue templates --state PATH
 software-defence-factory issue draft --state PATH --template bug-report.yml --sha TEMPLATE_SHA --file answers.json > draft.json
-software-defence-factory issue create --state PATH --draft draft.json --workflow software
-software-defence-factory issue recommend --file brief.md
-software-defence-factory issue create --state PATH --file brief.md --title "Investigate supplied evidence" --workflow defence
-software-defence-factory issue create --state PATH --github URL --workflow software
+software-defence-factory issue create --state PATH --draft draft.json --key release-board-fix-01
+software-defence-factory issue submissions --state PATH
+software-defence-factory issue recover --state PATH --key release-board-fix-01
+# Explicit execution, independent of creation:
+software-defence-factory issue start --state PATH --url URL --workflow software
+software-defence-factory issue start --state PATH --file brief.md --title "Investigate supplied evidence" --workflow defence
 ```
 
 `answers.json` contains `{"title":"Fix the board","answers":{"problem":"..."}}`;
 keys match `fields[].id` in `issue templates`. Multi-select/checkbox answers are
-arrays of exact option labels. These reads and compilation do not create work.
-Only **Create & start** or `issue create` queues execution. It requires an
-explicit CLI work type; the old `run` command retains its Software default for
-compatibility. Private validated incident intake remains `incident --file`,
-distinct from a generic Defence brief or issue.
+arrays of exact option labels. `issue create` now publishes only; migrate 0.5.1
+execution scripts to `issue start`. Legacy `run` remains compatible. Typed private
+incident admission remains `incident --file`, distinct from a generic Defence brief.
+`--source github` remains an alias for repository listing; `--github URL` remains a compatibility alias for `--url URL`.
 
-View repo opens GitHub in a new tab, where the browser's own login applies.
-Import uses the controller host's `gh` identity; it does not borrow browser
-credentials. Import previews neither enable automatic triggers nor grant an
-issue author more access.
+Provider selection and unknown-host behavior are documented in [integrations](integrations.md).
+View repo uses the browser's own login. Factory's provider uses the controller
+host identity; neither shares credentials with the browser or job containers.
+
+## Scheduled work
+
+Configure schedules in the selected harness, where supported (for example Codex
+Automations). The scheduled agent calls Factory CLI/API with explicitly selected
+scope. Factory owns execution, checks and acceptance, not the external schedule.
+There is no Factory cron module, issue watcher or silently enabled automation.
+The Automations view identifies this owner; it does not claim to discover external
+schedules. Before enabling one, test its host availability, access, duplicate
+handling, resource limits and stop behavior. No schedule is created by onboarding.
 
 ## Change the definition
 

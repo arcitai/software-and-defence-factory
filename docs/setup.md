@@ -103,7 +103,7 @@ qualification record; stop this controller unless it is the selected dashboard.
 ## 4. Prepare each application and inference profile
 
 Preserve existing commits, branches, uncommitted work and licenses before moving
-anything. Verify the canonical GitHub origin and main branch's tracking target;
+anything. Verify the canonical Git origin and main branch's tracking target;
 a fork may still track its upstream product. Move application sources into the
 chosen workspace, not into the npm package or private runtime state.
 
@@ -115,7 +115,7 @@ Before admitting development work, establish:
 - Reproducible toolchain/dependency pins and an actual build/check command.
 - A compatible job image for native libraries, browser/mobile tools or custom
   model adapters; the standard image does not supply every application stack.
-- Meaningful checks in GitHub CI on the selected revision, plus the intended
+- Meaningful checks in the selected CI on the selected revision, plus the intended
   review/branch policy. Record plan/access limits if enforcement is unavailable.
 - Applicable application instructions, design/scope, resource limits, secret
   references and a clear delivery destination. Keep unfinished WIP separate

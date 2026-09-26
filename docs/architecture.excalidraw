@@ -35,7 +35,7 @@
       "strokeWidth": 2,
       "text": "Software & Defence Factory",
       "textAlign": "left",
-      "updated": 1790411489819,
+      "updated": 1790417433994,
       "version": 1,
       "versionNonce": 420483429,
       "verticalAlign": "top"
@@ -72,7 +72,7 @@
       "strokeWidth": 2,
       "text": "One project. One execution owner. CLI for agents, dashboard for people.",
       "textAlign": "left",
-      "updated": 1790411489819,
+      "updated": 1790417433994,
       "version": 1,
       "versionNonce": 1162747127,
       "verticalAlign": "top"
@@ -109,7 +109,7 @@
       "strokeWidth": 2,
       "text": "01  PREPARE",
       "textAlign": "left",
-      "updated": 1790411489819,
+      "updated": 1790417433994,
       "version": 1,
       "versionNonce": 1752728627,
       "verticalAlign": "top"
@@ -149,7 +149,7 @@
       "strokeColor": "#868e96",
       "strokeStyle": "solid",
       "strokeWidth": 1,
-      "updated": 1790411489819,
+      "updated": 1790417433994,
       "version": 1,
       "versionNonce": 1774777764
     },
@@ -192,7 +192,7 @@
       "strokeColor": "#868e96",
       "strokeStyle": "solid",
       "strokeWidth": 1,
-      "updated": 1790411489819,
+      "updated": 1790417433994,
       "version": 1,
       "versionNonce": 361902680
     },
@@ -231,7 +231,7 @@
       "strokeColor": "#868e96",
       "strokeStyle": "solid",
       "strokeWidth": 1,
-      "updated": 1790411489819,
+      "updated": 1790417433994,
       "version": 1,
       "versionNonce": 2062279558
     },
@@ -240,7 +240,7 @@
       "type": "arrow",
       "x": 388,
       "y": 212.5,
-      "width": 105.5,
+      "width": 86.5,
       "height": 0.5000000000000284,
       "angle": 0,
       "backgroundColor": "transparent",
@@ -268,7 +268,7 @@
           0.5
         ],
         [
-          105.5,
+          86.5,
           -0.4999999999999716
         ]
       ],
@@ -285,7 +285,7 @@
       "strokeColor": "#868e96",
       "strokeStyle": "solid",
       "strokeWidth": 2,
-      "updated": 1790411489819,
+      "updated": 1790417433994,
       "version": 1,
       "versionNonce": 926509442
     },
@@ -294,7 +294,7 @@
       "type": "arrow",
       "x": 953,
       "y": 212.5,
-      "width": 105.5,
+      "width": 86.5,
       "height": 0.5000000000000284,
       "angle": 0,
       "backgroundColor": "transparent",
@@ -322,7 +322,7 @@
           0.5
         ],
         [
-          105.5,
+          86.5,
           -0.4999999999999716
         ]
       ],
@@ -339,7 +339,7 @@
       "strokeColor": "#868e96",
       "strokeStyle": "solid",
       "strokeWidth": 2,
-      "updated": 1790411489819,
+      "updated": 1790417433994,
       "version": 1,
       "versionNonce": 228432178
     },
@@ -375,7 +375,7 @@
       "strokeWidth": 2,
       "text": "02  OPERATE",
       "textAlign": "left",
-      "updated": 1790411489819,
+      "updated": 1790417433994,
       "version": 1,
       "versionNonce": 1468615406,
       "verticalAlign": "top"
@@ -386,7 +386,7 @@
       "x": 425,
       "y": 350,
       "width": 1075,
-      "height": 460,
+      "height": 650,
       "angle": 0,
       "backgroundColor": "#f8f9fa",
       "boundElements": null,
@@ -406,7 +406,7 @@
       "strokeColor": "#adb5bd",
       "strokeStyle": "dashed",
       "strokeWidth": 1,
-      "updated": 1790411489819,
+      "updated": 1790417433994,
       "version": 1,
       "versionNonce": 951558898
     },
@@ -442,7 +442,7 @@
       "strokeWidth": 2,
       "text": "EXECUTION HOST  ·  detected machine / VPS  ·  one installation per project",
       "textAlign": "left",
-      "updated": 1790411489819,
+      "updated": 1790417433994,
       "version": 1,
       "versionNonce": 171818286,
       "verticalAlign": "top"
@@ -464,6 +464,14 @@
         {
           "id": "interfaces-to-api",
           "type": "arrow"
+        },
+        {
+          "id": "schedule-to-cli",
+          "type": "arrow"
+        },
+        {
+          "id": "harness-to-cli",
+          "type": "arrow"
         }
       ],
       "fillStyle": "solid",
@@ -482,9 +490,9 @@
       "strokeColor": "#343a40",
       "strokeStyle": "solid",
       "strokeWidth": 1,
-      "updated": 1790411489819,
+      "updated": 1790417433994,
       "version": 1,
-      "versionNonce": 258634930
+      "versionNonce": 1023361202
     },
     {
       "id": "controller",
@@ -537,7 +545,7 @@
       "strokeColor": "#0b7285",
       "strokeStyle": "solid",
       "strokeWidth": 1,
-      "updated": 1790411489819,
+      "updated": 1790417433994,
       "version": 1,
       "versionNonce": 1729381298
     },
@@ -576,7 +584,7 @@
       "strokeColor": "#868e96",
       "strokeStyle": "solid",
       "strokeWidth": 1,
-      "updated": 1790411489819,
+      "updated": 1790417433994,
       "version": 1,
       "versionNonce": 861736562
     },
@@ -585,7 +593,7 @@
       "type": "arrow",
       "x": 348,
       "y": 470,
-      "width": 100.5,
+      "width": 81.5,
       "height": 0,
       "angle": 0,
       "backgroundColor": "transparent",
@@ -613,7 +621,7 @@
           0
         ],
         [
-          100.5,
+          81.5,
           0
         ]
       ],
@@ -630,7 +638,7 @@
       "strokeColor": "#868e96",
       "strokeStyle": "solid",
       "strokeWidth": 2,
-      "updated": 1790411489819,
+      "updated": 1790417433994,
       "version": 1,
       "versionNonce": 127322542
     },
@@ -639,7 +647,7 @@
       "type": "arrow",
       "x": 893,
       "y": 470,
-      "width": 115.5,
+      "width": 96.5,
       "height": 0,
       "angle": 0,
       "backgroundColor": "transparent",
@@ -667,7 +675,7 @@
           0
         ],
         [
-          115.5,
+          96.5,
           0
         ]
       ],
@@ -684,7 +692,7 @@
       "strokeColor": "#868e96",
       "strokeStyle": "solid",
       "strokeWidth": 2,
-      "updated": 1790411489819,
+      "updated": 1790417433994,
       "version": 1,
       "versionNonce": 2035707954
     },
@@ -692,7 +700,7 @@
       "id": "github",
       "type": "rectangle",
       "x": 40,
-      "y": 555,
+      "y": 830,
       "width": 300,
       "height": 92,
       "angle": 0,
@@ -704,6 +712,10 @@
         },
         {
           "id": "github-import",
+          "type": "arrow"
+        },
+        {
+          "id": "repository-to-adapter",
           "type": "arrow"
         }
       ],
@@ -723,9 +735,9 @@
       "strokeColor": "#868e96",
       "strokeStyle": "solid",
       "strokeWidth": 1,
-      "updated": 1790411489819,
+      "updated": 1790417433994,
       "version": 1,
-      "versionNonce": 347199602
+      "versionNonce": 230073202
     },
     {
       "id": "worker",
@@ -770,7 +782,7 @@
       "strokeColor": "#5f3dc4",
       "strokeStyle": "solid",
       "strokeWidth": 1,
-      "updated": 1790411489819,
+      "updated": 1790417433994,
       "version": 1,
       "versionNonce": 87923186
     },
@@ -780,7 +792,7 @@
       "x": 677.5,
       "y": 533,
       "width": 0,
-      "height": 60.5,
+      "height": 41.5,
       "angle": 0,
       "backgroundColor": "transparent",
       "boundElements": null,
@@ -808,7 +820,7 @@
         ],
         [
           0,
-          60.5
+          41.5
         ]
       ],
       "roughness": 0,
@@ -824,7 +836,7 @@
       "strokeColor": "#868e96",
       "strokeStyle": "solid",
       "strokeWidth": 2,
-      "updated": 1790411489819,
+      "updated": 1790417433994,
       "version": 1,
       "versionNonce": 712422958
     },
@@ -867,7 +879,7 @@
       "strokeColor": "#868e96",
       "strokeStyle": "solid",
       "strokeWidth": 1,
-      "updated": 1790411489819,
+      "updated": 1790417433994,
       "version": 1,
       "versionNonce": 2100253170
     },
@@ -876,7 +888,7 @@
       "type": "arrow",
       "x": 1022,
       "y": 677.5,
-      "width": 115.5,
+      "width": 96.5,
       "height": 0,
       "angle": 0,
       "backgroundColor": "transparent",
@@ -904,7 +916,7 @@
           0
         ],
         [
-          -115.5,
+          -96.5,
           0
         ]
       ],
@@ -921,7 +933,7 @@
       "strokeColor": "#868e96",
       "strokeStyle": "solid",
       "strokeWidth": 2,
-      "updated": 1790411489819,
+      "updated": 1790417433994,
       "version": 1,
       "versionNonce": 1255915630
     },
@@ -960,7 +972,7 @@
       "strokeColor": "#868e96",
       "strokeStyle": "solid",
       "strokeWidth": 1,
-      "updated": 1790411489819,
+      "updated": 1790417433994,
       "version": 1,
       "versionNonce": 839992690
     },
@@ -969,8 +981,8 @@
       "type": "arrow",
       "x": 462.0569852921046,
       "y": 703.3531617649476,
-      "width": 100.61397058420926,
-      "height": 0.19367647010494693,
+      "width": 81.61397058420926,
+      "height": 1.193676470104947,
       "angle": 0,
       "backgroundColor": "transparent",
       "boundElements": null,
@@ -997,7 +1009,7 @@
           0.5
         ],
         [
-          -100.61397058420926,
+          -81.61397058420926,
           0.19367647010494693
         ]
       ],
@@ -1014,7 +1026,7 @@
       "strokeColor": "#868e96",
       "strokeStyle": "solid",
       "strokeWidth": 2,
-      "updated": 1790411489819,
+      "updated": 1790417433994,
       "version": 1,
       "versionNonce": 648381102
     },
@@ -1022,8 +1034,8 @@
       "id": "host-note",
       "type": "text",
       "x": 448,
-      "y": 770,
-      "width": 734.17919921875,
+      "y": 975,
+      "width": 773.93994140625,
       "height": 21.25,
       "angle": 0,
       "autoResize": true,
@@ -1041,16 +1053,16 @@
       "link": null,
       "locked": false,
       "opacity": 100,
-      "originalText": "Jobs receive inference access; no Docker socket, host admin, SSH, GitHub or deploy credentials.",
+      "originalText": "Jobs receive inference access; forge, deploy and host credentials remain outside execution containers.",
       "roughness": 1,
       "roundness": null,
       "seed": 682075456,
       "strokeColor": "#343a40",
       "strokeStyle": "solid",
       "strokeWidth": 2,
-      "text": "Jobs receive inference access; no Docker socket, host admin, SSH, GitHub or deploy credentials.",
+      "text": "Jobs receive inference access; forge, deploy and host credentials remain outside execution containers.",
       "textAlign": "left",
-      "updated": 1790411489819,
+      "updated": 1790417433994,
       "version": 1,
       "versionNonce": 577488690,
       "verticalAlign": "top"
@@ -1059,8 +1071,8 @@
       "id": "github-note",
       "type": "text",
       "x": 40,
-      "y": 835,
-      "width": 728.509765625,
+      "y": 1037,
+      "width": 789.0556640625,
       "height": 21.25,
       "angle": 0,
       "autoResize": true,
@@ -1078,16 +1090,16 @@
       "link": null,
       "locked": false,
       "opacity": 100,
-      "originalText": "GitHub import uses host gh access. Publication stays with the operator; it is not a job permission.",
+      "originalText": "Issue creation writes to the provider. Starting an agent is separate. Unknown hosts retain local execution.",
       "roughness": 1,
       "roundness": null,
       "seed": 1025303093,
       "strokeColor": "#343a40",
       "strokeStyle": "solid",
       "strokeWidth": 2,
-      "text": "GitHub import uses host gh access. Publication stays with the operator; it is not a job permission.",
+      "text": "Issue creation writes to the provider. Starting an agent is separate. Unknown hosts retain local execution.",
       "textAlign": "left",
-      "updated": 1790411489819,
+      "updated": 1790417433994,
       "version": 1,
       "versionNonce": 1618803950,
       "verticalAlign": "top"
@@ -1096,7 +1108,7 @@
       "id": "work-label",
       "type": "text",
       "x": 40,
-      "y": 880,
+      "y": 1100,
       "width": 189.6796875,
       "height": 20,
       "angle": 0,
@@ -1124,7 +1136,7 @@
       "strokeWidth": 2,
       "text": "03  DELIVER SOFTWARE",
       "textAlign": "left",
-      "updated": 1790411489819,
+      "updated": 1790417433994,
       "version": 1,
       "versionNonce": 797970674,
       "verticalAlign": "top"
@@ -1133,7 +1145,7 @@
       "id": "implement",
       "type": "rectangle",
       "x": 40,
-      "y": 915,
+      "y": 1135,
       "width": 240,
       "height": 100,
       "angle": 0,
@@ -1164,7 +1176,7 @@
       "strokeColor": "#5f3dc4",
       "strokeStyle": "solid",
       "strokeWidth": 1,
-      "updated": 1790411489819,
+      "updated": 1790417433994,
       "version": 1,
       "versionNonce": 1575694126
     },
@@ -1172,7 +1184,7 @@
       "id": "check",
       "type": "rectangle",
       "x": 345,
-      "y": 915,
+      "y": 1135,
       "width": 240,
       "height": 100,
       "angle": 0,
@@ -1207,7 +1219,7 @@
       "strokeColor": "#868e96",
       "strokeStyle": "solid",
       "strokeWidth": 1,
-      "updated": 1790411489819,
+      "updated": 1790417433994,
       "version": 1,
       "versionNonce": 755311282
     },
@@ -1215,8 +1227,8 @@
       "id": "flow-check",
       "type": "arrow",
       "x": 288,
-      "y": 965,
-      "width": 35.5,
+      "y": 1185,
+      "width": 18.5,
       "height": 0,
       "angle": 0,
       "backgroundColor": "transparent",
@@ -1244,7 +1256,7 @@
           0
         ],
         [
-          35.5,
+          18.5,
           0
         ]
       ],
@@ -1261,7 +1273,7 @@
       "strokeColor": "#868e96",
       "strokeStyle": "solid",
       "strokeWidth": 2,
-      "updated": 1790411489819,
+      "updated": 1790417433994,
       "version": 1,
       "versionNonce": 1801001326
     },
@@ -1269,7 +1281,7 @@
       "id": "review",
       "type": "rectangle",
       "x": 650,
-      "y": 915,
+      "y": 1135,
       "width": 240,
       "height": 100,
       "angle": 0,
@@ -1304,7 +1316,7 @@
       "strokeColor": "#5f3dc4",
       "strokeStyle": "solid",
       "strokeWidth": 1,
-      "updated": 1790411489819,
+      "updated": 1790417433994,
       "version": 1,
       "versionNonce": 1701969010
     },
@@ -1312,8 +1324,8 @@
       "id": "flow-review",
       "type": "arrow",
       "x": 593,
-      "y": 965,
-      "width": 35.5,
+      "y": 1185,
+      "width": 19.5,
       "height": 0,
       "angle": 0,
       "backgroundColor": "transparent",
@@ -1341,7 +1353,7 @@
           0
         ],
         [
-          35.5,
+          19.5,
           0
         ]
       ],
@@ -1358,7 +1370,7 @@
       "strokeColor": "#868e96",
       "strokeStyle": "solid",
       "strokeWidth": 2,
-      "updated": 1790411489819,
+      "updated": 1790417433994,
       "version": 1,
       "versionNonce": 1611643822
     },
@@ -1366,7 +1378,7 @@
       "id": "approve",
       "type": "rectangle",
       "x": 955,
-      "y": 915,
+      "y": 1135,
       "width": 240,
       "height": 100,
       "angle": 0,
@@ -1401,7 +1413,7 @@
       "strokeColor": "#868e96",
       "strokeStyle": "solid",
       "strokeWidth": 1,
-      "updated": 1790411489819,
+      "updated": 1790417433994,
       "version": 1,
       "versionNonce": 916299314
     },
@@ -1409,8 +1421,8 @@
       "id": "flow-approve",
       "type": "arrow",
       "x": 898,
-      "y": 965,
-      "width": 35.5,
+      "y": 1185,
+      "width": 20.5,
       "height": 0,
       "angle": 0,
       "backgroundColor": "transparent",
@@ -1438,7 +1450,7 @@
           0
         ],
         [
-          35.5,
+          20.5,
           0
         ]
       ],
@@ -1455,7 +1467,7 @@
       "strokeColor": "#868e96",
       "strokeStyle": "solid",
       "strokeWidth": 2,
-      "updated": 1790411489819,
+      "updated": 1790417433994,
       "version": 1,
       "versionNonce": 1110971886
     },
@@ -1463,7 +1475,7 @@
       "id": "handoff",
       "type": "rectangle",
       "x": 1260,
-      "y": 915,
+      "y": 1135,
       "width": 240,
       "height": 100,
       "angle": 0,
@@ -1494,7 +1506,7 @@
       "strokeColor": "#868e96",
       "strokeStyle": "solid",
       "strokeWidth": 1,
-      "updated": 1790411489819,
+      "updated": 1790417433994,
       "version": 1,
       "versionNonce": 762251250
     },
@@ -1502,8 +1514,8 @@
       "id": "flow-handoff",
       "type": "arrow",
       "x": 1203,
-      "y": 965,
-      "width": 35.5,
+      "y": 1185,
+      "width": 21.5,
       "height": 0,
       "angle": 0,
       "backgroundColor": "transparent",
@@ -1531,7 +1543,7 @@
           0
         ],
         [
-          35.5,
+          21.5,
           0
         ]
       ],
@@ -1548,7 +1560,7 @@
       "strokeColor": "#868e96",
       "strokeStyle": "solid",
       "strokeWidth": 2,
-      "updated": 1790411489819,
+      "updated": 1790417433994,
       "version": 1,
       "versionNonce": 1792747566
     },
@@ -1556,7 +1568,7 @@
       "id": "failure-note",
       "type": "text",
       "x": 40,
-      "y": 1040,
+      "y": 1260,
       "width": 872.05078125,
       "height": 22.5,
       "angle": 0,
@@ -1584,7 +1596,7 @@
       "strokeWidth": 2,
       "text": "Failed checks stop delivery. Requested revisions repeat Implement → Check → Review; old attempts remain.",
       "textAlign": "left",
-      "updated": 1790411489819,
+      "updated": 1790417433994,
       "version": 1,
       "versionNonce": 569194930,
       "verticalAlign": "top"
@@ -1593,7 +1605,7 @@
       "id": "handoff-note",
       "type": "text",
       "x": 40,
-      "y": 1080,
+      "y": 1300,
       "width": 962.15625,
       "height": 22.5,
       "angle": 0,
@@ -1621,7 +1633,7 @@
       "strokeWidth": 2,
       "text": "Authorized PR → protected CI → merge/release is a separate delivery action. Acceptance never publishes automatically.",
       "textAlign": "left",
-      "updated": 1790411489819,
+      "updated": 1790417433994,
       "version": 1,
       "versionNonce": 702673518,
       "verticalAlign": "top"
@@ -1630,7 +1642,7 @@
       "id": "defence",
       "type": "rectangle",
       "x": 40,
-      "y": 1130,
+      "y": 1350,
       "width": 1460,
       "height": 90,
       "angle": 0,
@@ -1657,7 +1669,7 @@
       "strokeColor": "#9c6f19",
       "strokeStyle": "solid",
       "strokeWidth": 1,
-      "updated": 1790411489819,
+      "updated": 1790417433994,
       "version": 1,
       "versionNonce": 1396650866
     },
@@ -1665,7 +1677,7 @@
       "id": "planned",
       "type": "rectangle",
       "x": 40,
-      "y": 1260,
+      "y": 1480,
       "width": 1460,
       "height": 95,
       "angle": 0,
@@ -1687,7 +1699,7 @@
       "strokeColor": "#adb5bd",
       "strokeStyle": "dashed",
       "strokeWidth": 1,
-      "updated": 1790411489819,
+      "updated": 1790417433994,
       "version": 1,
       "versionNonce": 1779791022
     },
@@ -1695,7 +1707,7 @@
       "id": "planned-title",
       "type": "text",
       "x": 60,
-      "y": 1275,
+      "y": 1495,
       "width": 241,
       "height": 20,
       "angle": 0,
@@ -1723,7 +1735,7 @@
       "strokeWidth": 2,
       "text": "PLANNED · not active capabilities",
       "textAlign": "left",
-      "updated": 1790411489819,
+      "updated": 1790417433994,
       "version": 1,
       "versionNonce": 61601074,
       "verticalAlign": "top"
@@ -1732,9 +1744,9 @@
       "id": "planned-body",
       "type": "text",
       "x": 60,
-      "y": 1310,
-      "width": 965.400390625,
-      "height": 23.75,
+      "y": 1530,
+      "width": 870.064453125,
+      "height": 22.5,
       "angle": 0,
       "autoResize": true,
       "backgroundColor": "transparent",
@@ -1742,7 +1754,7 @@
       "containerId": null,
       "fillStyle": "solid",
       "fontFamily": 2,
-      "fontSize": 19,
+      "fontSize": 18,
       "frameId": null,
       "groupIds": [],
       "index": "ah",
@@ -1751,16 +1763,16 @@
       "link": null,
       "locked": false,
       "opacity": 100,
-      "originalText": "Automations + GitHub identity  ·  per-role profiles  ·  scorers/benchmarks  ·  scoped MCP  ·  optional Coolify hosting",
+      "originalText": "More issue-provider adapters · per-role profiles · scorers/benchmarks · scoped MCP · optional Coolify hosting",
       "roughness": 1,
       "roundness": null,
       "seed": 1770480476,
       "strokeColor": "#343a40",
       "strokeStyle": "solid",
       "strokeWidth": 2,
-      "text": "Automations + GitHub identity  ·  per-role profiles  ·  scorers/benchmarks  ·  scoped MCP  ·  optional Coolify hosting",
+      "text": "More issue-provider adapters · per-role profiles · scorers/benchmarks · scoped MCP · optional Coolify hosting",
       "textAlign": "left",
-      "updated": 1790411489819,
+      "updated": 1790417433994,
       "version": 1,
       "versionNonce": 1428074222,
       "verticalAlign": "top"
@@ -1797,7 +1809,7 @@
       "strokeWidth": 1,
       "text": "Project\nScope · design · source · real checks",
       "textAlign": "center",
-      "updated": 1790411489819,
+      "updated": 1790417433994,
       "version": 1,
       "versionNonce": 345669362,
       "verticalAlign": "middle"
@@ -1834,7 +1846,7 @@
       "strokeWidth": 1,
       "text": "Factory Foundation\nRepo/CI · access · host · harness\nServices · recovery · qualification",
       "textAlign": "center",
-      "updated": 1790411489819,
+      "updated": 1790417433994,
       "version": 1,
       "versionNonce": 2005311790,
       "verticalAlign": "middle"
@@ -1871,7 +1883,7 @@
       "strokeWidth": 1,
       "text": "Ready for bounded work\nCommitted source + private state\nKnown limits and acceptance owner",
       "textAlign": "center",
-      "updated": 1790411489819,
+      "updated": 1790417433994,
       "version": 1,
       "versionNonce": 579981490,
       "verticalAlign": "middle"
@@ -1879,10 +1891,10 @@
     {
       "id": "interfaces-label",
       "type": "text",
-      "x": 91.0546875,
-      "y": 432.5,
-      "width": 197.890625,
-      "height": 75,
+      "x": 67.427734375,
+      "y": 436.25,
+      "width": 245.14453125,
+      "height": 67.5,
       "angle": 0,
       "autoResize": true,
       "backgroundColor": "transparent",
@@ -1890,7 +1902,7 @@
       "containerId": "interfaces",
       "fillStyle": "solid",
       "fontFamily": 2,
-      "fontSize": 20,
+      "fontSize": 18,
       "frameId": null,
       "groupIds": [],
       "index": "al",
@@ -1899,16 +1911,16 @@
       "link": null,
       "locked": false,
       "opacity": 100,
-      "originalText": "CLI + dashboard\nTask actions and state\nLocal or SSH tunnel",
+      "originalText": "CLI + dashboard\nSame issue and execution API\nLocal or SSH tunnel",
       "roughness": 1,
       "roundness": null,
       "seed": 913690662,
       "strokeColor": "#343a40",
       "strokeStyle": "solid",
       "strokeWidth": 1,
-      "text": "CLI + dashboard\nTask actions and state\nLocal or SSH tunnel",
+      "text": "CLI + dashboard\nSame issue and execution API\nLocal or SSH tunnel",
       "textAlign": "center",
-      "updated": 1790411489819,
+      "updated": 1790417433994,
       "version": 1,
       "versionNonce": 1689668462,
       "verticalAlign": "middle"
@@ -1916,9 +1928,9 @@
     {
       "id": "controller-label",
       "type": "text",
-      "x": 545.1904296875,
+      "x": 529.658203125,
       "y": 432.5,
-      "width": 264.619140625,
+      "width": 295.68359375,
       "height": 75,
       "angle": 0,
       "autoResize": true,
@@ -1936,16 +1948,16 @@
       "link": null,
       "locked": false,
       "opacity": 100,
-      "originalText": "Controller\nLoopback API · queue · policy\nOne scheduler",
+      "originalText": "Controller\nShared API · policy · explicit Start\nOne execution queue",
       "roughness": 1,
       "roundness": null,
       "seed": 642074048,
       "strokeColor": "#343a40",
       "strokeStyle": "solid",
       "strokeWidth": 1,
-      "text": "Controller\nLoopback API · queue · policy\nOne scheduler",
+      "text": "Controller\nShared API · policy · explicit Start\nOne execution queue",
       "textAlign": "center",
-      "updated": 1790411489819,
+      "updated": 1790417433995,
       "version": 1,
       "versionNonce": 557378162,
       "verticalAlign": "middle"
@@ -1953,10 +1965,10 @@
     {
       "id": "state-label",
       "type": "text",
-      "x": 1072.6806640625,
-      "y": 432.5,
-      "width": 334.638671875,
-      "height": 75,
+      "x": 1093.17431640625,
+      "y": 436.25,
+      "width": 293.6513671875,
+      "height": 67.5,
       "angle": 0,
       "autoResize": true,
       "backgroundColor": "transparent",
@@ -1964,7 +1976,7 @@
       "containerId": "state",
       "fillStyle": "solid",
       "fontFamily": 2,
-      "fontSize": 20,
+      "fontSize": 18,
       "frameId": null,
       "groupIds": [],
       "index": "an",
@@ -1973,16 +1985,16 @@
       "link": null,
       "locked": false,
       "opacity": 100,
-      "originalText": "Private state\nfactory.json · SQLite attempts\nCredentials · revision-bound evidence",
+      "originalText": "Private SQLite + files\nQueue · attempts · write receipts\nConfig + evidence; no backlog mirror",
       "roughness": 1,
       "roundness": null,
       "seed": 1564776073,
       "strokeColor": "#343a40",
       "strokeStyle": "solid",
       "strokeWidth": 1,
-      "text": "Private state\nfactory.json · SQLite attempts\nCredentials · revision-bound evidence",
+      "text": "Private SQLite + files\nQueue · attempts · write receipts\nConfig + evidence; no backlog mirror",
       "textAlign": "center",
-      "updated": 1790411489820,
+      "updated": 1790417433995,
       "version": 1,
       "versionNonce": 1526115758,
       "verticalAlign": "middle"
@@ -1990,9 +2002,9 @@
     {
       "id": "github-label",
       "type": "text",
-      "x": 66.62109375,
-      "y": 576,
-      "width": 246.7578125,
+      "x": 104.4140625,
+      "y": 851,
+      "width": 171.171875,
       "height": 50,
       "angle": 0,
       "autoResize": true,
@@ -2010,16 +2022,16 @@
       "link": null,
       "locked": false,
       "opacity": 100,
-      "originalText": "GitHub + CI\nIssues · source · PR checks",
+      "originalText": "Repository service\nIssues · source · CI",
       "roughness": 1,
       "roundness": null,
       "seed": 1131216231,
       "strokeColor": "#343a40",
       "strokeStyle": "solid",
       "strokeWidth": 1,
-      "text": "GitHub + CI\nIssues · source · PR checks",
+      "text": "Repository service\nIssues · source · CI",
       "textAlign": "center",
-      "updated": 1790411489820,
+      "updated": 1790417433995,
       "version": 1,
       "versionNonce": 2002177074,
       "verticalAlign": "middle"
@@ -2056,7 +2068,7 @@
       "strokeWidth": 1,
       "text": "Local worker\nIsolated checkout + Docker jobs\nHarness runs agent roles\nCodex / Pi / custom",
       "textAlign": "center",
-      "updated": 1790411489820,
+      "updated": 1790417433995,
       "version": 1,
       "versionNonce": 1735444462,
       "verticalAlign": "middle"
@@ -2093,7 +2105,7 @@
       "strokeWidth": 1,
       "text": "Installed definition\nRoles · phase order · approval gates\nPolicy + six read-only job skills\nFoundation stays with the operator",
       "textAlign": "center",
-      "updated": 1790411489820,
+      "updated": 1790417433995,
       "version": 1,
       "versionNonce": 450000370,
       "verticalAlign": "middle"
@@ -2130,7 +2142,7 @@
       "strokeWidth": 1,
       "text": "Inference\nLocal model or cloud provider",
       "textAlign": "center",
-      "updated": 1790411489820,
+      "updated": 1790417433995,
       "version": 1,
       "versionNonce": 170760750,
       "verticalAlign": "middle"
@@ -2139,7 +2151,7 @@
       "id": "implement-label",
       "type": "text",
       "x": 113.3154296875,
-      "y": 940,
+      "y": 1160,
       "width": 93.369140625,
       "height": 50,
       "angle": 0,
@@ -2167,7 +2179,7 @@
       "strokeWidth": 1,
       "text": "Implement\nAgent role",
       "textAlign": "center",
-      "updated": 1790411489820,
+      "updated": 1790417433995,
       "version": 1,
       "versionNonce": 749922226,
       "verticalAlign": "middle"
@@ -2176,7 +2188,7 @@
       "id": "check-label",
       "type": "text",
       "x": 387.1923828125,
-      "y": 940,
+      "y": 1160,
       "width": 155.615234375,
       "height": 50,
       "angle": 0,
@@ -2204,7 +2216,7 @@
       "strokeWidth": 1,
       "text": "Check\nProject command",
       "textAlign": "center",
-      "updated": 1790411489820,
+      "updated": 1790417433995,
       "version": 1,
       "versionNonce": 1511400558,
       "verticalAlign": "middle"
@@ -2213,7 +2225,7 @@
       "id": "review-label",
       "type": "text",
       "x": 681.6064453125,
-      "y": 940,
+      "y": 1160,
       "width": 176.787109375,
       "height": 50,
       "angle": 0,
@@ -2241,7 +2253,7 @@
       "strokeWidth": 1,
       "text": "Review\nSeparate invocation",
       "textAlign": "center",
-      "updated": 1790411489820,
+      "updated": 1790417433995,
       "version": 1,
       "versionNonce": 354361714,
       "verticalAlign": "middle"
@@ -2250,7 +2262,7 @@
       "id": "approve-label",
       "type": "text",
       "x": 1013.2958984375,
-      "y": 940,
+      "y": 1160,
       "width": 123.408203125,
       "height": 50,
       "angle": 0,
@@ -2278,7 +2290,7 @@
       "strokeWidth": 1,
       "text": "Accept\nOperator gate",
       "textAlign": "center",
-      "updated": 1790411489820,
+      "updated": 1790417433995,
       "version": 1,
       "versionNonce": 687040174,
       "verticalAlign": "middle"
@@ -2287,7 +2299,7 @@
       "id": "handoff-label",
       "type": "text",
       "x": 1282.9833984375,
-      "y": 940,
+      "y": 1160,
       "width": 194.033203125,
       "height": 50,
       "angle": 0,
@@ -2315,7 +2327,7 @@
       "strokeWidth": 1,
       "text": "Hand off\nCandidate + evidence",
       "textAlign": "center",
-      "updated": 1790411489820,
+      "updated": 1790417433995,
       "version": 1,
       "versionNonce": 526263090,
       "verticalAlign": "middle"
@@ -2324,7 +2336,7 @@
       "id": "defence-label",
       "type": "text",
       "x": 380.3515625,
-      "y": 1150,
+      "y": 1370,
       "width": 779.296875,
       "height": 50,
       "angle": 0,
@@ -2352,72 +2364,18 @@
       "strokeWidth": 1,
       "text": "DEFENCE   Scoped incident evidence → Investigate agent → private draft for validation\nNo live monitoring or production recovery in the current runtime.",
       "textAlign": "center",
-      "updated": 1790411489820,
+      "updated": 1790417433995,
       "version": 1,
       "versionNonce": 661545198,
       "verticalAlign": "middle"
-    },
-    {
-      "id": "github-import",
-      "type": "arrow",
-      "x": 347.72591978600065,
-      "y": 558.6162143754542,
-      "width": 104.37258790891474,
-      "height": 18.540121058600675,
-      "angle": 0,
-      "backgroundColor": "transparent",
-      "boundElements": null,
-      "elbowed": false,
-      "endArrowhead": "arrow",
-      "endBinding": {
-        "elementId": "controller",
-        "fixedPoint": null,
-        "focus": -5.921109155029366e-16,
-        "gap": 14.71507595933402
-      },
-      "fillStyle": "solid",
-      "frameId": null,
-      "groupIds": [],
-      "index": "ay",
-      "isDeleted": false,
-      "lastCommittedPoint": null,
-      "link": null,
-      "locked": false,
-      "opacity": 100,
-      "points": [
-        [
-          0.5,
-          -0.5
-        ],
-        [
-          104.37258790891474,
-          -18.540121058600675
-        ]
-      ],
-      "roughness": 0,
-      "roundness": null,
-      "seed": 152048430,
-      "startArrowhead": null,
-      "startBinding": {
-        "elementId": "github",
-        "fixedPoint": null,
-        "focus": 1.8115129936702783e-16,
-        "gap": 12.178072983904022
-      },
-      "strokeColor": "#868e96",
-      "strokeStyle": "solid",
-      "strokeWidth": 2,
-      "updated": 1790411489820,
-      "version": 1,
-      "versionNonce": 709599150
     },
     {
       "id": "definition-to-controller",
       "type": "arrow",
       "x": 1063.0666839208154,
       "y": 612.231265624123,
-      "width": 222.46469314283547,
-      "height": 77.96253124824602,
+      "width": 203.46469314283547,
+      "height": 58.96253124824602,
       "angle": 0,
       "backgroundColor": "transparent",
       "boundElements": null,
@@ -2444,8 +2402,8 @@
           -0.5
         ],
         [
-          -222.46469314283547,
-          -77.96253124824602
+          -203.46469314283547,
+          -58.96253124824602
         ]
       ],
       "roughness": 0,
@@ -2461,9 +2419,345 @@
       "strokeColor": "#868e96",
       "strokeStyle": "solid",
       "strokeWidth": 2,
-      "updated": 1790411489820,
+      "updated": 1790417433995,
       "version": 1,
       "versionNonce": 765230638
+    },
+    {
+      "id": "harness-schedule",
+      "type": "rectangle",
+      "x": 40,
+      "y": 555,
+      "width": 300,
+      "height": 105,
+      "angle": 0,
+      "backgroundColor": "#ffffff",
+      "boundElements": [
+        {
+          "id": "yXTOtrmgas65QeNuCxXoU",
+          "type": "text"
+        },
+        {
+          "id": "schedule-to-cli",
+          "type": "arrow"
+        },
+        {
+          "id": "harness-to-cli",
+          "type": "arrow"
+        }
+      ],
+      "fillStyle": "solid",
+      "frameId": null,
+      "groupIds": [],
+      "index": "b00",
+      "isDeleted": false,
+      "link": null,
+      "locked": false,
+      "opacity": 100,
+      "roughness": 1,
+      "roundness": {
+        "type": 3
+      },
+      "seed": 246953714,
+      "strokeColor": "#868e96",
+      "strokeStyle": "dashed",
+      "strokeWidth": 2,
+      "updated": 1790417433995,
+      "version": 1,
+      "versionNonce": 1274408690
+    },
+    {
+      "id": "issue-adapter",
+      "type": "rectangle",
+      "x": 470,
+      "y": 815,
+      "width": 415,
+      "height": 110,
+      "angle": 0,
+      "backgroundColor": "#e6fcf5",
+      "boundElements": [
+        {
+          "id": "icB13HUDeMobHgbiRO-sb",
+          "type": "text"
+        },
+        {
+          "id": "repository-to-adapter",
+          "type": "arrow"
+        }
+      ],
+      "fillStyle": "solid",
+      "frameId": null,
+      "groupIds": [],
+      "index": "b02",
+      "isDeleted": false,
+      "link": null,
+      "locked": false,
+      "opacity": 100,
+      "roughness": 1,
+      "roundness": {
+        "type": 3
+      },
+      "seed": 3705010,
+      "strokeColor": "#0b7285",
+      "strokeStyle": "solid",
+      "strokeWidth": 2,
+      "updated": 1790417433995,
+      "version": 1,
+      "versionNonce": 1572169010
+    },
+    {
+      "id": "provider-boundary",
+      "type": "rectangle",
+      "x": 1030,
+      "y": 815,
+      "width": 420,
+      "height": 110,
+      "angle": 0,
+      "backgroundColor": "#ffffff",
+      "boundElements": [
+        {
+          "id": "Fz7Kwb1VVf24NoTj20vaZ",
+          "type": "text"
+        }
+      ],
+      "fillStyle": "solid",
+      "frameId": null,
+      "groupIds": [],
+      "index": "b03",
+      "isDeleted": false,
+      "link": null,
+      "locked": false,
+      "opacity": 100,
+      "roughness": 1,
+      "roundness": {
+        "type": 3
+      },
+      "seed": 603394926,
+      "strokeColor": "#868e96",
+      "strokeStyle": "solid",
+      "strokeWidth": 2,
+      "updated": 1790417433995,
+      "version": 1,
+      "versionNonce": 1394577390
+    },
+    {
+      "id": "yXTOtrmgas65QeNuCxXoU",
+      "type": "text",
+      "x": 83.4326171875,
+      "y": 573.75,
+      "width": 213.134765625,
+      "height": 67.5,
+      "angle": 0,
+      "autoResize": true,
+      "backgroundColor": "transparent",
+      "boundElements": null,
+      "containerId": "harness-schedule",
+      "fillStyle": "solid",
+      "fontFamily": 2,
+      "fontSize": 18,
+      "frameId": null,
+      "groupIds": [],
+      "index": "b04",
+      "isDeleted": false,
+      "lineHeight": 1.25,
+      "link": null,
+      "locked": false,
+      "opacity": 100,
+      "originalText": "Optional harness schedule\nCalls Factory CLI/API\nNo Factory cron module",
+      "roughness": 1,
+      "roundness": null,
+      "seed": 475278834,
+      "strokeColor": "#868e96",
+      "strokeStyle": "solid",
+      "strokeWidth": 2,
+      "text": "Optional harness schedule\nCalls Factory CLI/API\nNo Factory cron module",
+      "textAlign": "center",
+      "updated": 1790417433995,
+      "version": 1,
+      "versionNonce": 528430770,
+      "verticalAlign": "middle"
+    },
+    {
+      "id": "icB13HUDeMobHgbiRO-sb",
+      "type": "text",
+      "x": 547.439453125,
+      "y": 836.25,
+      "width": 260.12109375,
+      "height": 67.5,
+      "angle": 0,
+      "autoResize": true,
+      "backgroundColor": "transparent",
+      "boundElements": null,
+      "containerId": "issue-adapter",
+      "fillStyle": "solid",
+      "fontFamily": 2,
+      "fontSize": 18,
+      "frameId": null,
+      "groupIds": [],
+      "index": "b05",
+      "isDeleted": false,
+      "lineHeight": 1.25,
+      "link": null,
+      "locked": false,
+      "opacity": 100,
+      "originalText": "Issue-provider adapter\nGitHub: read · templates · create\nCalled by the controller",
+      "roughness": 1,
+      "roundness": null,
+      "seed": 1855642418,
+      "strokeColor": "#0b7285",
+      "strokeStyle": "solid",
+      "strokeWidth": 2,
+      "text": "Issue-provider adapter\nGitHub: read · templates · create\nCalled by the controller",
+      "textAlign": "center",
+      "updated": 1790417433995,
+      "version": 1,
+      "versionNonce": 70927726,
+      "verticalAlign": "middle"
+    },
+    {
+      "id": "Fz7Kwb1VVf24NoTj20vaZ",
+      "type": "text",
+      "x": 1091.412109375,
+      "y": 836.25,
+      "width": 297.17578125,
+      "height": 67.5,
+      "angle": 0,
+      "autoResize": true,
+      "backgroundColor": "transparent",
+      "boundElements": null,
+      "containerId": "provider-boundary",
+      "fillStyle": "solid",
+      "fontFamily": 2,
+      "fontSize": 18,
+      "frameId": null,
+      "groupIds": [],
+      "index": "b06",
+      "isDeleted": false,
+      "lineHeight": 1.25,
+      "link": null,
+      "locked": false,
+      "opacity": 100,
+      "originalText": "Capability-based integration\nUnknown remote → local fallback\nForgejo / Origin adapters not shipped",
+      "roughness": 1,
+      "roundness": null,
+      "seed": 1287431410,
+      "strokeColor": "#868e96",
+      "strokeStyle": "solid",
+      "strokeWidth": 2,
+      "text": "Capability-based integration\nUnknown remote → local fallback\nForgejo / Origin adapters not shipped",
+      "textAlign": "center",
+      "updated": 1790417433995,
+      "version": 1,
+      "versionNonce": 663326834,
+      "verticalAlign": "middle"
+    },
+    {
+      "id": "repository-to-adapter",
+      "type": "arrow",
+      "x": 347.9993941516695,
+      "y": 874.0553920719794,
+      "width": 112.00121169666102,
+      "height": 1.4030918362665261,
+      "angle": 0,
+      "backgroundColor": "transparent",
+      "boundElements": null,
+      "elbowed": false,
+      "endArrowhead": "arrow",
+      "endBinding": {
+        "elementId": "issue-adapter",
+        "fixedPoint": null,
+        "focus": -2.8519838360655613e-15,
+        "gap": 7.999394151669492
+      },
+      "fillStyle": "solid",
+      "frameId": null,
+      "groupIds": [],
+      "index": "b07",
+      "isDeleted": false,
+      "lastCommittedPoint": null,
+      "link": null,
+      "locked": false,
+      "opacity": 100,
+      "points": [
+        [
+          0.5,
+          -0.5
+        ],
+        [
+          112.00121169666102,
+          -0.4030918362665261
+        ]
+      ],
+      "roughness": 1,
+      "roundness": null,
+      "seed": 1459987950,
+      "startArrowhead": null,
+      "startBinding": {
+        "elementId": "github",
+        "fixedPoint": null,
+        "focus": 0,
+        "gap": 7.999394151669492
+      },
+      "strokeColor": "#868e96",
+      "strokeStyle": "solid",
+      "strokeWidth": 2,
+      "updated": 1790417433995,
+      "version": 1,
+      "versionNonce": 1225589934
+    },
+    {
+      "id": "harness-to-cli",
+      "type": "arrow",
+      "x": 190,
+      "y": 547,
+      "width": 0,
+      "height": 12,
+      "angle": 0,
+      "backgroundColor": "transparent",
+      "boundElements": null,
+      "elbowed": false,
+      "endArrowhead": "arrow",
+      "endBinding": {
+        "elementId": "interfaces",
+        "fixedPoint": null,
+        "focus": 0,
+        "gap": 8
+      },
+      "fillStyle": "solid",
+      "frameId": null,
+      "groupIds": [],
+      "index": "b08",
+      "isDeleted": false,
+      "lastCommittedPoint": null,
+      "link": null,
+      "locked": false,
+      "opacity": 100,
+      "points": [
+        [
+          0,
+          -0.5
+        ],
+        [
+          0,
+          -12
+        ]
+      ],
+      "roughness": 1,
+      "roundness": null,
+      "seed": 1107458034,
+      "startArrowhead": null,
+      "startBinding": {
+        "elementId": "harness-schedule",
+        "fixedPoint": null,
+        "focus": 0,
+        "gap": 8
+      },
+      "strokeColor": "#868e96",
+      "strokeStyle": "dashed",
+      "strokeWidth": 2,
+      "updated": 1790417433995,
+      "version": 1,
+      "versionNonce": 165294382
     }
   ],
   "appState": {

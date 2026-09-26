@@ -40,3 +40,5 @@ use the linked guides for details rather than copying their specifications.
 
 Roadmap features remain in [issues](https://github.com/arcitai/software-and-defence-factory/issues)
 and the [interface gaps](interfaces.md), separate from this implemented map.
+
+[Repository integrations](integrations.md) defines provider selection, data ownership and local fallback.

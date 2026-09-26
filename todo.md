@@ -44,7 +44,7 @@ explicit [capability matrix](docs/interfaces.md):
 1. Read/status/artifacts and machine-readable CLI results, plus the existing
    task actions through the common API.
 2. GitHub backlog/admission with visible issue-to-job links and explicit scope;
-   labels remain planning metadata until a trigger is separately qualified.
+   labels remain planning metadata; optional harness automations call the shared API/CLI.
 3. Setup, image selection, diagnostics, services and updates through a supported
    operator boundary, including behavior when a project controller is stopped.
 4. Source and delivery controls from #28/#29 in both interfaces.
@@ -84,15 +84,15 @@ and the [self-development recipe](docs/development.md) before submitting work.
 ## Current workbench slice
 
 - [x] [#47 — shared workflows/skills and clearer task intake](https://github.com/arcitai/software-and-defence-factory/issues/47): implementation, 114 automated tests, Node 22/24 CI, independent code review and desktop/narrow light/dark browser acceptance passed. Includes generic worker identity, checkbox filters, horizontal Kanban, GitHub issue chooser and modal issue import. Normal publication and installed readback are recorded in PR #48.
-- Workflow editing and optional issue triggers remain under #37, with common CLI/API policy; issue creation alone must not start execution.
+- Workflow editing remains under #37. Optional issue admission is scheduled by the selected harness, calling the common CLI/API; issue creation alone must not start execution.
 
 ## Definition and foundation alignment
 
 - [x] [#49 — one vocabulary, foundation ownership and workbench](https://github.com/arcitai/software-and-defence-factory/issues/49): shared catalog; operator skill in Factory; independent project contracts; whole-row filters, shared status groups and local task intake; repository cleanup. Verified in [PR #55](https://github.com/arcitai/software-and-defence-factory/pull/55); release/adoption evidence is recorded there.
 - [ ] [#50 — Defence roles, skills and evidence](https://github.com/arcitai/software-and-defence-factory/issues/50), then the bounded case in #7.
 - [ ] [#51 — scorers, benchmarks and improvement analytics](https://github.com/arcitai/software-and-defence-factory/issues/51). Recorded token coverage is not a quality score.
-- [ ] [#52 — native intake and GitHub identity](https://github.com/arcitai/software-and-defence-factory/issues/52). Explicit repository/credential boundaries precede automations.
-- [ ] [#53 — versioned definitions and role profiles](https://github.com/arcitai/software-and-defence-factory/issues/53). Current roles share one installation profile.
+- [ ] [#52 — native intake and GitHub identity](https://github.com/arcitai/software-and-defence-factory/issues/52). Repository/credential boundaries and persistent intake scope; #58 delivers the first provider bridge.
+- [ ] [#53 — versioned definitions and role profiles](https://github.com/arcitai/software-and-defence-factory/issues/53). Current roles share one installation profile; schedules belong to the selected harness.
 - [ ] [#54 — scoped MCP over the shared API](https://github.com/arcitai/software-and-defence-factory/issues/54). One controller and authorization policy.
 
 These extend the #37 parity track. Hosting (#39), observability (#32), quality
@@ -101,3 +101,7 @@ measurement (#51) and security investigation (#50) remain distinct scopes.
 ## Repository-backed issue intake
 
 - [x] [#56 — repository forms and GitHub issue intake](https://github.com/arcitai/software-and-defence-factory/issues/56): shared `issue` commands, repository templates and required fields, paged issue picker with labels, editable recommendation and explicit start. Verified in [PR #57](https://github.com/arcitai/software-and-defence-factory/pull/57), with 119 automated tests, independent review and desktop/mobile browser acceptance. A bounded slice of #52/#37; no background admission or GitHub writes.
+
+## Repository issue bridge
+
+- [ ] [#58 — modular repository issue bridge](https://github.com/arcitai/software-and-defence-factory/issues/58): GitHub publication through the shared API/CLI/dashboard, explicit later start, durable receipts and bounded recovery; other remotes retain local execution. Harnesses own scheduling. Implementation and real GitHub creation are verified; independent review and release/adoption remain the delivery gate. Broader hosted identity, unsent persistent drafts and additional provider adapters are not claimed.
