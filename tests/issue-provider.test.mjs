@@ -43,12 +43,14 @@ test('GitHub adapter pins repository identity, preserves labels and reconciles a
   const root=directory(t);execFileSync('git',['init',root],{stdio:'ignore'});execFileSync('git',['-C',root,'remote','add','origin','git@github.com:example/project.git']);
   let stored,writes=0;
   const provider=githubIssueProvider(root,{read:async args=>{
+    if(args[0]==='issue'){assert.deepEqual(args,['issue','view','https://github.com/example/project/issues/4','--json','title,body,url,labels']);return {title:stored.title,body:stored.body,url:stored.html_url,labels:stored.labels};}
     const endpoint=args[3];if(endpoint==='user')return {id:7,login:'operator'};
     if(endpoint==='repos/example/project')return {full_name:'example/project',has_issues:true,permissions:{push:true}};
     assert.match(endpoint,/repos\/example\/project\/issues\?state=all&creator=operator/);return stored?[stored]:[];
   },write:async(path,payload)=>{assert.equal(path,'repos/example/project/issues');writes++;stored={number:4,html_url:'https://github.com/example/project/issues/4',user:{id:7},title:payload.title,body:payload.body,labels:payload.labels.map(name=>({name}))};return stored;}});
   const queue=new JobQueue(root,executor);t.after(()=>queue.close());const store=new IssueSubmissions(queue,provider),input={...fixture().input,repository:'https://github.com/example/project'};
   const result=await store.create(input);assert.deepEqual(result.issue.labels,['enhancement']);assert.match(stored.body,/<!-- factory-issue:/);
+  const selected=await provider.preview(result.issue.url);assert.equal(selected.title,input.title);assert.equal(selected.url,result.issue.url);assert.match(selected.spec,/bounded software improvement/);
   const record=store.get(input.request_id);record.state='pending';store.save(record);assert.equal((await store.recover(input.request_id)).issue.url,stored.html_url);assert.equal(writes,1);
   stored=null;record.state='uncertain';store.save(record);await assert.rejects(store.recover(input.request_id),/still unconfirmed/);assert.equal(writes,1);
 });
