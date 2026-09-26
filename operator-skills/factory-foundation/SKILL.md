@@ -21,7 +21,10 @@ It is not an execution-job skill and grants no infrastructure or account access.
 Identify the repository, responsible owner, intended work, checks and delivery
 destination. Distinguish application hosting from Factory execution compute.
 Use the actual host's OS, service manager, hardware and private network; do not
-assume a machine model, a VPN provider, a cloud or a particular harness.
+assume a machine model, a VPN provider, a cloud, Git forge, issue tracker, CI
+provider or particular harness. Inspect the configured remote and actual provider
+capabilities. GitHub is one adapter; an unsupported host keeps local execution
+without guessed API calls. Use [integration ownership](../../docs/integrations.md).
 
 Use the existing task/issue record for missing obligations and evidence. Avoid a
 second project registry or a template conversion of an existing application.
@@ -33,13 +36,13 @@ Continue authorized repairs; ask only for decisions or authority actually missin
   real checks, code/design standards, secrets, ownership and recovery. Preserve
   the project’s canonical sources and confirm that jobs can discover them through
   repository instructions. Adapt the staged method to the
-  project; do not overwrite its files. Reconcile issue forms/labels, CI triggers,
+  project; do not overwrite its files. Reconcile the chosen provider’s issue forms/labels (where supported), CI triggers,
   required checks, protection rules and the intended PR/release path using
   [repository readiness](../../kit/repository.md). File presence is not proof.
 - **Infrastructure:** choose a private state directory, loopback port, host and
   unprivileged operator. Verify actual SSH authentication, host key, network,
   Docker and stable Node executable where needed. Factory needs no unrestricted
-  sudo. Jobs must not receive Docker, SSH, GitHub or deployment credentials.
+  sudo. Jobs must not receive Docker, SSH, forge or deployment credentials.
 - **Harness and model:** select supported tools and a compatible job image;
   verify the intended inference route from that image/network. Keep credentials
   private and scoped. A working model endpoint does not qualify output quality.
@@ -53,8 +56,11 @@ Continue authorized repairs; ask only for decisions or authority actually missin
   authorized delivery. A synthetic success is not application qualification.
 
 Skills guide agents. The controller owns execution order, isolation and approval
-gates. Creating a GitHub issue or assigning a label does not start work. Do not
-invent polling, automatic publication or production recovery capabilities.
+gates. Remote issues stay in the selected provider; SQLite owns execution and
+external-write receipts. Creating an issue or assigning a label does not start work.
+Optional schedules belong to the selected harness and call Factory CLI/API; do
+not install a parallel cron module or enable schedules during ordinary setup.
+Verify each requested provider action separately from job/inference access.
 
 ## Handoff
 

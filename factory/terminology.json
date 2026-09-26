@@ -7,7 +7,8 @@
   "skill": "Reusable instructions available to an agent or operator; not a process or an access grant.",
   "workflow": "The ordered agent steps, deterministic checks and approval gates for a work type.",
   "task": "Compatibility name for an admitted local issue, stored as a job with retained run attempts.",
-  "automation": "A trigger, filters and target that admits work automatically. Not yet implemented.",
+  "automation": "A schedule managed by the selected harness, which invokes the Factory CLI/API. Factory has no cron scheduler.",
   "definition": "The effective work roles, workflows, skills and installation settings, separate from runtime records.",
-  "issue": "A bounded local work request, created from a repository form, blank brief or GitHub issue; Create & start admits execution. This does not publish a GitHub issue."
+  "issue": "A bounded work request. Repository issues live with the selected provider; local briefs remain possible. Creation and execution are separate actions.",
+  "provider": "An adapter for repository issue capabilities. GitHub is supported first; unknown hosts retain local execution."
 }

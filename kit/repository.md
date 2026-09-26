@@ -1,8 +1,11 @@
 # Prepare a repository for Factory work
 
 The method works with an existing agent and CI. The optional runtime adds a
-queue, isolated execution and dashboard. GitHub preparation provides a shared
-work queue; it does not turn labels into an execution trigger.
+queue, isolated execution and dashboard. Use the chosen Git forge, issue tracker
+and CI. GitHub is the currently implemented runtime issue adapter and the example
+below, not a requirement of the method. Unknown hosts retain local brief execution;
+do not translate these commands into guessed provider APIs. Labels are planning
+metadata, not execution triggers.
 
 ## Establish a reproducible baseline
 
@@ -27,7 +30,10 @@ and AGENTS routes a fresh job to it. Record terminology and durable decisions
 where the project already keeps them. Skills guide behavior; enforce mechanical
 rules through actual checks and access limits. A prose rule is not a sandbox.
 
-## Adopt the issue form and labels
+## Adopt provider-appropriate issue forms and labels
+
+Preserve the adopter’s conventions. The following GitHub example only applies
+when GitHub was selected; other providers require their own supported formats.
 
 The exported kit includes `.github/ISSUE_TEMPLATE/factory-task.yml` and
 `.factory-kit/labels.json`. Review the form and merge it with existing repository
@@ -78,10 +84,11 @@ tracked separately in Factory #28; naming a SHA in task text does not pin it.
 Submit the selected issue with `software-defence-factory run --issue URL --state
 PATH`, or submit a reviewed task file using `run --file`. Issue submission uses
 the operator's `gh` authentication and checks the issue against the configured
-origin. The dashboard submits briefs to the same runtime and can preview/import a
-selected GitHub issue using the operator host’s authentication. It does not
-synchronize the backlog; browser GitHub login is separate. Keep external link/issue/job
-mapping in the trusted handoff record. No automatic GitHub polling is enabled.
+origin. The dashboard and `issue create` can create a GitHub issue through the selected
+provider, without starting execution. `issue start` or a deliberate UI Start
+admits work separately. Remote issues remain the provider’s backlog; SQLite
+retains execution and creation receipts. Browser login is separate from host
+access. Optional schedules belong to the harness, not a Factory polling module.
 
 ## Review and deliver
 

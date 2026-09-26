@@ -223,7 +223,7 @@ function App() {
         {view === "task" ? <TaskDetail identity={identity} links={status.project_links} navigation={visibleJobs.map(job => ({ id: job.id, title: jobDisplayTitle(job) }))} csrfToken={status.csrf_token} job={selectedJob} loaded={statusLoaded} error={statusError || taskActionError} deleting={deletingJob === route.jobID} onDelete={deleteJob} onWorkflowAction={workflowAction} />
           : view === "analytics" ? <Analytics jobs={status.jobs} workflows={status.workflows || []} loaded={statusLoaded} error={statusError} />
             : view === "infrastructure" ? <InfrastructurePage infrastructure={status.infrastructure} workers={status.workers} identity={identity} loaded={statusLoaded} error={statusError} />
-              : view === "automations" ? <AutomationsPage loaded={statusLoaded} error={statusError} />
+              : view === "automations" ? <AutomationsPage control={status.automation_control} loaded={statusLoaded} error={statusError} />
                   : ["agents", "skills", "definition"].includes(view) ? <DefinitionPage key={view} section={view} />
                   : <RunsOverview
                     visibleJobs={visibleJobs}
@@ -247,7 +247,7 @@ function App() {
                     setRunsView={changeRunsView}
                     refresh={() => statusLoader.current.refresh()}
                     openComposer={() => (setSubmitError(""), setComposerOpen(true))}
-                    composer={composerOpen && <RunComposer csrfToken={status.csrf_token} projectLinks={status.project_links} error={submitError} title={title} setTitle={setTitle} sourceURL={sourceURL} setSourceURL={setSourceURL} choices={choices} repositories={repositories} identity={identity} selection={selection} setSelection={setSelection} repository={repository} setRepository={setRepository} prompt={prompt} setPrompt={setPrompt} model={model} setModel={setModel} submitting={submitting} submit={submit} close={() => setComposerOpen(false)} />}
+                    composer={composerOpen && <RunComposer issueProvider={status.issue_provider} csrfToken={status.csrf_token} projectLinks={status.project_links} error={submitError} title={title} setTitle={setTitle} sourceURL={sourceURL} setSourceURL={setSourceURL} choices={choices} repositories={repositories} identity={identity} selection={selection} setSelection={setSelection} repository={repository} setRepository={setRepository} prompt={prompt} setPrompt={setPrompt} model={model} setModel={setModel} submitting={submitting} submit={submit} close={() => setComposerOpen(false)} />}
                   />}
       </main>
     </div>

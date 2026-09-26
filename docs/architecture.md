@@ -15,9 +15,18 @@ Defence. Dashed planned capabilities are not installed behavior.
 
 Software phases are build → verify → review → approved handoff. An implementation receives a writable job checkout; verification and review cannot modify that candidate. Both must cover the candidate commit and current policy hash. A requested revision preserves old work and starts a fresh implementation/check/review sequence. Retry resumes a stopped phase only after process/container reconciliation.
 
-Defence is a separate read-only investigation workflow over admitted incident evidence. Both workflows use one execution owner; no competing scheduler exists. Automatic issue polling, live production connectors, arbitrary workflow editing and autonomous deployment are not implemented.
+Defence is a separate read-only investigation workflow over admitted incident evidence. Both workflows use one execution owner; no competing scheduler exists. Schedules belong to the selected harness; Factory has no cron module or issue watcher. Live production connectors, arbitrary workflow editing and autonomous deployment are not implemented.
 
 `dashboard/` preserves the selected task board, details, files, history, analytics, infrastructure, agents, skills and definition views. Vite builds self-contained assets into `factory/ui/`; npm consumers need no frontend toolchain. The UI displays actual queue records, with unreported cost/tokens remaining unknown.
+
+## Repository integration
+
+The [provider boundary](integrations.md) selects supported issue capabilities from
+the Git origin. GitHub is the first adapter; unknown hosts retain local execution.
+The CLI and dashboard call one controller API. Remote issues remain with their
+provider; SQLite stores execution records and durable write receipts for recovery,
+not a second issue backlog. Creating a remote issue never schedules execution.
+The harness owns optional automations and calls the same API/CLI.
 
 ## Method and updates
 
@@ -34,7 +43,9 @@ Earlier experimental runtime and evaluation dashboards are retained in Git histo
 | Vocabulary | `factory/terminology.json` | Definition catalog, dashboard, CLI |
 | Agent roles, skills and phase order | `factory/definition.mjs` | Queue, definitions API, CLI and UI |
 | Instance settings | Private `factory.json` | Controller and immutable admitted attempt config |
-| Job state and attempts | Private SQLite queue | CLI status/Inbox and dashboard |
+| Job state, attempts and external write receipts | Private SQLite queue | CLI/API and dashboard |
+| Remote issue metadata | Selected provider (GitHub adapter first) | Live adapter reads, CLI/API and dashboard |
+| Automation schedule | Selected harness | Explicit calls into Factory CLI/API |
 | List/board status groups | `dashboard/src/runs-board.js` | Both task views and their filters |
 | Host details | `factory/machine.mjs` | Infrastructure API and dashboard |
 | Job instructions | `.agents/skills/`, `kit/policy.md` | Read-only execution mounts and staged method export |

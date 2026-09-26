@@ -3,8 +3,8 @@ import http from 'node:http';
 import { randomBytes, timingSafeEqual } from 'node:crypto';
 import { existsSync, readFileSync, readdirSync, lstatSync, realpathSync } from 'node:fs';
 import { join, resolve, sep } from 'node:path';
-import { listIssues, readIssue } from './issue-intake.mjs';
-import { readTemplates, draftFromTemplate } from './issue-templates.mjs';
+import { issueProvider, providerInfo } from './issue-provider.mjs';
+import { IssueSubmissions } from './issue-submissions.mjs';
 import { recommendWork } from './intake.mjs';
 import { machineInfo } from './machine.mjs';
 import { factoryDefinition } from './definition.mjs';
@@ -30,10 +30,12 @@ function artifacts(state, jobId) {
       return stat.isFile() && !stat.isSymbolicLink() ? [{ id: `${jobId}~${runId}~${name}`, run_id: runId, path: name, storagePath: `${runId}/${name}`, size: stat.size, bytes: stat.size, content_type: 'text/plain' }] : [];
     }));
 }
-export function createController(state, adapter = executors(state)) {
+export function createController(state, adapter = executors(state), integrations = {}) {
   const config = configAt(state), csrf = randomBytes(32).toString('hex');
   const token = readFileSync(join(state, 'worker.token'), 'utf8').trim();
   const queue = new JobQueue(state, adapter);
+  const provider = integrations.issueProvider || issueProvider(config.repo);
+  const submissions = new IssueSubmissions(queue, provider);
   const projectLinks = readProjectLinks(config.repo);
   const definitions = factoryDefinition(config), host = machineInfo();
   const server = http.createServer(async (request, response) => {
@@ -52,7 +54,7 @@ export function createController(state, adapter = executors(state)) {
           outcome: attempt.outcome || (attempt.state === 'succeeded' ? 'complete' : undefined) }, adapter.usage?.(job, attempt))) }));
         return send(200, { version: 1, runtime_version: VERSION, maintenance: queue.maintenance, workflows: Object.keys(definitions.workflows), commands: [], triggers: [], jobs, csrf_token: csrf,
           infrastructure: { host, controller: { connected: !queue.closing }, workers: [{ id: 'local-executor', name: 'Local worker', host: host.hostname, connected: !queue.closing }] },
-          automations: [],
+          automations: [], automation_control: definitions.automations, issue_provider: providerInfo(provider),
           workers: [{ name: 'Local worker', machine: host, instance_id: 'local-executor', repositories: ['app'], connected: !queue.closing, last_seen_at: new Date().toISOString() }], // v1 compatibility view
           repositories: ['app'], repo: config.repo, project_links: projectLinks, harness: harnessOf(config), agent: harnessOf(config) });
       }
@@ -61,13 +63,17 @@ export function createController(state, adapter = executors(state)) {
       }
       if (request.method === 'GET' && url.pathname === '/api/v1/issues') {
         if (!authenticated) throw new QueueError('Session required', 403);
-        try { return send(200, await listIssues(config.repo, Number(url.searchParams.get('page') || 1))); }
+        try { return send(200, await provider.list(Number(url.searchParams.get('page') || 1))); }
         catch (error) { throw new QueueError(error.message, 400); }
       }
       if (request.method === 'GET' && url.pathname === '/api/v1/issue-templates') {
         if (!authenticated) throw new QueueError('Session required', 403);
-        try { return send(200, await readTemplates(config.repo)); }
+        try { return send(200, await provider.templates()); }
         catch (error) { throw new QueueError(error.message, 400); }
+      }
+      if (request.method === 'GET' && ['/api/v1/issue-connection','/api/v1/issue-submissions'].includes(url.pathname)) {
+        if (!authenticated) throw new QueueError('Session required', 403);
+        return send(200, url.pathname.endsWith('issue-submissions') ? submissions.list() : { ...providerInfo(provider), ...(provider.supported ? await provider.context() : {}) });
       }
       const content = url.pathname.match(/^\/api\/v1\/artifacts\/(job_[a-f0-9]+)~(run_[a-f0-9]+)~([\w.-]+)\/content$/);
       const artifactList = url.pathname.match(/^\/api\/v1\/jobs\/(job_[a-f0-9]+)\/artifacts$/);
@@ -85,16 +91,19 @@ export function createController(state, adapter = executors(state)) {
         if (!authenticated) throw new QueueError('Session required', 403);
         if (!(request.headers['content-type'] || '').startsWith('application/json')) throw new QueueError('Use application/json', 415);
         const input = await body(request);
+        if (url.pathname === '/api/v1/issues') return send(201, await submissions.create(input));
+        const recovery = url.pathname.match(/^\/api\/v1\/issue-submissions\/([A-Za-z0-9_-]{16,100})\/recover$/);
+        if (recovery) return send(200, await submissions.recover(recovery[1]));
         if (url.pathname === '/api/v1/maintenance') {
           if (!equal(request.headers.authorization, `Bearer ${token}`)) throw new QueueError('Operator token required for maintenance', 403);
           return send(200, queue.setMaintenance(input.enabled));
         }
         if (url.pathname === '/api/v1/issues/preview') {
-          try { return send(200, await readIssue(config.repo, input.url)); }
+          try { return send(200, await provider.preview(input.url)); }
           catch (error) { throw new QueueError(error.message, 400); }
         }
         if (url.pathname === '/api/v1/issue-templates/draft') {
-          try { return send(200, await draftFromTemplate(config.repo, input)); }
+          try { return send(200, await provider.draft(input)); }
           catch (error) { throw new QueueError(error.message, 400); }
         }
         if (url.pathname === '/api/v1/intake/recommend') {

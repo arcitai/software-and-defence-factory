@@ -12,14 +12,16 @@ The CLI `definition` command and dashboard Definition page read that same catalo
 | Agent | Responsibility and instructions | Implement, Review, Investigate; one shared harness/model profile |
 | Skill | Reusable instructions | Six job skills; separate operator Factory Foundation |
 | Workflow | Ordered steps and gates | Software: Implement → Check → Review → Accept; Defence: Investigate |
-| Local issue | Bounded work request | Created from a form, brief or GitHub source; stored as a job with retained run attempts |
-| Automation | Trigger, filters and target | Planned; work starts manually |
+| Issue | Bounded work request | Remote issue lives in its provider; a local brief needs no remote issue |
+| Execution | Admitted work and its attempts | Stored in the private SQLite queue with source link and evidence |
+| Provider | Repository issue integration | GitHub adapter first; unknown remotes retain local execution |
+| Automation | External schedule and agent context | Owned by the selected harness; calls Factory CLI/API, no Factory cron |
 | Definition | Effective roles, workflows, skills and settings | Installed method plus private factory.json; read-only catalog |
 
-Inbox contains admitted local issues, not an automatically imported GitHub backlog.
-New issue previews a local draft; Create & start admits execution. GitHub issues
-and templates are source material: nothing is posted back to GitHub. Drafts stay
-in the open form until creation; there is no persistent unstarted backlog yet.
+Inbox contains execution history, not a copied remote issue backlog. New issue
+can create a repository issue without execution; Start work admits execution
+separately. The provider owns issue content/state; SQLite owns queue/attempts and
+creation receipts for recovery. An unfinished local form is not a saved backlog.
 An agent role is neither a machine nor a skill. Check is deterministic, and
 Accept is an operator gate. Triage/specification precede admission; evaluation
 is separately scoped work, not an automatic hidden agent phase.
@@ -51,7 +53,10 @@ Execution IDs (`build`, `verify`, `handoff`, `job_*`, `run_*`) are stable wire a
 evidence identifiers. Human labels explain them without rewriting stored jobs.
 Compatibility is handled at these boundaries; there is one active implementation.
 
-CLI `issue` groups list, templates, preview, draft, recommend and create. The
+CLI `issue` groups list, connection, templates, preview, draft, recommend, create,
+start, submissions and recover. Since 0.6, `issue create` only publishes; migrate
+0.5.1 execution callers to `issue start`. The
 legacy `run`, `issues` (GitHub list) and `recommend` commands remain compatible.
 Task/job field names and `/api/v1/jobs` are stable wire/storage identifiers for
-these same local issues; this adds no parallel scheduler or issue database.
+these same local issues; the extra SQLite receipt table is external-write bookkeeping, not an issue mirror
+or another scheduler.

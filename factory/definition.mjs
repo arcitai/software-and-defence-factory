@@ -34,7 +34,7 @@ export function factoryDefinition(config) {
       phase, title: info.title, responsibility: info.description, harness, model: config.model || null, skills: info.skills,
     })),
     operator_skills: [foundationSkill()],
-    automations: { supported: false, items: [] },
+    automations: { owner: 'harness', harness, managed_by_factory: false, discovery: 'unavailable', items: null },
     commands: Object.entries(phaseInfo).map(([name, info]) => ({ name, ...info, prompt: info.description,
       executor: info.owner === 'agent' ? harnessOf(config) : 'factory', timeout: `${config.timeoutSeconds}s` })),
     skills,

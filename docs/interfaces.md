@@ -10,16 +10,17 @@ shell endpoint or a second scheduler.
 | Capability | CLI | Shared API | Dashboard | Remaining work |
 | --- | --- | --- | --- | --- |
 | Project/queue/attempt state | `status`, `inbox` JSON | `GET /api/v1/status` | Project, tasks, details/history | Stable versioned agent result/error contract |
-| Create local issue | `issue create --file --title`, `--draft` or `--github`, explicit `--workflow`, optional `--model` | `POST /api/v1/jobs` | New issue → review → Create & start | Persistent unstarted drafts and typed incident intake remain separate |
-| Browse/import GitHub issues | `issue list --source github [--page N]`, `issue preview --github URL` via operator `gh` | Authenticated `GET /api/v1/issues`, `POST /api/v1/issues/preview` using shared readers | Paged open-issue list, search loaded results, preview and explicit start for either type | Stronger issue/job identity, issue creation and qualified triggers remain; no implicit polling |
+| Start local work | `issue start --file --title`, `--draft` or `--url`, explicit `--workflow`, optional `--model` | `POST /api/v1/jobs` | Local execution only → review → Create & start locally | Persistent unstarted drafts and typed incident intake remain separate |
+| Browse/import repository issues | `issue list --source remote [--page N]`, `issue preview --url URL` via controller provider | Authenticated `GET /api/v1/issues`, `POST /api/v1/issues/preview` using shared readers | Paged open-issue list, search loaded results, preview and explicit start for either type | Issue → execution links retained; no implicit polling |
+| Create repository issue / recovery | `issue connection`, `create --key`, `submissions`, `recover --key` | Authenticated connection, `POST /issues`, receipts and recovery | Display destination/actor, create without execution, recover uncertain result | GitHub adapter first; assignees/projects and other providers unimplemented |
 | Repository issue templates | `issue templates`, `issue draft --template --sha --file` | Authenticated template list and draft compilation | Chooser, fields/defaults/validation, review | Supports Markdown and YAML markdown/input/textarea/dropdown/checkboxes; unsupported templates link to GitHub |
-| Suggest task type | `issue recommend --file` or `--github` | Authenticated `POST /api/v1/intake/recommend`; issue preview includes suggestion | Editable recommendation after source selection | Deterministic label/brief rules; no model judgment or execution authority |
+| Suggest task type | `issue recommend --file` or `--url` | Authenticated `POST /api/v1/intake/recommend`; issue preview includes suggestion | Editable recommendation after source selection | Deterministic label/brief rules; no model judgment or execution authority |
 | Cancel/retry/approve | Commands | Job action endpoints with current run ID | Task controls | JSON action results and consistent needs-attention outcomes |
 | Request changes | `revise --file` | `request_changes` action | Feedback form | JSON action result; retain shared stale-action guards |
 | Remove a stopped task | No command | `DELETE /api/v1/jobs/:id` | Remove action | Add CLI; keep existing recoverability/history semantics |
 | Evidence list/read/download | No command | Authenticated artifact routes | Files/preview/download | Add CLI with matching access and size/path rules |
 | Roles, workflows and packaged skills | `definition`, `agents`, `skills` JSON (also while stopped) | `GET /api/v1/definitions` | Agents, Skills and Definition | Shared read-only catalog; future editing must preserve common policy/gates |
-| Project repository links | Validated links in `status` | `project_links` from configured Git origin | View repo / optional GitHub issue link | Links only; no issue synchronization or creation API |
+| Project repository links | Validated links in `status` | `project_links` from configured Git origin | View repo / optional GitHub issue link | Provider creates/issues reads are separate from Git source links |
 | Recorded token usage | Per-attempt `usage` and `token_usage` in `status` | Same status records | Analytics, task rows, metadata/history | No billing estimate; partial/unknown coverage stays explicit |
 | Analytics/filtering | Raw status available | Source queue records | Derived views | Expose equivalent queries/summaries without inventing usage data |
 | Scoped incident admission | `incident --file` validates/deduplicates private evidence | No equivalent typed intake endpoint | Generic Defence form is not equivalent admission | Common typed intake, gaps and deduplication before execution |
@@ -46,8 +47,10 @@ authority. Headless use and GUI use must ultimately reach the same outcomes;
 intermediate releases must explicitly retain their unimplemented rows here.
 
 Infrastructure exposes detected host capacity and the local worker through
-`infrastructure` and the same status API. `automations` returns the supported
-empty list; the UI explicitly states that automatic admission is unavailable.
+`infrastructure` and the same status API. `automations` returns the harness
+ownership contract; the UI explains that external schedules are not discovered.
+Factory has no cron module. The v1 `automations: []` field remains a compatibility
+view; `automation_control` owns the current semantics.
 `foundation` prints the packaged operator skill without configuring anything;
 the Skills page reads that same file. Full safe setup controls remain #37.
 The roadmap is split into Defence #50, quality measurement #51, GitHub intake
