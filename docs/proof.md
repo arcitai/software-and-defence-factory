@@ -436,3 +436,34 @@ No executor/isolation code changed. The 0.5.0 Docker qualification remains the
 existing execution proof; this slice does not claim new live-model qualification.
 Release CI, npm byte comparison and idle managed installation readback remain
 delivery checks recorded in the PR.
+
+## 0.6.0 — repository issue providers (#58)
+
+The shared publication API is tested independently of GitHub with a second,
+synthetic provider. Coverage includes context drift, validation, maintenance
+locking, rejected writes, ambiguous responses, durable restart recovery,
+no-match recovery without another POST, session/Origin protection and CLI/API
+receipt identity. Unsupported remote hosts expose only a sanitized host and
+retain local execution. The final suite passes 76 runtime/package and 51 UI tests.
+
+A real browser created issue #58 on this repository with the existing controller
+GitHub identity and template label. GitHub readback and a same-key CLI replay
+returned the same issue; the isolated preview queue stayed empty. Browser
+inspection caught a provider-to-reader argument mismatch when selecting that
+issue. The correction adds adapter coverage and the real CLI/browser preview
+then succeeded. The preview blocked execution deliberately; no application jobs
+were started.
+
+Safari inspection covers desktop (including 1440px), 320px and 390px, with light
+and dark coverage: destination/account, templates, published result and separate
+Start, issue selection, scrolling, simulated provider failure and explicit start
+failure. The architecture canvas was inspected and exported with editable source.
+Independent review found a lost browser response could lose its request key on
+composer reopen. The follow-up uses a stable content/identity key, recovers saved
+created receipts and adds two browser regressions. Final review and exact
+release/adoption revisions are recorded in the delivery PR.
+
+This release does not qualify another live issue provider, external schedule
+discovery, hosted authentication or live model execution. Executor/isolation code
+is unchanged; the existing 0.5.0 Docker qualification remains the execution proof.
+SQLite receipts are not a mirrored backlog or persistent unsent drafts.
