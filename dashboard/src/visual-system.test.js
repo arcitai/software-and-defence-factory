@@ -10,9 +10,9 @@ test("project view leads with identity and each control plane view keeps its pag
   ]);
 
   assert.match(main, /<ProjectContext identity=\{identity\}/);
-  assert.match(main, /<h2[^>]*>Tasks<\/h2>/);
-  assert.match(main, /aria-label="Search tasks"/);
-  assert.match(analytics, /<PageHeading title="Task analytics"/);
+  assert.match(main, /<h2[^>]*>Issues<\/h2>/);
+  assert.match(main, /aria-label="Search issues"/);
+  assert.match(analytics, /<PageHeading title="Issue analytics"/);
   assert.match(catalog, /<Page title="Infrastructure"/);
   assert.match(catalog, /<Page title=\{displayName\(section\)\}/);
   assert.match(catalog, /<Page title="Automations"/);
@@ -25,7 +25,7 @@ test("narrow navigation and status filters collapse into labelled controls", asy
 
   assert.match(main, /className="mobile-nav"/);
   assert.match(main, /aria-label="Open navigation"/);
-  assert.match(main, /aria-label="Filter tasks by status"/);
+  assert.match(main, /aria-label="Filter issues by status"/);
   assert.match(styles, /\.mobile-nav \{ position: relative; display: block;/);
   assert.match(styles, /\.project-header h1 \{[^}]*font-size: 36px/);
   assert.match(styles, /grid-template-columns: 212px minmax\(0, 1fr\)/);

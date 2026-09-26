@@ -1,10 +1,11 @@
 import test from 'node:test';
+import { recommendWork } from '../factory/intake.mjs';
 import assert from 'node:assert/strict';
-import { mkdtempSync, rmSync } from 'node:fs';
+import { mkdtempSync, rmSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { tmpdir } from 'node:os';
 import { execFileSync } from 'node:child_process';
-import { readIssue, validateIssueURL } from '../factory/issue-intake.mjs';
+import { listIssues, readIssue, validateIssueURL } from '../factory/issue-intake.mjs';
 
 test('issue intake confines reads to the configured origin and preserves literal untrusted instructions',async t=>{
   const repo=mkdtempSync(join(tmpdir(),'sdf-issue-'));t.after(()=>rmSync(repo,{recursive:true,force:true}));
@@ -19,4 +20,31 @@ test('issue intake confines reads to the configured origin and preserves literal
   await assert.rejects(readIssue(repo,url,async()=>({...fixture,body:'x'.repeat(240000)})),/240 KB/);
   await assert.rejects(readIssue(repo,url,async()=>({...fixture,body:null})),/unexpected/);
   assert.throws(()=>validateIssueURL(undefined,url),/origin/);
+});
+
+test('issue listing stays in the configured repository, excludes PRs and retains pagination for PR-only pages',async t=>{
+  const repo=mkdtempSync(join(tmpdir(),'sdf-issues-'));t.after(()=>rmSync(repo,{recursive:true,force:true}));
+  execFileSync('git',['init',repo],{stdio:'ignore'});execFileSync('git',['-C',repo,'remote','add','origin','https://github.com/example/project.git']);
+  const issue={html_url:'https://github.com/example/project/issues/8',number:8,title:'Investigate incident',labels:[{name:'track:security'}]};
+  let calls=0;
+  const result=await listIssues(repo,2,async args=>{calls++;assert.equal(args[3],'repos/example/project/issues?state=open&sort=created&direction=desc&per_page=50&page=2');return [issue,{pull_request:{url:'unused'}}];});
+  assert.deepEqual(result,{repository:'https://github.com/example/project',issues:[{number:8,title:issue.title,url:issue.html_url,labels:[{name:'track:security',color:null}]}],next_page:null});
+  const prs=await listIssues(repo,1,async()=>Array(50).fill({pull_request:{}}));assert.equal(prs.next_page,2);assert.deepEqual(prs.issues,[]);
+  for(const page of [0,-1,1.5,NaN,10001])await assert.rejects(listIssues(repo,page,async()=>{calls++;return [];}),/integer/);
+  assert.equal(calls,1);
+  await assert.rejects(listIssues(repo,1,async()=>[{...issue,html_url:'https://github.com/example/other/issues/8'}]),/origin/);
+  await assert.rejects(listIssues(repo,1,async()=>[{...issue,number:9}]),/unexpected/);
+});
+
+test('recommendations distinguish investigation from fixing security software and never require inference',()=>{
+  assert.deepEqual(recommendWork({spec:'Add navigation.'}),{workflow:'software',basis:'default',reason:'Software is the default for changes to this project. Choose Defence for a scoped security investigation.'});
+  assert.equal(recommendWork({spec:'Investigate suspicious access logs.'}).workflow,'defence');
+  assert.equal(recommendWork({spec:'Fix a security vulnerability in auth.'}).workflow,'software');
+  assert.equal(recommendWork({spec:'Inspect evidence',labels:['track:security']}).workflow,'defence');
+  assert.equal(recommendWork({spec:'Investigate an incident',labels:['track:software']}).workflow,'software');
+  assert.equal(recommendWork({spec:'Inspect',labels:['track:software','track:security']}).basis,'conflicting_labels');
+  assert.throws(()=>recommendWork({spec:''}),/brief/);assert.throws(()=>recommendWork({spec:'x',labels:'security'}),/label/);
+  const root=mkdtempSync(join(tmpdir(),'sdf-recommend-'));
+  try {writeFileSync(join(root,'task.md'),'Investigate the incident.');const output=JSON.parse(execFileSync(process.execPath,['bin/software-defence-factory.mjs','recommend','--file',join(root,'task.md')],{encoding:'utf8',env:{...process.env,SDF_AUTO_UPDATE:'0'}}));assert.equal(output.workflow,'defence');}
+  finally {rmSync(root,{recursive:true,force:true});}
 });

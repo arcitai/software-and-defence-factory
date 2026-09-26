@@ -97,3 +97,7 @@ and the [self-development recipe](docs/development.md) before submitting work.
 
 These extend the #37 parity track. Hosting (#39), observability (#32), quality
 measurement (#51) and security investigation (#50) remain distinct scopes.
+
+## Source-first task admission
+
+- [ ] [#56 — browse project issues and suggest a work type](https://github.com/arcitai/software-and-defence-factory/issues/56): paged GitHub reads, local brief or selected issue, editable recommendation and explicit start. A bounded slice of #52/#37; no background admission or new authentication scheme.

@@ -142,7 +142,7 @@ test("runDetails always surfaces the executor, even when a worker has claimed th
 
 test("analytics presents task KPIs while retaining completed run metrics", async () => {
   const source = await readFile(new URL("./analytics.jsx", import.meta.url), "utf8");
-  for (const label of ["Average task time", "Total tasks", "Success rate", "Failed tasks", "Active tasks", "Total reported tokens", "Reporting coverage", "Duration", "Reported token usage"]) {
+  for (const label of ["Average issue time", "Total issues", "Success rate", "Failed issues", "Active issues", "Total reported tokens", "Reporting coverage", "Duration", "Reported token usage"]) {
     assert.match(source, new RegExp(label));
   }
 });

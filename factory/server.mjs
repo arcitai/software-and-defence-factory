@@ -3,7 +3,9 @@ import http from 'node:http';
 import { randomBytes, timingSafeEqual } from 'node:crypto';
 import { existsSync, readFileSync, readdirSync, lstatSync, realpathSync } from 'node:fs';
 import { join, resolve, sep } from 'node:path';
-import { readIssue } from './issue-intake.mjs';
+import { listIssues, readIssue } from './issue-intake.mjs';
+import { readTemplates, draftFromTemplate } from './issue-templates.mjs';
+import { recommendWork } from './intake.mjs';
 import { machineInfo } from './machine.mjs';
 import { factoryDefinition } from './definition.mjs';
 import { JobQueue, QueueError } from './queue.mjs';
@@ -57,6 +59,16 @@ export function createController(state, adapter = executors(state)) {
       if (request.method === 'GET' && url.pathname === '/api/v1/definitions') {
         return send(200, definitions);
       }
+      if (request.method === 'GET' && url.pathname === '/api/v1/issues') {
+        if (!authenticated) throw new QueueError('Session required', 403);
+        try { return send(200, await listIssues(config.repo, Number(url.searchParams.get('page') || 1))); }
+        catch (error) { throw new QueueError(error.message, 400); }
+      }
+      if (request.method === 'GET' && url.pathname === '/api/v1/issue-templates') {
+        if (!authenticated) throw new QueueError('Session required', 403);
+        try { return send(200, await readTemplates(config.repo)); }
+        catch (error) { throw new QueueError(error.message, 400); }
+      }
       const content = url.pathname.match(/^\/api\/v1\/artifacts\/(job_[a-f0-9]+)~(run_[a-f0-9]+)~([\w.-]+)\/content$/);
       const artifactList = url.pathname.match(/^\/api\/v1\/jobs\/(job_[a-f0-9]+)\/artifacts$/);
       if (request.method === 'GET' && (artifactList || content)) {
@@ -79,6 +91,14 @@ export function createController(state, adapter = executors(state)) {
         }
         if (url.pathname === '/api/v1/issues/preview') {
           try { return send(200, await readIssue(config.repo, input.url)); }
+          catch (error) { throw new QueueError(error.message, 400); }
+        }
+        if (url.pathname === '/api/v1/issue-templates/draft') {
+          try { return send(200, await draftFromTemplate(config.repo, input)); }
+          catch (error) { throw new QueueError(error.message, 400); }
+        }
+        if (url.pathname === '/api/v1/intake/recommend') {
+          try { return send(200, recommendWork(input)); }
           catch (error) { throw new QueueError(error.message, 400); }
         }
         if (url.pathname === '/api/v1/jobs') {

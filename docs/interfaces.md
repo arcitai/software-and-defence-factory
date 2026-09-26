@@ -10,8 +10,10 @@ shell endpoint or a second scheduler.
 | Capability | CLI | Shared API | Dashboard | Remaining work |
 | --- | --- | --- | --- | --- |
 | Project/queue/attempt state | `status`, `inbox` JSON | `GET /api/v1/status` | Project, tasks, details/history | Stable versioned agent result/error contract |
-| Submit software text | `run --file` | `POST /api/v1/jobs` | New task modal | Equivalent title/source/model options and validation |
-| Import a GitHub issue | `run --issue` via operator `gh` | Authenticated `POST /api/v1/issues/preview` using the same reader | Import, review and explicitly start | Backlog/listing, stronger issue/job identity and optional qualified triggers remain; no implicit polling |
+| Create local issue | `issue create --file --title`, `--draft` or `--github`, explicit `--workflow`, optional `--model` | `POST /api/v1/jobs` | New issue → review → Create & start | Persistent unstarted drafts and typed incident intake remain separate |
+| Browse/import GitHub issues | `issue list --source github [--page N]`, `issue preview --github URL` via operator `gh` | Authenticated `GET /api/v1/issues`, `POST /api/v1/issues/preview` using shared readers | Paged open-issue list, search loaded results, preview and explicit start for either type | Stronger issue/job identity, issue creation and qualified triggers remain; no implicit polling |
+| Repository issue templates | `issue templates`, `issue draft --template --sha --file` | Authenticated template list and draft compilation | Chooser, fields/defaults/validation, review | Supports Markdown and YAML markdown/input/textarea/dropdown/checkboxes; unsupported templates link to GitHub |
+| Suggest task type | `issue recommend --file` or `--github` | Authenticated `POST /api/v1/intake/recommend`; issue preview includes suggestion | Editable recommendation after source selection | Deterministic label/brief rules; no model judgment or execution authority |
 | Cancel/retry/approve | Commands | Job action endpoints with current run ID | Task controls | JSON action results and consistent needs-attention outcomes |
 | Request changes | `revise --file` | `request_changes` action | Feedback form | JSON action result; retain shared stale-action guards |
 | Remove a stopped task | No command | `DELETE /api/v1/jobs/:id` | Remove action | Add CLI; keep existing recoverability/history semantics |

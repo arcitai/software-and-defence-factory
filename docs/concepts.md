@@ -12,12 +12,14 @@ The CLI `definition` command and dashboard Definition page read that same catalo
 | Agent | Responsibility and instructions | Implement, Review, Investigate; one shared harness/model profile |
 | Skill | Reusable instructions | Six job skills; separate operator Factory Foundation |
 | Workflow | Ordered steps and gates | Software: Implement → Check → Review → Accept; Defence: Investigate |
-| Task | Bounded admitted work | A stored job with retained run attempts; not a GitHub issue |
+| Local issue | Bounded work request | Created from a form, brief or GitHub source; stored as a job with retained run attempts |
 | Automation | Trigger, filters and target | Planned; work starts manually |
 | Definition | Effective roles, workflows, skills and settings | Installed method plus private factory.json; read-only catalog |
 
-Inbox contains admitted tasks, not an imported GitHub backlog. An issue is source
-material; importing it previews the scope and starting a task queues execution.
+Inbox contains admitted local issues, not an automatically imported GitHub backlog.
+New issue previews a local draft; Create & start admits execution. GitHub issues
+and templates are source material: nothing is posted back to GitHub. Drafts stay
+in the open form until creation; there is no persistent unstarted backlog yet.
 An agent role is neither a machine nor a skill. Check is deterministic, and
 Accept is an operator gate. Triage/specification precede admission; evaluation
 is separately scoped work, not an automatic hidden agent phase.
@@ -26,7 +28,7 @@ All job skills are available read-only. Role instructions identify relevant
 skills; per-role skill/access/harness profiles are not yet supported. Inference
 authentication, GitHub identity and SSH access are separate boundaries. Browser
 GitHub sign-in does not configure `gh` on the controller host, and host `gh` auth
-does not sign a browser in. Writing a local task needs neither a GitHub issue nor
+does not sign a browser in. Writing a blank local issue needs neither a GitHub issue nor
 browser GitHub login. Import uses the controller's configured-repository `gh`
 access. See [interface support](interfaces.md).
 
@@ -48,3 +50,8 @@ private so existing installations can upgrade without credential migration.
 Execution IDs (`build`, `verify`, `handoff`, `job_*`, `run_*`) are stable wire and
 evidence identifiers. Human labels explain them without rewriting stored jobs.
 Compatibility is handled at these boundaries; there is one active implementation.
+
+CLI `issue` groups list, templates, preview, draft, recommend and create. The
+legacy `run`, `issues` (GitHub list) and `recommend` commands remain compatible.
+Task/job field names and `/api/v1/jobs` are stable wire/storage identifiers for
+these same local issues; this adds no parallel scheduler or issue database.

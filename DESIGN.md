@@ -59,7 +59,7 @@ reference's clipped narrow view is not part of the target.
   Filter tasks and analytics by workflow; a source issue link does not choose
   the execution type. Defence remains scoped investigation, distinct from
   software delivery and from production recovery authority.
-- New task opens a brief modal; optional issue import/review is a separate mode. Project/model defaults are inherited and advanced options stay secondary. Submission explicitly starts work.
+- New issue opens a repository template chooser or a blank local form; selecting an existing GitHub issue is a separate mode. Project/model defaults are inherited and advanced options stay secondary. Submission explicitly starts work.
 - Agents distinguish roles from deterministic checks and operator gates. Skills expose actual instructions; Definition exposes shared settings. Automations show their unimplemented state honestly. Both interfaces inspect the same installed catalog.
 - One project/controller per dashboard. There is no global project hub.
 
@@ -118,3 +118,16 @@ PR actions or source admission need real common backend support; do not add
 decorative controls or a separate UI-only execution path. Publishing the UI
 uses the existing npm package/update flow and never replaces a running job's
 controller mid-attempt.
+
+## Task intake
+
+New issue starts with repository templates, a blank local form or a selectable GitHub issue list. Keep work type
+out of the first step; review the shared, editable suggestion before execution.
+Issue rows show open-state icon, title, number and wrapping label pills. Map
+GitHub label colors into the accessible light/dark palette, without interpreting
+remote strings as CSS. Search names the loaded-result boundary; pagination,
+loading, errors and retry remain visible.
+
+Definition is infrequent setup: put its existing route in the sidebar footer
+above the theme control, separated from primary work navigation. Keep it in a
+separate section of the narrow-screen menu. The name matches CLI `definition`.

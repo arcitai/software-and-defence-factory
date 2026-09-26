@@ -79,6 +79,7 @@ button:disabled { cursor: not-allowed; }
 .nav-item-active { background: var(--muted); color: var(--foreground); font-weight: 500; }
 .nav-count { margin-left: auto; color: var(--muted-foreground); font-size: 11px; font-variant-numeric: tabular-nums; }
 .sidebar-bottom { display: grid; gap: 4px; margin-top: auto; padding-top: 12px; border-top: 1px solid var(--border); }
+.mobile-settings { border-top: 1px solid var(--border); margin-top: 5px; padding-top: 5px; }
 .theme-switch { width: 100%; background: transparent; border: 0; text-align: left; }
 .mobile-theme { display: none; }
 .workshop { min-width: 0; flex: 1; background: var(--background); }
@@ -458,8 +459,30 @@ body { font-size: 14px; }
 .work-source button { border-bottom: 2px solid transparent; padding-bottom: 10px; font-size: 13px; color: var(--muted-foreground); }
 .work-source button[aria-pressed="true"] { color: var(--foreground); border-bottom-color: var(--foreground); }
 .work-brief { min-height: 180px; max-height: 45vh; resize: vertical; }
-.issue-intake { display: grid; grid-template-columns: minmax(0,1fr) auto; align-items: end; gap: 12px; }
-.issue-intake > p { grid-column: 1/-1; }
+.issue-picker { display: grid; gap: 12px; min-width: 0; }
+.issue-list { max-height: 310px; overflow-y: auto; border: 1px solid var(--border); border-radius: 8px; }
+.issue-list > p { padding: 16px; }
+.issue-choice { display: flex; align-items: center; gap: 12px; width: 100%; padding: 14px; text-align: left; border-bottom: 1px solid var(--border); }
+.issue-choice:last-child { border-bottom: 0; }
+.issue-choice:hover, .issue-choice:focus-visible { background: var(--muted); }
+.issue-choice:focus-visible { outline: 2px solid var(--ring); outline-offset: -2px; }
+.issue-choice:disabled { opacity: .55; }
+.issue-choice > svg, .issue-number { flex: none; }
+.issue-number { color: var(--muted-foreground); font-size: 12px; }
+.issue-choice-copy { flex: 1; min-width: 0; overflow-wrap: anywhere; }
+.issue-choice-copy strong { display: block; font-size: 13px; font-weight: 500; }
+.issue-choice-meta { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; margin-top: 8px; }
+.issue-choice-meta .issue-number { margin-right: 3px; }
+.issue-open-icon { color: #3c925d; align-self: flex-start; margin-top: 2px; }
+.issue-label { font-size: 10px; font-weight: 500; line-height: 17px; padding: 1px 7px; border-radius: 20px; border: 1px solid color-mix(in srgb, var(--label-color) 28%, transparent); color: var(--label-color); background: color-mix(in srgb, var(--label-color) 8%, var(--surface)); }
+.label-neutral { --label-color: #646b77; } .label-red { --label-color: #af4048; } .label-orange { --label-color: #9f5a2a; } .label-yellow { --label-color: #846b12; } .label-green { --label-color: #3d764d; } .label-cyan { --label-color: #20757b; } .label-blue { --label-color: #366faa; } .label-purple { --label-color: #8254a8; }
+.dark .label-neutral { --label-color: #acb2bc; } .dark .label-red { --label-color: #eb969b; } .dark .label-orange { --label-color: #ebb182; } .dark .label-yellow { --label-color: #d7c678; } .dark .label-green { --label-color: #8bc99d; } .dark .label-cyan { --label-color: #80c8ce; } .dark .label-blue { --label-color: #8bb4e5; } .dark .label-purple { --label-color: #bea0df; }
+.issue-search { display: flex; align-items: center; gap: 9px; border: 1px solid var(--border); border-radius: 7px; padding: 10px 12px; color: var(--muted-foreground); }
+.issue-search:focus-within { outline: 2px solid var(--ring); outline-offset: 2px; }
+.issue-search input { min-width: 0; width: 100%; background: transparent; color: var(--foreground); border: 0; outline: 0; font-size: 12px; }
+.issue-picker-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+.work-recommendation { display: grid; gap: 12px; padding: 16px; background: var(--muted); border: 1px solid var(--border); border-radius: 8px; }
+.work-recommendation h3 { font-size: 14px; font-weight: 600; }
 .work-help { color: var(--muted-foreground); font-size: 12px; line-height: 20px; }
 .work-help a { text-decoration: underline; }
 .work-options summary { cursor: pointer; font-size: 12px; color: var(--muted-foreground); }
@@ -471,7 +494,6 @@ body { font-size: 14px; }
   .work-dialog-header, .work-dialog-body, .work-dialog-footer { padding: 18px; }
   .work-dialog-footer { gap: 12px; align-items: flex-start; flex-direction: column; }
   .work-dialog-footer button { align-self: flex-end; }
-  .issue-intake { grid-template-columns: 1fr; }
 }
 
 /* Header divider and page content share the same outer edges. */
@@ -507,3 +529,20 @@ body { font-size: 14px; }
 @media (max-width: 359px) {
   .project-header:not(.project-header-compact), .runs-page, .workshop > .secondary-page { width: calc(100% - 32px); }
 }
+
+.template-chooser, .issue-form-fields { display: grid; gap: 14px; }
+.template-choice { border: 1px solid var(--border); border-radius: 8px; overflow: hidden; }
+.template-choice > button { display: flex; justify-content: space-between; align-items: center; gap: 16px; width: 100%; text-align: left; padding: 16px; }
+.template-choice > button:hover, .template-choice > button:focus-visible { background: var(--muted); }
+.template-choice > button > span { display: grid; gap: 5px; }
+.template-choice strong, .template-contact strong, .template-form-name { font-size: 13px; font-weight: 600; }
+.template-choice span > span, .template-contact > span { font-size: 12px; line-height: 18px; color: var(--muted-foreground); }
+.template-choice > strong, .template-choice > p, .template-choice > a { display: block; margin: 12px 16px; }
+.template-choice > a { font-size: 12px; text-decoration: underline; }
+.template-contact { display: grid; gap: 5px; padding: 8px 0; }
+.template-note { white-space: pre-wrap; font-size: 12px; line-height: 19px; color: var(--muted-foreground); padding: 12px; border: 1px solid var(--border); border-radius: 6px; }
+.field-description { display: block; margin: 4px 0 8px; }
+.issue-form-textarea { min-height: 100px; resize: vertical; }
+.issue-form-options { display: grid; gap: 8px; }
+.issue-form-options > label { display: flex; align-items: flex-start; gap: 8px; font-size: 12px; }
+.issue-form-options input { margin-top: 3px; }
