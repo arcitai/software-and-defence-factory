@@ -46,9 +46,9 @@ export function TaskDetail({
     return (
       <div className="p-8">
         <a href="#/runs" className="text-sm underline">
-          Back to tasks
+          Back to inbox
         </a>
-        <p className="mt-4">{!loaded ? "Loading task…" : "Task not found."}</p>
+        <p className="mt-4">{!loaded ? "Loading issue…" : "Issue not found."}</p>
         {error && <p role="alert">{error}</p>}
       </div>
     );
@@ -62,16 +62,16 @@ export function TaskDetail({
     <div className="task-detail-layout">
       <div className="task-detail-main">
       <div className="detail-toolbar">
-        <div className="detail-position"><span>{navigation.findIndex(item => item.id === job.id) >= 0 ? `${navigation.findIndex(item => item.id === job.id) + 1} / ${navigation.length}` : "Task"}</span><div>
+        <div className="detail-position"><span>{navigation.findIndex(item => item.id === job.id) >= 0 ? `${navigation.findIndex(item => item.id === job.id) + 1} / ${navigation.length}` : "Issue"}</span><div>
           {[-1, 1].map((delta) => {
             const index = navigation.findIndex(item => item.id === job.id);
             const adjacent = index >= 0 ? navigation[index + delta] : undefined;
             const Icon = delta < 0 ? ChevronUp : ChevronDown;
-            const label = delta < 0 ? "Previous task" : "Next task";
+            const label = delta < 0 ? "Previous issue" : "Next issue";
             return adjacent ? <a key={delta} href={`#/runs/${encodeURIComponent(adjacent.id)}`} aria-label={label} title={adjacent.title}><Icon size={14} /></a> : <span key={delta} aria-label={`${label} unavailable`}><Icon size={14} /></span>;
           })}
         </div></div>
-        <div className="detail-toolbar-actions"><span role="status" className="copy-status">{copyStatus}</span><button type="button" aria-label="Copy task link" title="Copy task link" onClick={copyLink}><Link2 size={16} /></button><a href="#/runs" aria-label="Close task detail" title="Close task detail (Esc)"><X size={18} /></a></div>
+        <div className="detail-toolbar-actions"><span role="status" className="copy-status">{copyStatus}</span><button type="button" aria-label="Copy issue link" title="Copy issue link" onClick={copyLink}><Link2 size={16} /></button><a href="#/runs" aria-label="Close issue detail" title="Close issue detail (Esc)"><X size={18} /></a></div>
       </div>
       <header className="task-detail-heading">
         <TaskStateIcon value={job.state} /><h2>{jobDisplayTitle(job)}</h2>
@@ -80,7 +80,7 @@ export function TaskDetail({
       {stages.length > 1 && (
         <ol
           className="task-progress flex flex-wrap items-center gap-3 text-sm"
-          aria-label="Task progress"
+          aria-label="Issue progress"
         >
           {stages.map((stage, index) => (
             <li
@@ -123,7 +123,7 @@ export function TaskDetail({
       )}
       <Tabs
         key={job.id}
-        label="Task sections"
+        label="Issue sections"
         items={[
           {
             id: "result",
@@ -271,7 +271,7 @@ export function TaskDetail({
                 {result && <ExecutionDetails run={result} />}
                 <section className="border-t border-border pt-4">
                   <dl className="my-4 grid gap-3 sm:grid-cols-3">
-                    <RunMetric label="Task ID" value={job.id} />
+                    <RunMetric label="Issue ID" value={job.id} />
                     <RunMetric label="Repository" value={job.repository} />
                     <RunMetric
                       label="Created"
@@ -287,7 +287,7 @@ export function TaskDetail({
                     disabled={!terminal || deleting}
                     onClick={() => onDelete(job)}
                   >
-                    {deleting ? "Deleting…" : "Delete task"}
+                    {deleting ? "Deleting…" : "Delete issue"}
                   </Button>
                 </section>
               </div>
@@ -296,7 +296,7 @@ export function TaskDetail({
         ]}
       />
       </div>
-      <aside className="task-metadata" aria-label="Task metadata">
+      <aside className="task-metadata" aria-label="Issue details">
         <h3><FileText size={15} />Metadata</h3>
         <dl>
           <div><dt>Status</dt><dd><State value={job.state} /></dd></div>
@@ -457,7 +457,7 @@ function TaskActions({ job, result, onAction }) {
       )}
       {job.state === "blocked" && (
         <p className="text-sm text-muted-foreground">
-          Resolve the blocker, then cancel this task to reconcile the worker before retrying.
+          Resolve the blocker, then cancel this work to reconcile the worker before retrying.
         </p>
       )}
       {job.state === "timed_out" && <p className="text-sm text-muted-foreground">Inspect the timeout evidence and recovery options. This state cannot be retried directly.</p>}
@@ -481,7 +481,7 @@ function TaskActions({ job, result, onAction }) {
           disabled={busy}
           onClick={() => action("cancel")}
         >
-          Cancel task
+          Cancel work
         </Button>
       )}
       {retry && <p className="text-xs text-muted-foreground">Retry repeats the stopped {friendlyName(latest?.command).toLowerCase()} phase.{latest?.command === "review" && " It does not change the candidate."}{canRevise && " Request changes when the implementation needs revision."}</p>}
@@ -512,7 +512,7 @@ function resultTitle(job, result) {
     case "queued":
       return `${command} queued`;
     case "succeeded":
-      return "Task complete";
+      return "Issue complete";
     default:
       return `${command} · ${stateLabel(job.state)}`;
   }

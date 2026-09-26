@@ -89,7 +89,7 @@ test("rows use the current workflow phase and action implied by runtime state", 
   const awaiting = { state: "awaiting_approval", workflow: { steps: ["build", "review", "handoff"], current_step: 2 }, runs: [{ command: "review", state: "succeeded", id: "review" }, { command: "handoff", state: "awaiting_approval", reviewed_run_id: "review" }] };
   assert.equal(taskPhase(awaiting), "review");
   assert.equal(nextOperatorAction(awaiting), "Approve handoff or request changes");
-  assert.equal(nextOperatorAction({ state: "succeeded" }), "Task complete");
+  assert.equal(nextOperatorAction({ state: "succeeded" }), "Issue complete");
   assert.equal(nextOperatorAction({ state: "succeeded", workflow: { steps: ["build", "review", "handoff"] } }), "Handoff complete");
   assert.equal(taskPhase({ state: "awaiting_approval", runs: [{ command: "build" }] }), "build", "initial approval does not invent a completed review");
 });

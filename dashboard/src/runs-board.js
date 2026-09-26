@@ -163,7 +163,7 @@ export function nextOperatorAction(job) {
     case "awaiting_approval":
       return "Approve handoff or request changes";
     case "succeeded":
-      return job.workflow?.steps?.includes("handoff") ? "Handoff complete" : "Task complete";
+      return job.workflow?.steps?.includes("handoff") ? "Handoff complete" : "Issue complete";
     default:
       return "Inspect task";
   }

@@ -37,6 +37,13 @@ test('installed CLI, controller and queue share the same phase/skill contract fo
   assert(status.workers[0].machine.hostname);assert(status.workers[0].machine.memoryMiB>0);
   const denied=await fetch(origin+'/api/v1/issues/preview',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({url:'https://github.com/example/another/issues/1'})});
   assert.equal(denied.status,403);
+  assert.equal((await fetch(origin+'/api/v1/issues')).status,403);
+  assert.equal((await fetch(origin+'/api/v1/issue-templates')).status,403);
+  assert.equal((await fetch(origin+'/api/v1/issue-templates/draft',{method:'POST',headers:{'Content-Type':'application/json'},body:'{}'})).status,403);
+  assert.equal((await fetch(origin+'/api/v1/issues?page=0',{headers:{'X-Factory-Session':status.csrf_token}})).status,400);
+  const recommendation=await fetch(origin+'/api/v1/intake/recommend',{method:'POST',headers:{'Content-Type':'application/json','X-Factory-Session':status.csrf_token},body:JSON.stringify({spec:'Investigate suspicious access logs.'})});
+  assert.equal((await recommendation.json()).workflow,'defence');
+  assert.equal((await fetch(origin+'/api/v1/intake/recommend',{method:'POST',headers:{'Content-Type':'application/json'},body:'{}'})).status,403);
   const invalid=await fetch(origin+'/api/v1/issues/preview',{method:'POST',headers:{'Content-Type':'application/json','X-Factory-Session':status.csrf_token},body:JSON.stringify({url:'https://github.com/example/another/issues/1'})});
   assert.equal(invalid.status,400);assert.equal(controller.queue.all().length,0);
 });

@@ -1,4 +1,4 @@
-name: Factory task
+name: Factory issue
 description: Describe a business outcome and observable acceptance criteria.
 title: "[Factory] "
 labels: ["factory:triage"]

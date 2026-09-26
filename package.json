@@ -1,6 +1,6 @@
 {
   "name": "software-defence-factory",
-  "version": "0.5.0",
+  "version": "0.5.1",
   "description": "Scoped software delivery and defence investigations with isolated jobs, evidence and review",
   "type": "module",
   "license": "MIT",
@@ -53,5 +53,8 @@
     "check": "node scripts/check.mjs && node --test tests/*.test.mjs && npm run test:dashboard",
     "build:dashboard": "npm --prefix dashboard ci --ignore-scripts && npm --prefix dashboard run build",
     "test:dashboard": "npm --prefix dashboard test"
+  },
+  "dependencies": {
+    "yaml": "2.9.1"
   }
 }

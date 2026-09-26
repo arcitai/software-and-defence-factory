@@ -70,7 +70,7 @@ test("runs default to the searchable list and share state filters across board a
   assert.equal(button("Board").getAttribute("aria-pressed"), "false");
   assert.match(document.body.textContent, /Last activity/);
 
-  const search = document.querySelector('input[aria-label="Search tasks"]');
+  const search = document.querySelector('input[aria-label="Search issues"]');
   const setInputValue = Object.getOwnPropertyDescriptor(dom.window.HTMLInputElement.prototype, "value").set;
   setInputValue.call(search, "compact");
   search.dispatchEvent(new dom.window.Event("input", { bubbles: true }));
@@ -80,9 +80,9 @@ test("runs default to the searchable list and share state filters across board a
   await eventually(() => assert.equal(button("Failed").getAttribute("aria-pressed"), "true"));
   assert.ok(document.querySelector('a[href="#/runs/job_failed"]'), "search and failed-state filters intersect");
 
-  setInputValue.call(document.querySelector('input[aria-label="Search tasks"]'), "Succeeded fixture");
-  document.querySelector('input[aria-label="Search tasks"]').dispatchEvent(new dom.window.Event("input", { bubbles: true }));
-  await eventually(() => assert.match(document.body.textContent, /No matching tasks/));
+  setInputValue.call(document.querySelector('input[aria-label="Search issues"]'), "Succeeded fixture");
+  document.querySelector('input[aria-label="Search issues"]').dispatchEvent(new dom.window.Event("input", { bubbles: true }));
+  await eventually(() => assert.match(document.body.textContent, /No matching issues/));
   button("Clear filters").click();
   await eventually(() => assert.match(document.body.textContent, /Failed fixture/));
   assert.match(document.body.textContent, /Succeeded fixture/);
@@ -112,7 +112,7 @@ test("runs default to the searchable list and share state filters across board a
   tab("Details").click();
   await eventually(() => assert.equal(tab("Details").getAttribute("aria-selected"), "true"));
   const details = document.querySelector('[role="tabpanel"]:not([hidden])');
-  for (const text of ["codex", "test-model", "test-worker", "Not reported", "Delete task", "Exit code"]) {
+  for (const text of ["codex", "test-model", "test-worker", "Not reported", "Delete issue", "Exit code"]) {
     assert.ok(details.textContent.includes(text), `details include ${text}`);
   }
   tab("History").click();
@@ -125,11 +125,11 @@ test("runs default to the searchable list and share state filters across board a
   assert.equal(document.querySelectorAll("script").length, 0, "preview renders text, not markup");
   assert.equal(artifactRequests, 1, "changing tabs does not refetch metadata");
   window.location.hash = "#/runs/job_interrupted";
-  await eventually(() => assert.ok([...document.querySelectorAll("button")].find(el => el.textContent === "Cancel task")));
-  button("Cancel task").click();
+  await eventually(() => assert.ok([...document.querySelectorAll("button")].find(el => el.textContent === "Cancel work")));
+  button("Cancel work").click();
   await eventually(() => assert.equal(cancelled, true));
-  await eventually(() => assert.equal(button("Delete task").disabled, false));
-  await eventually(() => assert.equal([...document.querySelectorAll("button")].find(el => el.textContent === "Cancel task"), undefined));
+  await eventually(() => assert.equal(button("Delete issue").disabled, false));
+  await eventually(() => assert.equal([...document.querySelectorAll("button")].find(el => el.textContent === "Cancel work"), undefined));
 
 });
 

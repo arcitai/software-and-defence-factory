@@ -31,7 +31,7 @@ use the linked guides for details rather than copying their specifications.
 | Operator outcome | Behavior and boundary | Implementation / proof entrypoint |
 | --- | --- | --- |
 | Prepare a repository | Staged method, preserved project contracts, explicit setup | [Foundation](setup.md), [kit export](../scripts/export-kit.mjs), [package tests](../tests/npm.test.mjs) |
-| Admit a task | Brief or selected issue; no background backlog polling | [Intake](workflows.md), [server](../factory/server.mjs), [issue tests](../tests/issue-intake.test.mjs) |
+| Admit a local issue | Repository form, blank brief or selected GitHub issue; no background backlog polling | [Intake](workflows.md), [server](../factory/server.mjs), [issue tests](../tests/issue-intake.test.mjs) |
 | Execute Software or Defence | One queue; isolated roles/checks; Defence produces a private draft | [Architecture](architecture.md), [executor](../factory/executor.mjs), [controller tests](../tests/controller.test.mjs) |
 | Review, revise and accept | Evidence belongs to candidate and policy; acceptance does not publish | [Recovery](recovery.md), [queue](../factory/queue.mjs), [review tests](../tests/review-evidence.test.mjs) |
 | Inspect project work | Shared list/board filters, task details, real usage and unknown costs | [Design](../DESIGN.md), [dashboard](../dashboard/src/main.jsx), [dashboard tests](../dashboard/package.json) |

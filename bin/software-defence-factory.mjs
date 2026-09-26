@@ -6,7 +6,9 @@ import { spawn } from 'node:child_process';
 import { createServer } from 'node:net';
 import { ROOT, PINS, DEFAULT_STATE, configAt, save, json, run, stream, digest, api, sleep, stopContainers } from '../factory/lib.mjs';
 import { assertInstalledJobImage, installCustomJobImage, installStandardJobImage, inspectImageInstallation } from '../factory/image-install.mjs';
-import { readIssue } from '../factory/issue-intake.mjs';
+import { listIssues, readIssue } from '../factory/issue-intake.mjs';
+import { readTemplates, draftFromTemplate } from '../factory/issue-templates.mjs';
+import { recommendWork } from '../factory/intake.mjs';
 import { factoryDefinition, foundationSkill } from '../factory/definition.mjs';
 import { harnessOf } from '../factory/lib.mjs';
 import { admitIncident } from '../factory/incident.mjs';
@@ -158,14 +160,49 @@ try {
     const config=configAt(state),dockerVersion=run('docker',['info','--format','{{.ServerVersion}}']),imageStatus=inspectImageInstallation(state,config);
     console.log(JSON.stringify({node:process.version,docker:dockerVersion,engineInstalled:imageStatus.installed,image:imageStatus.image,repo:config.repo,harness:harnessOf(config),agent:harnessOf(config),checksConfigured:!!config.check?.trim(),inference:'Not called or verified',qualification:{model:'not assessed',toolchain:'not assessed'},dashboard:`http://127.0.0.1:${config.port}`},null,2));
     if(!imageStatus.installed)process.exitCode=1;
+  } else if(command==='issue') {
+    const action=positional[0];
+    if(action==='list') {
+      if(flags.source && !['factory','github'].includes(flags.source))throw new Error('Choose --source factory or github');
+      console.log(JSON.stringify(flags.source==='github' ? await listIssues(configAt(state).repo,Number(flags.page || 1)) : (await api(state,'/api/v1/status')).jobs,null,2));
+    } else if(action==='templates') console.log(JSON.stringify(await readTemplates(configAt(state).repo),null,2));
+    else if(action==='preview') {
+      if(!flags.github)throw new Error('Use --github ISSUE_URL');
+      console.log(JSON.stringify(await readIssue(configAt(state).repo,flags.github),null,2));
+    } else if(action==='recommend') {
+      if(Boolean(flags.github)===Boolean(flags.file))throw new Error('Choose --file brief.md or --github ISSUE_URL');
+      console.log(JSON.stringify(flags.github ? (await readIssue(configAt(state).repo,flags.github)).recommendation : recommendWork({spec:readFileSync(resolve(flags.file),'utf8')}),null,2));
+    } else if(action==='draft') {
+      if(!flags.file||!flags.template||!flags.sha)throw new Error('Use --template NAME --sha SHA --file answers.json with {title, answers}');
+      console.log(JSON.stringify(await draftFromTemplate(configAt(state).repo,{...json(resolve(flags.file)),template:flags.template,sha:flags.sha}),null,2));
+    } else if(action==='create') {
+      if(!['software','defence'].includes(flags.workflow))throw new Error('Review the issue and choose --workflow software or defence');
+      if([flags.file,flags.github,flags.draft].filter(Boolean).length!==1)throw new Error('Choose --file brief.md, --draft draft.json or --github ISSUE_URL');
+      let input;
+      if(flags.github) { const issue=await readIssue(configAt(state).repo,flags.github);input={title:issue.title,spec:issue.spec,source_url:issue.url}; }
+      else if(flags.draft) { const draft=json(resolve(flags.draft));input={title:draft.title,spec:draft.spec}; }
+      else input={title:flags.title,spec:readFileSync(resolve(flags.file),'utf8')};
+      input.title=flags.title || input.title;
+      if(typeof input.title!=='string'||!input.title.trim()||input.title.length>160)throw new Error('Provide a title of 1–160 characters (use --title for a blank issue)');
+      if(flags.workflow==='software'&&!configAt(state).check?.trim())throw new Error('Configure an app check before submitting software work');
+      console.log(JSON.stringify(await api(state,'/api/v1/jobs',{...input,workflow:flags.workflow,repository:'app',model:flags.model || ''}),null,2));
+    } else throw new Error('Use issue list|templates|preview|recommend|draft|create; see help');
+  } else if(command==='issues') {
+    console.log(JSON.stringify(await listIssues(configAt(state).repo,Number(flags.page || 1)),null,2));
+  } else if(command==='recommend') {
+    if(Boolean(flags.issue) === Boolean(flags.file))throw new Error('Choose --file task.md or --issue URL');
+    const recommendation=flags.issue ? (await readIssue(configAt(state).repo,flags.issue)).recommendation : recommendWork({spec:readFileSync(resolve(flags.file),'utf8')});
+    console.log(JSON.stringify(recommendation,null,2));
   } else if(command==='run') {
+    const workflow=flags.workflow || 'software';
+    if(!['software','defence'].includes(workflow))throw new Error('Choose --workflow software or defence');
     let spec;
     if(flags.issue) {
       spec=(await readIssue(configAt(state).repo,flags.issue)).spec;
     } else if(flags.file)spec=readFileSync(resolve(flags.file),'utf8');
     else throw new Error('Use --file task.md or --issue https://github.com/owner/repo/issues/123');
-    if(!configAt(state).check?.trim())throw new Error('Configure an app check before submitting software work');
-    console.log(JSON.stringify(await submit('software',spec)));
+    if(workflow==='software'&&!configAt(state).check?.trim())throw new Error('Configure an app check before submitting software work');
+    console.log(JSON.stringify(await submit(workflow,spec)));
   } else if(command==='incident') {
     if(!flags.file)throw new Error('Use --file incident.json; see factory/examples/incident.json');
     console.log(JSON.stringify(await admitIncident(state,json(resolve(flags.file)),submit)));
@@ -211,7 +248,18 @@ try {
   service resume                          Release a reconciled maintenance reservation
   tunnel install|start|stop|status|logs|uninstall --host SSH_ALIAS --port PORT
                                           Persistent loopback SSH tunnel (macOS/Linux)
-  run --file task.md | --issue URL         Submit one software vertical slice
+  issue list [--source github] [--page N]  List local Factory issues or open GitHub issues
+  issue templates                         Read this repository's issue forms and contact links
+  issue preview --github URL              Preview one GitHub issue without starting work
+  issue recommend --file brief.md | --github URL
+  issue draft --template NAME --sha SHA --file answers.json
+                                          Validate {title,answers}; output a local draft JSON
+  issue create --draft draft.json | --github URL | --file brief.md --title TITLE
+               --workflow software|defence [--model MODEL]
+                                          Create a local issue and start work; no GitHub write
+  issues [--page N]                       Browse open project issues, with next_page for more
+  recommend --file task.md | --issue URL  Suggest a work type without starting work
+  run --file task.md | --issue URL         Submit software (default), or --workflow defence
   incident --file incident.json            Submit a private, read-only incident draft
   approve JOB_ID | cancel JOB_ID           Review gate / stop this attempt
   retry JOB_ID                            Prove stop; retain old checkout and retry

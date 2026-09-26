@@ -97,3 +97,7 @@ and the [self-development recipe](docs/development.md) before submitting work.
 
 These extend the #37 parity track. Hosting (#39), observability (#32), quality
 measurement (#51) and security investigation (#50) remain distinct scopes.
+
+## Repository-backed issue intake
+
+- [x] [#56 — repository forms and GitHub issue intake](https://github.com/arcitai/software-and-defence-factory/issues/56): shared `issue` commands, repository templates and required fields, paged issue picker with labels, editable recommendation and explicit start. Verified in [PR #57](https://github.com/arcitai/software-and-defence-factory/pull/57), with 119 automated tests, independent review and desktop/mobile browser acceptance. A bounded slice of #52/#37; no background admission or GitHub writes.

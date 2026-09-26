@@ -6,7 +6,8 @@
   "agent": "A configured work role with a responsibility and instructions, executed through a harness.",
   "skill": "Reusable instructions available to an agent or operator; not a process or an access grant.",
   "workflow": "The ordered agent steps, deterministic checks and approval gates for a work type.",
-  "task": "A bounded work request admitted to the controller; stored as a job with retained run attempts.",
+  "task": "Compatibility name for an admitted local issue, stored as a job with retained run attempts.",
   "automation": "A trigger, filters and target that admits work automatically. Not yet implemented.",
-  "definition": "The effective work roles, workflows, skills and installation settings, separate from runtime records."
+  "definition": "The effective work roles, workflows, skills and installation settings, separate from runtime records.",
+  "issue": "A bounded local work request, created from a repository form, blank brief or GitHub issue; Create & start admits execution. This does not publish a GitHub issue."
 }

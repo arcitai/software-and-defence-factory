@@ -61,6 +61,7 @@ test("project identity stays visible, app keeps its submission key, and stale or
       if (statusCalls === 5) return jsonResponse({ ...baseStatus, jobs: [createdJob] });
       throw new Error("status connection lost");
     }
+    if (url === "/api/v1/intake/recommend") return jsonResponse({workflow:"software",reason:"Project change",basis:"default"});
     if (url === "/api/v1/jobs" && options?.method === "POST") {
       submitted = JSON.parse(options.body);
       return jsonResponse({ id: createdJob.id });
@@ -104,17 +105,24 @@ test("project identity stays visible, app keeps its submission key, and stale or
   assert.equal(projectContext().querySelector('[role="tooltip"]').textContent.includes(repo), true, "full configured path remains available as detail");
   assert.match(document.body.textContent, /Synthetic installation demo — no model calls\./);
 
-  button("New task").click();
+  button("New issue").click();
   await eventually(() => assert.ok(document.querySelector("form")));
   const repositoryOption = document.querySelector('#start-work-description');
   assert.ok(repositoryOption, "the configured repository option is present");
   assert.match(repositoryOption.textContent, /customer-portal/);
 
+  document.querySelector('[data-blank-issue]').click();
+  await eventually(() => assert.ok(document.querySelector('input[name="issue-title"]')));
+  const titleInput=document.querySelector('input[name="issue-title"]');
+  Object.getOwnPropertyDescriptor(dom.window.HTMLInputElement.prototype,'value').set.call(titleInput,'Project identity task');
+  titleInput.dispatchEvent(new dom.window.Event('input',{bubbles:true}));
   const prompt = document.querySelector("textarea");
   const setTextareaValue = Object.getOwnPropertyDescriptor(dom.window.HTMLTextAreaElement.prototype, "value").set;
   setTextareaValue.call(prompt, "Add the project label.");
   prompt.dispatchEvent(new dom.window.Event("input", { bubbles: true }));
-  button("Start task").click();
+  button("Continue").click();
+  await eventually(() => assert.ok(button("Create & start")));
+  button("Create & start").click();
   await eventually(() => assert.ok(submitted));
   assert.equal(submitted.repository, "app", "the readable label does not replace the controller key");
   assert.equal(submitted.workflow, "software");
@@ -134,8 +142,8 @@ test("project identity stays visible, app keeps its submission key, and stale or
   await eventually(() => assert.match(projectName().textContent, /Project identity unavailable/));
   assert.match(projectContext().textContent, /Status current/);
   window.location.hash = "#/runs";
-  await eventually(() => assert.ok([...document.querySelectorAll("h2")].some((heading) => heading.textContent === "Tasks")));
-  button("New task").click();
+  await eventually(() => assert.ok([...document.querySelectorAll("h2")].some((heading) => heading.textContent === "Issues")));
+  button("New issue").click();
   await eventually(() => assert.match(document.querySelector('#start-work-description').textContent, /Project identity unavailable/));
   document.querySelector('button[aria-label="Close start work form"]').click();
 
@@ -146,7 +154,7 @@ test("project identity stays visible, app keeps its submission key, and stale or
   await eventually(() => assert.match(projectContext().textContent, /Status stale/));
   assert.equal(projectName().textContent, "customer-portal", "last known identity remains visible but is marked stale");
   window.location.hash = "#/runs/job_created";
-  await eventually(() => assert.ok(document.querySelector('[aria-label="Task metadata"]')));
+  await eventually(() => assert.ok(document.querySelector('[aria-label="Issue details"]')));
   assert.match(projectContext().textContent,/Status stale/);
   assert(projectContext().querySelector('[role="tooltip"]').textContent.includes(repo));
   await eventually(() => assert.match(document.body.textContent, /status connection lost/));

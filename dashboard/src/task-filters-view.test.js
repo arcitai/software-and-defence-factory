@@ -34,11 +34,11 @@ test('workflow, model, badge and search compose; task navigation preserves the f
   assert.equal(rows().length,3);
   assert.equal(document.querySelector('[aria-label="Factory home"]').getAttribute('href'),'#/runs');
   assert.equal(document.querySelector('.repo-action').href,status.project_links.repository);
-  assert.equal(document.querySelectorAll('.repo-action')[1].textContent.trim(),'New task');
+  assert.equal(document.querySelectorAll('.repo-action')[1].textContent.trim(),'New issue');
   await setSelect('Filter by workflow','software');assert.equal(rows().length,2);
   await setSelect('Filter by model','model-a');assert.equal(rows().length,1);assert.match(rows()[0],/Alpha/);
   await route('#/runs/job_alpha');assert.match(document.querySelector('.detail-position').textContent,/1 \/ 1/);
-  assert.equal(document.querySelector('a[aria-label="Next task"]'),null);
+  assert.equal(document.querySelector('a[aria-label="Next issue"]'),null);
   await route('#/runs');assert.equal(rows().length,1);assert.match(document.querySelector('[aria-label="Filter by work type"]').textContent,/1/);
   await click('.active-filters button');assert.equal(rows().length,3);
   // Multiple selections OR within a facet, while other facets/search intersect.
@@ -61,9 +61,9 @@ test('workflow, model, badge and search compose; task navigation preserves the f
   await click('button[aria-label="Filter by Timed out badge"]');assert.equal(rows().length,1);assert.match(rows()[0],/Beta/);
   await click('.active-filters button');
   await setSelect('Filter by badge','succeeded');assert.equal(rows().length,2);
-  await act(()=>{const search=document.querySelector('[aria-label="Search tasks"]');Object.getOwnPropertyDescriptor(dom.window.HTMLInputElement.prototype,'value').set.call(search,'Gamma');search.dispatchEvent(new dom.window.Event('input',{bubbles:true}));});
+  await act(()=>{const search=document.querySelector('[aria-label="Search issues"]');Object.getOwnPropertyDescriptor(dom.window.HTMLInputElement.prototype,'value').set.call(search,'Gamma');search.dispatchEvent(new dom.window.Event('input',{bubbles:true}));});
   assert.equal(rows().length,1);assert.match(rows()[0],/Gamma/);
   await route('#/runs/job_gamma');await act(()=>window.dispatchEvent(new dom.window.KeyboardEvent('keydown',{key:'Escape'})));await route('#/runs');assert.equal(rows().length,1);
   await click('.active-filters button');
-  await route('#/runs/job_alpha');assert.equal(document.querySelector('a[aria-label="Next task"]').getAttribute('href'),'#/runs/job_beta');
+  await route('#/runs/job_alpha');assert.equal(document.querySelector('a[aria-label="Next issue"]').getAttribute('href'),'#/runs/job_beta');
 });

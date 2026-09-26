@@ -88,7 +88,7 @@ No Docker socket, operator credentials or unrelated project caches are mounted.
 
 ## Read the project dashboard
 
-Tasks contains both Software delivery and Defence investigation. Select a
+Inbox contains both Software delivery and Defence investigation. Select a
 workflow to focus the list; workflow, requested-model, status-badge and text
 filters combine. Analytics offers the same workflow separation for recorded
 outcomes, duration and [token usage](usage.md). An issue link is a reference,
@@ -96,9 +96,10 @@ not an execution type. For validated, deduplicated private incident intake,
 use the [Defence integration](defence-integration.md) recipe; the generic
 Defence form is not that typed intake path.
 
-The header names the configured project. View repo and New issue appear only
-for a validated GitHub origin; they open GitHub and do not synchronize its
-backlog. The task detail provides previous/next within the filtered list, copy
+The header names the configured project. View repo opens a validated GitHub
+origin. New issue opens Factory’s local chooser: repository templates, a blank
+form or existing GitHub issues. It does not publish a GitHub issue; Create &
+start queues local work. See [intake and CLI examples](workflows.md). The task detail provides previous/next within the filtered list, copy
 link and close (Escape). Closing preserves the list's filters and position.
 
 If the interface looks unexpectedly small, check the browser zoom. The design
