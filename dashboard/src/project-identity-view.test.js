@@ -7,6 +7,7 @@ import { createServer } from "vite";
 test("project identity stays visible, app keeps its submission key, and stale or missing status is labeled", async (context) => {
   const dom = new JSDOM('<div id="root"></div>', { url: "http://localhost/#/runs" });
   dom.window.scrollTo = () => {};
+  dom.window.HTMLDialogElement.prototype.showModal = function() { this.open = true; };
   const priorGlobals = new Map();
   for (const name of ["window", "document", "navigator", "localStorage", "Event", "MouseEvent"]) {
     priorGlobals.set(name, Object.getOwnPropertyDescriptor(globalThis, name));
@@ -95,19 +96,19 @@ test("project identity stays visible, app keeps its submission key, and stale or
   firstStatus.reject(new Error("initial status connection lost"));
   await eventually(() => assert.match(projectName().textContent, /Project identity unavailable/));
   assert.match(projectContext().textContent, /Status unavailable/);
-  assert.equal(document.querySelector('select[aria-label="Filter tasks by status"]').disabled, true);
-  assert.match(document.querySelector('select[aria-label="Filter tasks by status"] option').textContent, /—/, "unavailable mobile counts are not reported as zero");
+  assert.equal(document.querySelector('button[aria-label="Filter by statuses"]').disabled, true);
+
   await eventually(() => assert.match(document.body.textContent, /initial status connection lost/));
   await runNextPoll();
   await eventually(() => assert.equal(projectName().textContent, "customer-portal"));
-  assert.equal(projectContext().querySelector("details").textContent.includes(repo), true, "full configured path remains available as detail");
+  assert.equal(projectContext().querySelector('[role="tooltip"]').textContent.includes(repo), true, "full configured path remains available as detail");
   assert.match(document.body.textContent, /Synthetic installation demo — no model calls\./);
 
-  button("New task").click();
+  button("Start work").click();
   await eventually(() => assert.ok(document.querySelector("form")));
-  const repositoryOption = document.querySelector('select[required]:last-of-type option[value="app"]');
+  const repositoryOption = document.querySelector('#start-work-description');
   assert.ok(repositoryOption, "the configured repository option is present");
-  assert.equal(repositoryOption.textContent, "customer-portal");
+  assert.match(repositoryOption.textContent, /customer-portal/);
 
   const prompt = document.querySelector("textarea");
   const setTextareaValue = Object.getOwnPropertyDescriptor(dom.window.HTMLTextAreaElement.prototype, "value").set;
@@ -134,9 +135,9 @@ test("project identity stays visible, app keeps its submission key, and stale or
   assert.match(projectContext().textContent, /Status current/);
   window.location.hash = "#/runs";
   await eventually(() => assert.ok([...document.querySelectorAll("h2")].some((heading) => heading.textContent === "Tasks")));
-  button("New task").click();
-  await eventually(() => assert.equal(document.querySelector('select[required]:last-of-type option[value="app"]').textContent, "Project identity unavailable"));
-  document.querySelector('button[aria-label="Close new task form"]').click();
+  button("Start work").click();
+  await eventually(() => assert.match(document.querySelector('#start-work-description').textContent, /Project identity unavailable/));
+  document.querySelector('button[aria-label="Close start work form"]').click();
 
   await runNextPoll();
   await eventually(() => assert.equal(projectName().textContent, "customer-portal"));
@@ -147,7 +148,7 @@ test("project identity stays visible, app keeps its submission key, and stale or
   window.location.hash = "#/runs/job_created";
   await eventually(() => assert.ok(document.querySelector('[aria-label="Task metadata"]')));
   assert.match(projectContext().textContent,/Status stale/);
-  assert(projectContext().querySelector('details').textContent.includes(repo));
+  assert(projectContext().querySelector('[role="tooltip"]').textContent.includes(repo));
   await eventually(() => assert.match(document.body.textContent, /status connection lost/));
 
   async function runNextPoll() {

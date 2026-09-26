@@ -82,7 +82,7 @@ test('controller enforces host/origin/session checks and persists only bounded j
   await new Promise(resolve => controller.server.listen(0, '127.0.0.1', resolve)); t.after(() => controller.close());
   const origin = `http://127.0.0.1:${controller.server.address().port}`;
   const status = await (await fetch(origin + '/api/v1/status')).json();
-  assert.deepEqual(status.project_links, {repository:'https://github.com/example/actual-project',new_issue:'https://github.com/example/actual-project/issues/new',source:'configured_git_origin'});
+  assert.deepEqual(status.project_links, {repository:'https://github.com/example/actual-project',new_issue:'https://github.com/example/actual-project/issues/new/choose',source:'configured_git_origin'});
   const post = headers => fetch(origin + '/api/v1/jobs', { method: 'POST', headers: { 'Content-Type': 'application/json', ...headers }, body: JSON.stringify(task) });
   assert.equal((await post({})).status, 403);
   assert.equal((await post({ Authorization: 'Bearer synthetic-private-token', Origin: 'https://untrusted.invalid' })).status, 403);

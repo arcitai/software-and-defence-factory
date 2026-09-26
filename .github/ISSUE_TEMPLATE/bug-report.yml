@@ -1,0 +1,32 @@
+name: Bug report
+description: Report an observable failure in the CLI, dashboard or runtime.
+title: "[Bug] "
+labels: ["bug", "factory:triage"]
+body:
+  - type: markdown
+    attributes:
+      value: Do not include credentials, private incident evidence or security exploit details. Use the security reporting link for vulnerabilities.
+  - type: textarea
+    id: problem
+    attributes:
+      label: What happened, and what should happen?
+    validations:
+      required: true
+  - type: textarea
+    id: reproduce
+    attributes:
+      label: Steps to reproduce
+      description: Include a minimal example and sanitized error output.
+    validations:
+      required: true
+  - type: textarea
+    id: environment
+    attributes:
+      label: Environment
+      description: Factory version, OS, agent and whether this affects the CLI or dashboard. Do not paste factory.json or model.env.
+    validations:
+      required: true
+  - type: textarea
+    id: acceptance
+    attributes:
+      label: How can we verify the fix?

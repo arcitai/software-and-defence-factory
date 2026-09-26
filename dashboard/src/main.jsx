@@ -1,9 +1,11 @@
+import { RunComposer } from "./run-composer.jsx";
+import { Github } from "./github-icon.jsx";
 import { TaskDetail } from "./task-detail.jsx";
 import { State, TaskStateIcon, friendlyName, relativeTime, stateLabel } from "./task-display.jsx";
 import React, { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import { createRoot } from "react-dom/client";
 import "@fontsource-variable/geist";
-import { Activity, BarChart3, Bot, LayoutDashboard, Menu, Moon, Play, Plus, Search, Server, Sun, Table2, TimerReset, X, ExternalLink, GitBranch, CircleHelp, ChevronDown, CheckCircle2, CirclePause, Code2, ShieldCheck, CircleAlert } from "lucide-react";
+import { Activity, BarChart3, Bot, LayoutDashboard, Menu, Moon, Play, Plus, Search, Server, Sun, Table2, TimerReset, X, ExternalLink, CircleHelp, ChevronDown, CheckCircle2, CirclePause, Code2, ShieldCheck, CircleAlert } from "lucide-react";
 import { Analytics } from "@/analytics";
 import { CommandsPage, WorkersPage } from "@/catalog";
 import { Badge } from "@/components/ui/badge";
@@ -35,11 +37,11 @@ function App() {
   const [deletingJob, setDeletingJob] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [composerOpen, setComposerOpen] = useState(false);
-  const [filter, setFilter] = useState("all");
+  const [filter, setFilter] = useState([]);
   const [runsView, setRunsView] = useState(() => localStorage.getItem("factory-runs-view") === "board" ? "board" : "list");
   const [search, setSearch] = useState("");
-  const [workflowFilter, setWorkflowFilter] = useState("");
-  const [modelFilter, setModelFilter] = useState("");
+  const [workflowFilter, setWorkflowFilter] = useState([]);
+  const [modelFilter, setModelFilter] = useState([]);
   const [dark, setDark] = useState(() => localStorage.getItem("factory-theme") === "dark");
   const [route, setRoute] = useState(() => routeFromHash(window.location.hash));
   const view = route.view;
@@ -120,7 +122,7 @@ function App() {
   const facetJobs = useMemo(() => filterTaskFacets(matchingJobs, workflowFilter, modelFilter), [matchingJobs, workflowFilter, modelFilter]);
   const visibleJobs = useMemo(() => jobsByRecentActivity(filterJobs(facetJobs, filter)), [filter, facetJobs]);
   const facetCounts = useMemo(() => jobCounts(facetJobs), [facetJobs]);
-  const clearFilters = () => { setFilter("all"); setSearch(""); setWorkflowFilter(""); setModelFilter(""); };
+  const clearFilters = () => { setFilter([]); setSearch(""); setWorkflowFilter([]); setModelFilter([]); };
 
   const selectedJob = route.jobID ? status.jobs.find((job) => job.id === route.jobID) : undefined;
 
@@ -137,7 +139,7 @@ function App() {
       const response = await fetch("/api/v1/jobs", {
         method: "POST",
         headers: { "Content-Type": "application/json", "X-Factory-Session": status.csrf_token },
-        body: JSON.stringify({ repository, model: model.trim(), ...(selection.startsWith("workflow:") ? { workflow: selection.slice(9),title: title || prompt.trim().split("\n")[0].slice(0,100),source_url:sourceURL || (/^https?:\/\/\S+$/.test(prompt.trim()) ? prompt.trim() : ""),spec:/^https?:\/\/\S+$/.test(prompt.trim()) ? "" : prompt } : { command: selection.slice(8),prompt }) }),
+        body: JSON.stringify({ repository, model: model.trim(), ...(selection.startsWith("workflow:") ? { workflow: selection.slice(9),title: title || prompt.trim().split("\n")[0].slice(0,100),source_url:sourceURL,spec:prompt } : { command: selection.slice(8),prompt }) }),
       });
       if (!response.ok) {
         const body = await response.json().catch(() => ({}));
@@ -194,7 +196,7 @@ function App() {
     <div className="app-shell min-h-screen bg-background text-foreground md:flex">
       <aside className="app-sidebar sticky top-0 z-20 flex shrink-0 items-center border-b border-border bg-sidebar px-4 py-2 md:h-screen md:w-[203px] md:flex-col md:items-stretch md:border-b-0 md:border-r md:px-4 md:py-5">
         <div className="brand-lockup flex h-10 shrink-0 items-center gap-3 px-1">
-          <a href="#/runs" className="brand-wordmark" aria-label="Factory home">factory<span className="brand-period">.</span></a>
+          <a href="#/runs" className="brand-wordmark" aria-label="Factory home"><span>factory<span className="brand-period">.</span></span><span className="brand-descriptor">Software &amp; Defence</span></a>
         </div>
         <nav className="desktop-nav" aria-label="Primary">
           <PrimaryLinks view={view} count={statusLoaded ? counts.all : undefined} triggerCount={status.triggers?.length} />
@@ -216,7 +218,7 @@ function App() {
       </aside>
 
       <main className="workshop min-w-0 flex-1">
-        <ProjectContext identity={identity} links={status.project_links} compact={view === "task"} loaded={statusLoaded} error={statusError} showNewTask={view === "runs"} onNewTask={() => setComposerOpen(true)} />
+        <ProjectContext identity={identity} links={status.project_links} compact={view === "task"} loaded={statusLoaded} error={statusError} showNewTask={view === "runs"} />
         {view === "task" ? <TaskDetail identity={identity} links={status.project_links} navigation={visibleJobs.map(job => ({ id: job.id, title: jobDisplayTitle(job) }))} csrfToken={status.csrf_token} job={selectedJob} loaded={statusLoaded} error={statusError || taskActionError} deleting={deletingJob === route.jobID} onDelete={deleteJob} onWorkflowAction={workflowAction} />
           : view === "analytics" ? <Analytics jobs={status.jobs} workflows={status.workflows || []} loaded={statusLoaded} error={statusError} />
             : view === "workers" ? <WorkersPage workers={status.workers} identity={identity} loaded={statusLoaded} error={statusError} />
@@ -243,8 +245,8 @@ function App() {
                     runsView={runsView}
                     setRunsView={changeRunsView}
                     refresh={() => statusLoader.current.refresh()}
-                    openComposer={() => setComposerOpen(true)}
-                    composer={composerOpen && <RunComposer title={title} setTitle={setTitle} sourceURL={sourceURL} setSourceURL={setSourceURL} choices={choices} repositories={repositories} identity={identity} selection={selection} setSelection={setSelection} repository={repository} setRepository={setRepository} prompt={prompt} setPrompt={setPrompt} model={model} setModel={setModel} submitting={submitting} submit={submit} close={() => setComposerOpen(false)} />}
+                    openComposer={() => (setSubmitError(""), setComposerOpen(true))}
+                    composer={composerOpen && <RunComposer csrfToken={status.csrf_token} projectLinks={status.project_links} error={submitError} title={title} setTitle={setTitle} sourceURL={sourceURL} setSourceURL={setSourceURL} choices={choices} repositories={repositories} identity={identity} selection={selection} setSelection={setSelection} repository={repository} setRepository={setRepository} prompt={prompt} setPrompt={setPrompt} model={model} setModel={setModel} submitting={submitting} submit={submit} close={() => setComposerOpen(false)} />}
                   />}
       </main>
     </div>
@@ -264,7 +266,7 @@ function PrimaryLinks({ view, count, triggerCount, mobile = false }) {
   </>;
 }
 
-function ProjectContext({ identity, links, compact, loaded, error, showNewTask, onNewTask }) {
+function ProjectContext({ identity, links, compact, loaded, error, showNewTask }) {
   const title = identity?.name || (!loaded && !error ? "Loading configured project…" : "Project identity unavailable");
   const freshness = error ? loaded ? "Status stale" : "Status unavailable" : loaded ? "Status current" : "Loading status";
   return <header aria-label="Configured project" className={cn("project-header", compact && "project-header-compact")}>
@@ -273,16 +275,24 @@ function ProjectContext({ identity, links, compact, loaded, error, showNewTask, 
         <h1 title={identity?.name}>{title}</h1>
         <div className="project-context-line">
           <span className={cn("project-freshness", error && "is-stale")} title={error || undefined} aria-label={error ? `${freshness}: ${error}` : freshness} aria-live="polite"><span className="freshness-dot" />{freshness}</span>
-          {identity && <details className="project-path"><summary><CircleHelp size={13} />Project details</summary><div>{identity.path}</div></details>}
+          {identity && <ProjectTooltip path={identity.path} />}
         </div>
       </div>
       <div className="project-actions">
-        {links?.repository && <a className="repo-action" href={links.repository} target="_blank" rel="noreferrer"><GitBranch size={14} />View repo<ExternalLink size={12} /></a>}
-        {showNewTask && links?.new_issue && <a className="repo-action" href={links.new_issue} target="_blank" rel="noreferrer">New issue<ExternalLink size={12} /></a>}
-        {showNewTask && <Button className="project-new-task" onClick={onNewTask}><Plus className="size-4" />New task</Button>}
+        {links?.repository && <a className="repo-action" href={links.repository} target="_blank" rel="noreferrer"><Github size={14} />View repo<ExternalLink size={12} /></a>}
+        {showNewTask && links?.new_issue && <a className="repo-action new-issue-action" href={links.new_issue} target="_blank" rel="noreferrer"><Plus size={14} />New issue<ExternalLink size={12} /></a>}
+
       </div>
     </div>
   </header>;
+}
+
+function ProjectTooltip({ path }) {
+  const [open, setOpen] = useState(false), id = React.useId();
+  return <span className="project-path" onMouseEnter={() => setOpen(true)} onMouseLeave={() => setOpen(false)} onBlur={() => setOpen(false)} onKeyDown={event => { if (event.key === "Escape") setOpen(false); }}>
+    <button type="button" aria-label="Project details" aria-describedby={open ? id : undefined} onFocus={() => setOpen(true)} onClick={() => setOpen(true)}><CircleHelp size={13} />Project details</button>
+    <span id={id} role="tooltip" hidden={!open}>Configured project<br /><code>{path}</code></span>
+  </span>;
 }
 
 const filterOptions = [
@@ -308,7 +318,8 @@ function formatCount(counts, key) {
 }
 
 function RunsOverview({ visibleJobs, jobs, workflows, counts, loaded, statusError, submitError, synthetic, filter, setFilter, search, setSearch, workflowFilter, setWorkflowFilter, modelFilter, setModelFilter, clearFilters, runsView, setRunsView, refresh, openComposer, composer }) {
-  const filtering = filter !== "all" || Boolean(search.trim()) || Boolean(workflowFilter || modelFilter);
+  const filtering = filter.length > 0 || Boolean(search.trim()) || workflowFilter.length > 0 || modelFilter.length > 0;
+  const selectStatus = value => setFilter(value === "all" || filter.length === 1 && filter[0] === value ? [] : [value]);
   return <div className="runs-page">
     <div className="tasks-toolbar">
       <h2 className="sr-only">Tasks</h2>
@@ -326,26 +337,20 @@ function RunsOverview({ visibleJobs, jobs, workflows, counts, loaded, statusErro
       </div>
     </div>
     {synthetic && <p className="synthetic-note">Synthetic installation demo — no model calls.</p>}
-    {filtering && <div className="active-filters" role="status"><span>{visibleJobs.length} matching {visibleJobs.length === 1 ? "task" : "tasks"}{workflowFilter && ` · ${friendlyName(workflowFilter)}`}{modelFilter && ` · ${modelFilter}`}{filter !== "all" && ` · ${filterOptions.find(option => option.id === filter)?.label || filter}`}{search.trim() && ` · “${search.trim()}”`}</span><button onClick={clearFilters}>Clear filters<X size={12} /></button></div>}
+    <div className="active-filters"><span role="status">{loaded ? `${visibleJobs.length} ${filtering ? "matching " : ""}${visibleJobs.length === 1 ? "task" : "tasks"}` : "Loading tasks…"}</span><div className="task-list-actions"><button onClick={clearFilters} disabled={!filtering}>Clear filters<X size={12} /></button><button onClick={openComposer} disabled={!loaded || Boolean(statusError)}><Play size={12} />Start work</button></div></div>
 
     {composer}
-    {submitError && <div role="alert" className="form-error">{submitError}</div>}
+
     {statusError && loaded && <div className="stale-banner" role="status"><span><strong>Status stale.</strong> Showing the last available task data. {statusError}</span><Button variant="outline" size="sm" onClick={refresh}>Refresh</Button></div>}
 
-    <div className="run-workspace">
-      <TaskFilterRail counts={counts} loaded={loaded} filter={filter} setFilter={setFilter} />
+    <div className={cn("run-workspace", runsView === "board" && "is-board")}>
+      <TaskFilterRail counts={counts} loaded={loaded} filter={filter} setFilter={selectStatus} />
       <section className="task-results" aria-label="Task results">
-        <label className="mobile-filter">
-          <span>Filter tasks</span>
-          <select className="field-control" aria-label="Filter tasks by status" value={filter} onChange={(event) => setFilter(event.target.value)} disabled={!loaded}>
-            {filterOptions.map((option) => <option key={option.id} value={option.id}>{option.label} · {formatCount(loaded ? counts : {}, option.count)}</option>)}
-          </select>
-        </label>
         {!loaded && !statusError ? <TaskMessage kind="loading" title="Loading tasks" description="Checking the latest task state." />
           : !loaded && statusError ? <TaskMessage kind="error" title="Task status unavailable" description={statusError} action="Retry status" onAction={refresh} />
+            : runsView === "board" ? <RunBoard jobs={visibleJobs} />
             : !visibleJobs.length ? <EmptyRuns filtered={filtering} clearFilters={clearFilters} openComposer={openComposer} />
-              : runsView === "board" ? <RunBoard jobs={visibleJobs} />
-                : <div className="task-list" role="list">{visibleJobs.map((job) => <RunRow key={job.id} job={job} setFilter={setFilter} />)}</div>}
+                : <div className="task-list" role="list">{visibleJobs.map((job) => <RunRow key={job.id} job={job} setFilter={selectStatus} />)}</div>}
       </section>
     </div>
   </div>;
@@ -362,15 +367,15 @@ function TaskFilterRail({ counts, loaded, filter, setFilter }) {
   if (counts.other) groups.push({ id: "other", label: "Other state", count: "other", Icon: CircleHelp, tone: "neutral" });
   const [expanded, setExpanded] = useState({ in_progress: true, needs_attention: true });
   return <aside className="task-filter-rail" aria-label="Filter tasks by status">
-    <button className="all-tasks-filter" type="button" aria-pressed={filter === "all"} onClick={() => setFilter("all")} disabled={!loaded}><span>All tasks</span><span>{loaded ? counts.all : "—"}</span></button>
+    <button className="all-tasks-filter" type="button" aria-pressed={filter.length === 0} onClick={() => setFilter("all")} disabled={!loaded}><span>All tasks</span><span>{loaded ? counts.all : "—"}</span></button>
     {groups.map(({ Icon, ...group }) => <section className={`filter-card tone-${group.tone}`} key={group.id}>
-      <button className="filter-card-main" type="button" aria-pressed={filter === group.id} onClick={() => setFilter(group.id)} disabled={!loaded}>
+      <button className="filter-card-main" type="button" aria-pressed={filter.includes(group.id)} onClick={() => setFilter(group.id)} disabled={!loaded}>
         <span className="filter-card-heading"><Icon size={14} /><span>{group.label}</span><span className="filter-card-count">{loaded ? counts[group.count] : "—"}</span></span>
       </button>
       {group.children && <>
         <button className="filter-disclosure" aria-expanded={Boolean(expanded[group.id])} aria-controls={`filter-${group.id}`} onClick={() => setExpanded(value => ({ ...value, [group.id]: !value[group.id] }))}>{group.children.length} statuses<ChevronDown size={12} /></button>
         <div className="filter-card-children" id={`filter-${group.id}`} hidden={!expanded[group.id]}>
-          {group.children.map(([id, label, count]) => <button type="button" className="filter-substate" key={id} aria-pressed={filter === id} onClick={() => setFilter(id)} disabled={!loaded}><span>{label}</span><span>{formatCount(loaded ? counts : {}, count)}</span></button>)}
+          {group.children.map(([id, label, count]) => <button type="button" className="filter-substate" key={id} aria-pressed={filter.includes(id)} onClick={() => setFilter(id)} disabled={!loaded}><span>{label}</span><span>{formatCount(loaded ? counts : {}, count)}</span></button>)}
         </div>
       </>}
     </section>)}
@@ -385,32 +390,9 @@ function TaskMessage({ kind, title, description, action, onAction }) {
   </div>;
 }
 
-function RunComposer({ title,setTitle,sourceURL,setSourceURL,choices,repositories,identity,selection,setSelection,repository,setRepository,prompt,setPrompt,model,setModel,submitting,submit,close }) {
-  const specHintID=React.useId();
-  const isTask=selection.startsWith("workflow:");
-  const isDefence=selection === "workflow:defence";
-  return <Card className="overflow-hidden border-primary/25">
-    <div className="flex items-center justify-between border-b border-border px-5 py-3"><h2 className="text-sm font-semibold">New task</h2><Button variant="ghost" size="icon" onClick={close} aria-label="Close new task form"><X className="size-4" /></Button></div>
-    <form onSubmit={submit} className="space-y-5 p-5">
-      <label className="block space-y-2"><span className="text-sm font-medium">What do you want done?</span><textarea autoFocus aria-describedby={specHintID} className="field-control min-h-32 resize-y" value={prompt} onChange={e=>setPrompt(e.target.value)} placeholder={isDefence ? "Describe the incident, evidence and investigation boundary…" : "Describe a change or paste an issue link…"} required={!sourceURL.trim() || !isTask} /></label>
-      <p id={specHintID} className="text-xs leading-5 text-muted-foreground">{isDefence ? <>Describe a scoped security investigation. Defence produces findings and evidence; it does not authorize production changes. For validated incident evidence intake, use <code>incident --file</code> in the CLI. <a href="#/workflows" className="text-primary underline">Workflow contracts</a></> : isTask ? <>Describe what to build and what counts as done. A link on its own is saved as the source. <a href="#/workflows" className="text-primary underline">Workflow contracts</a></> : "Write the instructions for this command. Its prompt template receives them as {{task.spec}}."}</p>
-      <section className="text-sm">
-        <div className="grid gap-4 sm:grid-cols-2">
-          <label><span className="field-label">{isTask ? "Workflow" : "Command"}</span><select className="field-control" value={selection} onChange={e=>setSelection(e.target.value)} required>{choices.map(c=><option key={c.value} value={c.value}>{c.label}</option>)}</select></label>
-          <label><span className="field-label">Repository</span><select className="field-control" value={repository} onChange={e=>setRepository(e.target.value)} required>{!repositories.length && <option value="">No repositories available</option>}{repositories.map(r=><option key={r} value={r}>{repositoryLabel(r,identity)}</option>)}</select></label>
-          {isTask && <><label><span className="field-label">Title · optional</span><input className="field-control" value={title} onChange={e=>setTitle(e.target.value)} maxLength={512} placeholder="From your instructions by default" /><span className="mt-1 block text-xs text-muted-foreground">Shown in the task list and board</span></label><label><span className="field-label">Source link · optional</span><input type="url" className="field-control" value={sourceURL} onChange={e=>setSourceURL(e.target.value)} placeholder="https://github.com/…" /><span className="mt-1 block text-xs text-muted-foreground">Preserved with the task requirements</span></label></>}
-          <label><span className="field-label">Model · optional</span><input className="field-control" value={model} onChange={e=>setModel(e.target.value)} maxLength={128} placeholder="Workflow default" /></label>
-        </div>
-      </section>
-      {!choices.length && <p role="alert" className="text-sm text-danger">Configure a workflow before starting a task.</p>}
-      <div className="flex justify-end"><Button disabled={submitting || !selection || !repository}>{submitting ? "Starting…" : "Start task"}<Play className="size-3.5" /></Button></div>
-    </form>
-  </Card>;
-}
-
 function RunBoard({ jobs }) {
   const groupedJobs = groupJobsByBoardColumn(jobs);
-  return <div className="grid min-w-0 gap-4 md:grid-cols-2 xl:grid-cols-4">
+  return <div className="kanban-scroll" role="region" aria-label="Task board — scroll horizontally" tabIndex={0}><div className="kanban-board">
     {boardColumns.filter((column) => column.id !== "other" || groupedJobs.other.length > 0).map((column) => <section key={column.id} className="run-column min-w-0 border border-border bg-muted/20" aria-labelledby={`board-${column.id}`}>
       <header className="flex items-center justify-between gap-3 border-b border-border px-3 py-2.5">
         <div className="min-w-0"><h2 id={`board-${column.id}`} className="text-sm font-semibold">{column.title}</h2><p className="break-words text-xs text-muted-foreground">{column.description}</p></div>
@@ -420,7 +402,7 @@ function RunBoard({ jobs }) {
         {groupedJobs[column.id].length ? groupedJobs[column.id].map((job) => <RunCard key={job.id} job={job} />) : <p className="px-2 py-8 text-center text-xs text-muted-foreground">No runs</p>}
       </div>
     </section>)}
-  </div>;
+  </div></div>;
 }
 
 function RunCard({ job }) {
@@ -455,7 +437,7 @@ function EmptyRuns({ filtered, clearFilters, openComposer }) {
   return <div className="empty-tasks" role="status">
     <h3>{filtered ? "No matching tasks" : "No tasks yet"}</h3>
     <p>{filtered ? "Try another state or search term." : "Describe the work to start a task in this project."}</p>
-    {filtered ? <Button variant="outline" size="sm" onClick={clearFilters}>Clear filters</Button> : <Button variant="outline" size="sm" onClick={openComposer}><Plus className="size-3.5" />New task</Button>}
+    {filtered ? <Button variant="outline" size="sm" onClick={clearFilters}>Clear filters</Button> : <Button variant="outline" size="sm" onClick={openComposer}><Plus className="size-3.5" />Start work</Button>}
   </div>;
 }
 

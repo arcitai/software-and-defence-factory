@@ -10,13 +10,13 @@ shell endpoint or a second scheduler.
 | Capability | CLI | Shared API | Dashboard | Remaining work |
 | --- | --- | --- | --- | --- |
 | Project/queue/attempt state | `status` JSON | `GET /api/v1/status` | Project, tasks, details/history | Stable versioned agent result/error contract |
-| Submit software text | `run --file` | `POST /api/v1/jobs` | New task | Equivalent title/source/model options and validation |
-| Import a GitHub issue | `run --issue` via operator `gh` | No issue import/list endpoint | Text/link input only | Backlog, explicit admission and issue/job identity; no implicit polling |
+| Submit software text | `run --file` | `POST /api/v1/jobs` | Start work modal | Equivalent title/source/model options and validation |
+| Import a GitHub issue | `run --issue` via operator `gh` | Authenticated `POST /api/v1/issues/preview` using the same reader | Import, review and explicitly start | Backlog/listing, stronger issue/job identity and optional qualified triggers remain; no implicit polling |
 | Cancel/retry/approve | Commands | Job action endpoints with current run ID | Task controls | JSON action results and consistent needs-attention outcomes |
 | Request changes | `revise --file` | `request_changes` action | Feedback form | JSON action result; retain shared stale-action guards |
 | Remove a stopped task | No command | `DELETE /api/v1/jobs/:id` | Remove action | Add CLI; keep existing recoverability/history semantics |
 | Evidence list/read/download | No command | Authenticated artifact routes | Files/preview/download | Add CLI with matching access and size/path rules |
-| Workflow definitions | No command | `GET /api/v1/definitions` | Workflows | Add structured CLI inspection |
+| Workflow definitions and packaged skills | `workflows` JSON (also while stopped) | `GET /api/v1/definitions` | Execution, Skills and Configuration | Shared read-only catalog; future editing must preserve common policy/gates |
 | Project repository links | Validated links in `status` | `project_links` from configured Git origin | View repo / New issue | Links only; no issue synchronization or creation API |
 | Recorded token usage | Per-attempt `usage` and `token_usage` in `status` | Same status records | Analytics, task rows, metadata/history | No billing estimate; partial/unknown coverage stays explicit |
 | Analytics/filtering | Raw status available | Source queue records | Derived views | Expose equivalent queries/summaries without inventing usage data |

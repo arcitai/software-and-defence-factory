@@ -360,3 +360,9 @@ Independent integrated review also closed incomplete-turn coverage and hidden
 compact-header context: a later unfinished/failed Codex turn makes counts
 partial, and task detail retains the project path and explicit status freshness.
 Regression tests cover these paths; the compact header is rechecked visually.
+
+## Workbench candidate (#47)
+
+Automated checks cover one workflow/skill catalog shared by CLI, controller and queue; non-Codex configuration, generic host metadata, authenticated and origin-bounded issue reads, modal import/preview/submission, filter intersection/navigation and unchanged telemetry/recovery contracts. UI interaction tests use jsdom and do not establish rendered layout, native dialog focus containment or scrollbar behavior.
+
+Desktop/narrow browser acceptance and independent candidate review remain required before publication/adoption. The operator browser connector was unavailable during initial implementation; no new visual acceptance is claimed. Live issue import must also be read back on the controller host; unit fixtures are not provider proof.

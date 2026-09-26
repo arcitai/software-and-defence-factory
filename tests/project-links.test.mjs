@@ -8,7 +8,7 @@ import { githubProjectLinks, readProjectLinks } from '../factory/project-links.m
 
 test('project links use the exact configured GitHub origin without credentials or transport syntax', () => {
   for (const remote of ['https://github.com/team/project.git', 'git@github.com:team/project.git', 'ssh://git@github.com/team/project', 'https://github.com/team/project/']) {
-    assert.deepEqual(githubProjectLinks(remote), { repository: 'https://github.com/team/project', new_issue: 'https://github.com/team/project/issues/new', source: 'configured_git_origin' });
+    assert.deepEqual(githubProjectLinks(remote), { repository: 'https://github.com/team/project', new_issue: 'https://github.com/team/project/issues/new/choose', source: 'configured_git_origin' });
   }
   for (const remote of ['https://secret@github.com/team/project', 'https://github.com.evil.test/team/project', 'https://github.com/team/project?token=secret', 'file:///team/project', '../team/project', 'https://github.com/team/..', 'https://github.com/team/project/issues/1', 'javascript:alert(1)', 'https://gitlab.com/team/project']) assert.equal(githubProjectLinks(remote), undefined, remote);
 });
