@@ -68,7 +68,11 @@ async function qualifyRetainedSource() {
     admitted=await wait(job=>job.state==='succeeded');
     const accepted=json(join(folder,'accepted.json'));
     assert.equal(accepted.source_admission.resolved_sha,sourceA);
-    assert.match(readFileSync(join(folder,'handoff.md'),'utf8'),new RegExp(sourceA));
+    const handoffRun=admitted.runs.find(run=>run.command==='handoff');
+    assert(handoffRun,'Expected a native handoff run after approval');
+    assert.equal(handoffRun.state,'succeeded');
+    assert.equal(handoffRun.outcome,'complete');
+    assert.match(readFileSync(join(folder,'artifacts',handoffRun.id,'handoff.md'),'utf8'),new RegExp(sourceA));
     assert.deepEqual(sourceFixtureOperatorState(repo),operator);
     assert.equal(readFileSync(join(repo,'base-id.txt'),'utf8'),'B\n');
     record('source admission: real Docker build retry after restart, ref deletion and GC uses retained A; evidence and operator checkout agree');
