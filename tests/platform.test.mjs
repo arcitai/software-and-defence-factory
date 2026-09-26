@@ -56,6 +56,7 @@ test('init preserves app and refuses to overwrite an existing installation',t=>{
   const args=['bin/software-defence-factory.mjs','init','--state',state,'--repo',repo,'--agent','mock','--check','true'];
   const options={env:{...process.env,XDG_STATE_HOME:join(parent,'private-state')}};
   run(process.execPath,args,options);const config=readFileSync(join(state,'factory.json'),'utf8');
+  assert.equal(JSON.parse(config).sourceRef,'HEAD');
   assert.throws(()=>run(process.execPath,args,options),/Already configured/);
   assert.equal(readFileSync(join(state,'factory.json'),'utf8'),config);assert.equal(run('git',['-C',repo,'status','--porcelain']),before);
   run('git',['-C',repo,'remote','add','origin','https://github.com/example/authorized.git']);

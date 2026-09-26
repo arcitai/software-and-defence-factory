@@ -403,9 +403,9 @@ function TaskActions({ job, result, onAction }) {
       setBusy(false);
     }
   };
-  const retry = ["failed", "interrupted", "cancelled"].includes(
-    job.state,
-  );
+  const hasRetainedSource = job.source_admission?.status === "retained";
+  const retry = hasRetainedSource && ["failed", "interrupted", "cancelled"].includes(job.state);
+  const legacyRecovery = !hasRetainedSource && ["blocked", "failed", "interrupted", "cancelled"].includes(job.state);
   const canRevise = job.can_request_changes ?? (job.state === "awaiting_approval" && job.workflow?.name === "software");
   return (
     <div className="space-y-3">
@@ -466,13 +466,14 @@ function TaskActions({ job, result, onAction }) {
           )}
         </div>
       )}
-      {job.state === "blocked" && (
+      {job.state === "blocked" && hasRetainedSource && (
         <p className="text-sm text-muted-foreground">
           Resolve the blocker, then cancel this work to reconcile the worker before retrying.
         </p>
       )}
+      {legacyRecovery && <p className="text-sm text-muted-foreground">This legacy job has no admission-time source record and cannot be retried or revised. Submit a replacement to capture the configured source before work starts.</p>}
       {job.state === "timed_out" && <p className="text-sm text-muted-foreground">Inspect the timeout evidence and recovery options. This state cannot be retried directly.</p>}
-      {["interrupted", "cancelled"].includes(job.state) && (
+      {hasRetainedSource && ["interrupted", "cancelled"].includes(job.state) && (
         <label className="flex items-start gap-2 text-sm">
           <input
             type="checkbox"

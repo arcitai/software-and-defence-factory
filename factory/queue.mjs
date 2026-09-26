@@ -136,20 +136,38 @@ export class JobQueue {
       if (typeof input.feedback !== 'string' || !input.feedback.trim() || input.feedback.length > 4000) throw new QueueError('Provide revision feedback under 4000 characters', 400);
       const revisedPrompt = job.prompt + `\n\nRequested revision: ${input.feedback}`;
       if (Buffer.byteLength(revisedPrompt) > 240000) throw new QueueError('Accumulated revision instructions exceed 240 KB; create a bounded continuation task', 400);
-      const nextSource = input.source_ref === undefined ? job.source_admission
-        : this.sourceAdmission.admit(job.id, input.source_ref, job.source_admission.repository_identity);
-      if (input.source_ref === undefined) this.sourceAdmission.validate?.(job.id, job.source_admission);
-      await this.reconcile(jobId, 'build');
+      const explicitSource = input.source_ref !== undefined;
+      if (typeof this.sourceAdmission?.validate !== 'function') throw new QueueError('Retained source validation is unavailable; this job was not revised.', 503);
+      const admittedSource = explicitSource
+        ? this.sourceAdmission.admit(job.id, input.source_ref, job.source_admission.repository_identity)
+        : job.source_admission;
+      if (!explicitSource) this.sourceAdmission.validate(job.id, job.source_admission);
+      const changedBase = admittedSource.resolved_sha !== job.source_admission.resolved_sha;
+      let repairRetainedSource = false;
+      if (explicitSource && !changedBase) {
+        try { this.sourceAdmission.validate(job.id, job.source_admission); }
+        catch { repairRetainedSource = true; }
+      }
+      const replaceSourceRecord = changedBase || repairRetainedSource;
+      const nextSource = replaceSourceRecord ? admittedSource : job.source_admission;
+      try { await this.reconcile(jobId, 'build'); }
+      catch (error) {
+        if (explicitSource) this.sourceAdmission.release?.(job.id, admittedSource);
+        throw error;
+      }
+      if (explicitSource && !replaceSourceRecord) this.sourceAdmission.release?.(job.id, admittedSource);
       // A failed review stays failed. Revision feedback must not rewrite its result.
-      const changedBase = nextSource.resolved_sha !== job.source_admission.resolved_sha;
-      attempt.revision = { feedback: input.feedback, requested_at: now(), ...(changedBase ? { previous_source_sha: job.source_admission.resolved_sha, new_source_sha: nextSource.resolved_sha } : {}) };
+      attempt.revision = { feedback: input.feedback, requested_at: now(), ...(explicitSource ? { requested_source_ref: admittedSource.requested_ref, resolved_source_sha: admittedSource.resolved_sha } : {}), ...(changedBase ? { previous_source_sha: job.source_admission.resolved_sha, new_source_sha: nextSource.resolved_sha } : {}) };
       if (job.state === 'awaiting_approval') Object.assign(attempt, { state: 'succeeded', outcome: 'changes_requested', summary: input.feedback, completed_at: now(), duration_millis: 0 });
-      if (changedBase) {
+      if (replaceSourceRecord) {
         job.source_history = [...(job.source_history || []), job.source_admission];
         job.source_admission = nextSource;
       }
       job.prompt = revisedPrompt;
-      job.workflow.current_step = 0; job.state = 'queued'; this.save(job); this.schedule();
+      job.workflow.current_step = 0; job.state = 'queued';
+      try { this.save(job); }
+      catch (error) { if (replaceSourceRecord) this.sourceAdmission.release?.(job.id, admittedSource); throw error; }
+      this.schedule();
     } else if (action === 'cancel') {
       if (!['queued', 'running', 'awaiting_approval', 'blocked', 'interrupted'].includes(job.state)) throw new QueueError('Job is already stopped');
       job.state = 'cancelling'; this.save(job);
@@ -160,9 +178,10 @@ export class JobQueue {
       if (attempt) Object.assign(attempt, { state: 'cancelled', completed_at: now() });
       this.save(job);
     } else if (action === 'retry') {
-      if (!['failed', 'interrupted', 'cancelled'].includes(job.state)) throw new QueueError('Only a stopped attempt can be retried');
       if (job.source_admission?.status !== 'retained') throw new QueueError('This legacy job has no admission-time source revision and cannot be retried. Submit a replacement job to capture a source revision explicitly.');
-      this.sourceAdmission?.validate?.(job.id, job.source_admission);
+      if (!['failed', 'interrupted', 'cancelled'].includes(job.state)) throw new QueueError('Only a stopped attempt can be retried');
+      if (typeof this.sourceAdmission?.validate !== 'function') throw new QueueError('Retained source validation is unavailable; this job was not retried.', 503);
+      this.sourceAdmission.validate(job.id, job.source_admission);
       await this.reconcile(jobId, attempt?.command);
       job.state = 'queued'; this.save(job); this.schedule();
     } else throw new QueueError('Unknown action', 404);

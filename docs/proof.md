@@ -468,3 +468,47 @@ This release does not qualify another live issue provider, external schedule
 discovery, hosted authentication or live model execution. Executor/isolation code
 is unchanged; the existing 0.5.0 Docker qualification remains the execution proof.
 SQLite receipts are not a mirrored backlog or persistent unsent drafts.
+
+## 0.7.0 candidate — immutable source admission (#28)
+
+Admission resolves the configured or explicit ref from the configured local Git
+repository, verifies a private per-job bare object store, and records the
+repository identity, requested ref and resolved SHA in protected job metadata
+before acknowledging the job. Build and retry restore that SHA. Revision actions
+preserve it unless the operator supplies a deliberate new ref; the previous
+source record and evidence remain in history. Legacy jobs stay labeled
+**Not recorded (legacy/unknown)** and cannot retry or request implementation
+changes without a replacement admission.
+
+`node --test tests/source-admission.test.mjs` passed seven focused local-Git/queue
+regressions, including admission at A before the execution pump, B movement,
+source-ref deletion and garbage collection, SQLite restart/build retry, missing
+objects, repository isolation, revision with a new base, same-revision repair of
+a missing retained copy, and unchanged operator checkout. `npm ci --ignore-scripts`,
+`npm run build:dashboard` and `npm run check` passed on this candidate. The full check reported 83
+runtime/package tests and 51 dashboard tests.
+
+The real Docker qualification recipe is included in
+`scripts/probe-platform.mjs`, reached through `software-defence-factory qualify
+--state PATH`. It adds an isolated synthetic source repository, intentionally
+fails the first build, moves and removes the original ref, prunes its original
+objects, restarts the controller, then retries from the retained commit. It
+checks the candidate base, status/evidence SHA, approval handoff and untouched
+operator checkout. Existing candidate-change, policy-change, approval, retry,
+cancellation and isolation paths remain in that probe.
+
+External operator proof is pending. Run the candidate on a dedicated synthetic
+Docker installation only; never use an application state:
+
+```sh
+SDF_BOOTSTRAPPED=1 node bin/software-defence-factory.mjs demo --state /private/state/sdf-0.7.0-proof
+# Complete and approve the initial synthetic sample task in the dashboard.
+SDF_BOOTSTRAPPED=1 node bin/software-defence-factory.mjs qualify --state /private/state/sdf-0.7.0-proof
+```
+
+The lead should retain `qualification.json` and the nested
+`source-admission-*` fixture evidence. Rendered UI inspection is also pending:
+inspect the built candidate at desktop and narrow widths, in light/dark themes,
+including source selection, resolved-source details and the revision form. The
+implementation container has no Docker or browser executable, so neither proof
+is claimed as passed here.

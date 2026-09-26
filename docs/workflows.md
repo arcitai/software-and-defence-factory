@@ -39,6 +39,12 @@ Conflicting labels request a choice. This is a simple editable suggestion, not a
 model assessment or permission to act. A security code fix can remain Software.
 Both sources support either type; Defence still produces a private draft.
 
+The **Source ref** option applies to the configured local Git repository. Leave
+it blank to use the configured default ref, or enter a branch, tag, `HEAD` or
+full commit SHA. The controller resolves it and retains the commit before
+admitting the job; the task and any linked issue cannot select another
+repository. Status and task details show the requested ref and resolved SHA.
+
 Repository templates are read from `.github/ISSUE_TEMPLATE` on the default
 branch through GitHub's API. Markdown templates and YAML markdown, input,
 textarea, dropdown (including multiple choices) and checkboxes are supported.
@@ -75,7 +81,7 @@ software-defence-factory issue submissions --state PATH
 software-defence-factory issue recover --state PATH --key release-board-fix-01
 # Explicit execution, independent of creation:
 software-defence-factory issue start --state PATH --url URL --workflow software
-software-defence-factory issue start --state PATH --file brief.md --title "Investigate supplied evidence" --workflow defence
+software-defence-factory issue start --state PATH --file brief.md --title "Investigate supplied evidence" --workflow defence --source-ref main
 ```
 
 `answers.json` contains `{"title":"Fix the board","answers":{"problem":"..."}}`;
@@ -84,6 +90,10 @@ arrays of exact option labels. `issue create` now publishes only; migrate 0.5.1
 execution scripts to `issue start`. Legacy `run` remains compatible. Typed private
 incident admission remains `incident --file`, distinct from a generic Defence brief.
 `--source github` remains an alias for repository listing; `--github URL` remains a compatibility alias for `--url URL`.
+`run` and `issue start` accept the same `--source-ref`; `init --source-ref` sets
+the configured default. A revision keeps the admitted SHA unless an explicit
+new ref is supplied. Every revision gets a fresh implementation, check and
+review sequence while earlier source records and evidence remain available.
 
 Provider selection and unknown-host behavior are documented in [integrations](integrations.md).
 View repo uses the browser's own login. Factory's provider uses the controller

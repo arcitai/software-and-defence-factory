@@ -76,4 +76,9 @@ test('failed review offers explicit revision, preserves denied/stale feedback, a
   await act(()=>button('Approve and start handoff').click());
   assert.equal(captured[1],'approve','approval is the explicit action that starts handoff');
   assert(![...document.querySelectorAll('button')].some(b=>b.textContent.trim()==='Open PR'));
+
+  job.state='failed';delete job.source_admission;job.can_request_changes=false;await render();
+  assert.match(document.body.textContent,/legacy job has no admission-time source record and cannot be retried or revised/);
+  assert(![...document.querySelectorAll('button')].some(b=>b.textContent.trim().startsWith('Retry ')));
+  assert(!button('Request changes'));
 });

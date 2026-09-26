@@ -5,7 +5,10 @@ import { run } from './lib.mjs';
 
 const REF_NAME = 'refs/heads/factory-source';
 const GIT_ENV = { ...process.env, GIT_CONFIG_NOSYSTEM: '1', GIT_CONFIG_GLOBAL: '/dev/null', GIT_TERMINAL_PROMPT: '0' };
-for (const key of ['GIT_DIR', 'GIT_WORK_TREE', 'GIT_INDEX_FILE', 'GIT_COMMON_DIR', 'GIT_OBJECT_DIRECTORY', 'GIT_ALTERNATE_OBJECT_DIRECTORIES', 'GIT_NAMESPACE']) delete GIT_ENV[key];
+for (const key of Object.keys(GIT_ENV)) {
+  if (['GIT_DIR', 'GIT_WORK_TREE', 'GIT_INDEX_FILE', 'GIT_COMMON_DIR', 'GIT_OBJECT_DIRECTORY', 'GIT_ALTERNATE_OBJECT_DIRECTORIES', 'GIT_NAMESPACE', 'GIT_CONFIG_PARAMETERS'].includes(key)
+    || /^GIT_CONFIG_(?:COUNT|KEY_\d+|VALUE_\d+)$/.test(key)) delete GIT_ENV[key];
+}
 
 export class SourceAdmissionError extends Error {
   constructor(message, status = 409) { super(message); this.status = status; }
@@ -66,8 +69,12 @@ function sourceLocation(state, jobId, record) {
   validJobId(jobId);
   if (!record || record.status !== 'retained' || record.version !== 1
     || !/^sources\/retained_[a-f0-9]{24}\.git$/.test(record.retained_repo || '')
+    || !['sha1', 'sha256'].includes(record.object_format)
     || !objectId(record.resolved_sha, record.object_format)
-    || !/^sha256:[a-f0-9]{64}$/.test(record.repository_identity || ''))
+    || !/^sha256:[a-f0-9]{64}$/.test(record.repository_identity || '')
+    || !validRequestedRef(record.requested_ref)
+    || !['configured', 'explicit'].includes(record.ref_source)
+    || record.retained_ref !== REF_NAME)
     throw new SourceAdmissionError('This job has no usable retained source record.', 409);
   const folder = join(state, 'jobs', jobId), sources = join(folder, 'sources');
   for (const directory of [join(state, 'jobs'), folder, sources]) {
@@ -108,7 +115,7 @@ export class SourceAdmissionStore {
   constructor(state, repository, defaultRef = 'HEAD') {
     this.state = state;
     this.repository = repository;
-    this.defaultRef = defaultRef || 'HEAD';
+    this.defaultRef = defaultRef ?? 'HEAD';
   }
 
   admit(jobId, requestedRef, expectedRepositoryIdentity) {
@@ -136,8 +143,7 @@ export class SourceAdmissionStore {
     const retained = join(sources, `retained_${nonce}.git`);
     const retainedRelative = relative(jobDir, retained).split(sep).join('/');
     try {
-      const init = run('git', ['init', '--quiet', '--bare', `--object-format=${identity.object_format}`, temporary], { env: GIT_ENV });
-      void init;
+      run('git', ['init', '--quiet', '--bare', `--object-format=${identity.object_format}`, temporary], { env: GIT_ENV });
       git(temporary, 'config', 'gc.auto', '0');
       git(temporary, 'fetch', '--no-tags', '--', repository, `${sha}:${REF_NAME}`);
       if (git(temporary, 'rev-parse', '--verify', `${REF_NAME}^{commit}`).toLowerCase() !== sha)

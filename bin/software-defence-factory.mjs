@@ -32,7 +32,7 @@ let state = resolve(flags.state || DEFAULT_STATE);
 if(existsSync(state))state=realpathSync(state);
 const alive = pid => { try { process.kill(pid,0); return true; } catch(error) { if(error.code === 'ESRCH')return false; throw error; } };
 
-function init(repo, harness='codex', check='', port=7331) {
+function init(repo, harness='codex', check='', port=7331, sourceRef='HEAD') {
   repo=realpathSync(resolve(repo));
   if (existsSync(join(state,'factory.json'))) throw new Error('Already configured; edit the private factory.json explicitly or choose another --state');
   if ([repo,state,ROOT].some(p=>/[,\n\r]/.test(p))) throw new Error('Paths cannot contain commas or line breaks');
@@ -43,7 +43,7 @@ function init(repo, harness='codex', check='', port=7331) {
   if (!argv) throw new Error('Select codex, pi, mock or custom with --command-json');
   if (flags.model && ['codex','pi'].includes(harness)) argv.splice(harness==='codex'?argv.length-1:argv.length,0,'--model',flags.model);
   mkdirSync(state,{recursive:true,mode:0o700});state=realpathSync(state);chmodSync(state,0o700);
-  save(join(state,'factory.json'),{version:1,repo,sourceRef:'HEAD',harness,command:argv,check,port:Number(port),image:PINS.jobImage,network:harness==='mock'?'none':'bridge',timeoutSeconds:1800,memoryMiB:2048,model:flags.model || null,
+  save(join(state,'factory.json'),{version:1,repo,sourceRef,harness,command:argv,check,port:Number(port),image:PINS.jobImage,network:harness==='mock'?'none':'bridge',timeoutSeconds:1800,memoryMiB:2048,model:flags.model || null,
     scope:{project:'pilot',service:'app',environment:'test',owner:'operator'}});
   configAt(state);
   writeFileSync(join(state,'worker.token'),randomBytes(32).toString('hex')+'\n',{mode:0o600});
@@ -123,7 +123,7 @@ async function jobAction(action) {
 }
 
 try {
-  if(command==='init') { if(!flags.repo)throw new Error('init requires --repo /path/to/existing/git/repo');if(flags.harness && flags.agent && flags.harness !== flags.agent)throw new Error('--harness conflicts with legacy --agent');init(flags.repo,flags.harness || flags.agent,flags.check,flags.port); }
+  if(command==='init') { if(!flags.repo)throw new Error('init requires --repo /path/to/existing/git/repo');if(flags.harness && flags.agent && flags.harness !== flags.agent)throw new Error('--harness conflicts with legacy --agent');init(flags.repo,flags.harness || flags.agent,flags.check,flags.port,flags['source-ref'] || 'HEAD'); }
   else if(command==='install')await withServiceOperation('install',install);
   else if(command==='up') { if(hasService(state))await manageService('controller','start',state);else await withServiceOperation('up',up); }
   else if(command==='stop') { if(hasService(state))await manageService('controller','stop',state);else await withServiceOperation('stop',stop); }
@@ -243,7 +243,7 @@ try {
   kit --output NEW_DIRECTORY               Export the portable method without a runtime
   demo                                    Install and run a synthetic sample (no model key)
   qualify --state PATH                    Exercise recovery and isolation with a stopped demo job
-  init --repo PATH --harness codex|pi|custom --check "npm ci && npm test"
+  init --repo PATH --harness codex|pi|custom --check "npm ci && npm test" [--source-ref REF]
   install [--image LOCAL_REF]             Build the standard image, or select an existing local image
   doctor | up | status | stop              Inspect / operate your private installation
   foundation                              Read the operator setup skill; no installation required

@@ -36,10 +36,10 @@ test('npm artifact installs without a checkout, keeps state outside the package,
   const repo = join(dir, 'app'); mkdirSync(repo);
   command('git', ['init', '-q', repo]);
   command('git', ['-C', repo, '-c', 'user.name=Fixture', '-c', 'user.email=fixture@localhost', 'commit', '--allow-empty', '-qm', 'fixture']);
-  run(['init', '--repo', repo, '--agent', 'mock', '--check', 'true']);
+  run(['init', '--repo', repo, '--agent', 'mock', '--check', 'true', '--source-ref', 'main']);
   const state = join(environment.XDG_STATE_HOME, 'software-defence-factory/platform');
   const configured=JSON.parse(readFileSync(join(state, 'factory.json')));
-  assert.equal(configured.repo,realpathSync(repo));assert.equal(configured.harness,'mock');assert.equal(configured.agent,undefined);
+  assert.equal(configured.repo,realpathSync(repo));assert.equal(configured.harness,'mock');assert.equal(configured.sourceRef,'main');assert.equal(configured.agent,undefined);
   assert.equal(JSON.parse(run(['definition'])).configuration.harness,'mock');
   const secondState=join(dir,'second-state');
   run(['init','--repo',repo,'--harness','pi','--state',secondState]);
